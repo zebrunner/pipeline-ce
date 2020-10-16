@@ -1,7 +1,7 @@
-import com.qaprosoft.jenkins.Logger
+import com.zebrunner.jenkins.Logger
 import groovy.transform.Field
 
-import static com.qaprosoft.jenkins.pipeline.Executor.*
+import static com.zebrunner.jenkins.pipeline.Executor.*
 
 @Field final Logger logger = new Logger(this)
 @Field final String MAVEN_TOOL = 'M3'
