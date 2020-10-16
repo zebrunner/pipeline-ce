@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.jobdsl.factory.pipeline
+package com.zebrunner.jenkins.jobdsl.factory.pipeline
 
 import groovy.transform.InheritConstructors
 import org.testng.xml.XmlSuite

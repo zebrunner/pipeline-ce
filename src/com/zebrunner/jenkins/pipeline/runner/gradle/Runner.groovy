@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner.gradle
+package com.zebrunner.jenkins.pipeline.runner.gradle
 
 import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.pipeline.runner.AbstractRunner

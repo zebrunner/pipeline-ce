@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline
+package com.zebrunner.jenkins.pipeline
 
 import com.zebrunner.jenkins.BaseObject
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory

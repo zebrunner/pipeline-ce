@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins
+package com.zebrunner.jenkins
 
 import com.zebrunner.jenkins.pipeline.Configuration
 import com.zebrunner.jenkins.pipeline.tools.scm.ISCM

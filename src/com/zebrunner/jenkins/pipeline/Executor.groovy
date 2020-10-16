@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline
+package com.zebrunner.jenkins.pipeline
 
 import java.util.regex.Pattern
 import java.util.regex.Matcher

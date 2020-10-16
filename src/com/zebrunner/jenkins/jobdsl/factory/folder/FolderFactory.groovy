@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.jobdsl.factory.folder
+package com.zebrunner.jenkins.jobdsl.factory.folder
 
 import com.zebrunner.jenkins.jobdsl.factory.DslFactory
 import groovy.transform.InheritConstructors

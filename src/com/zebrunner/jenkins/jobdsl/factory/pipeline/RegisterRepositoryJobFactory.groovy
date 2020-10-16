@@ -5,7 +5,7 @@ import org.testng.xml.XmlSuite
 import groovy.transform.InheritConstructors
 
 @InheritConstructors
-public class RegisterRepositoryJobFactory extecom.zebrunnernds PipelineFactory {
+public class RegisterRepositoryJobFactory extends PipelineFactory {
     public RegisterRepositoryJobFactory(folder, name, jobDesc) {
         this.folder = folder
         this.name = name

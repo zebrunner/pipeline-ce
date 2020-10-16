@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins
+package com.zebrunner.jenkins
 
 class Logger {
 

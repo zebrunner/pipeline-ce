@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.tools.scm
+package com.zebrunner.jenkins.pipeline.tools.scm
 
 public interface ISCM {
 

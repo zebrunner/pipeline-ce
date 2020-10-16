@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner.sbt
+package com.zebrunner.jenkins.pipeline.runner.sbt
 
 import com.zebrunner.jenkins.Utils
 import com.zebrunner.jenkins.pipeline.Configuration

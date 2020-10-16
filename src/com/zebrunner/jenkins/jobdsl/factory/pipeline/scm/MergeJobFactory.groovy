@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.jobdsl.factory.pipeline.scm
+package com.zebrunner.jenkins.jobdsl.factory.pipeline.scm
 
 import groovy.transform.InheritConstructors
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory

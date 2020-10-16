@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner.docker
+package com.zebrunner.jenkins.pipeline.runner.docker
 
 import com.zebrunner.jenkins.pipeline.runner.AbstractRunner
 import com.zebrunner.jenkins.pipeline.Configuration

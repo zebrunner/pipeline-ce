@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration.zafira
+package com.zebrunner.jenkins.pipeline.integration.zafira
 
 import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.pipeline.Configuration

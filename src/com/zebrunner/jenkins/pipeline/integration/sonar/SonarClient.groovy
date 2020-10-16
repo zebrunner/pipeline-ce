@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration.sonar
+package com.zebrunner.jenkins.pipeline.integration.sonar
 
 import com.zebrunner.jenkins.pipeline.integration.HttpClient
 import com.zebrunner.jenkins.pipeline.Configuration

@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration.zafira
+package com.zebrunner.jenkins.pipeline.integration.zafira
 
 class StatusMapper {
 

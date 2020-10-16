@@ -1,4 +1,4 @@
-com.zebrunnerimport com.zebrunner.jenkins.Logger
+import com.zebrunner.jenkins.Logger
 import groovy.transform.Field
 
 @Field final Logger logger = new Logger(this)

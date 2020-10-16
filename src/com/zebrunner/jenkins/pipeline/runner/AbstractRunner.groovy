@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner
+package com.zebrunner.jenkins.pipeline.runner
 
 import com.zebrunner.jenkins.BaseObject
 import com.zebrunner.jenkins.pipeline.integration.sonar.SonarClient

@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration
+package com.zebrunner.jenkins.pipeline.integration
 
 import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.Utils

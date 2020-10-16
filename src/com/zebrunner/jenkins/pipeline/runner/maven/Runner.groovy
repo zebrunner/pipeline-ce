@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner.maven
+package com.zebrunner.jenkins.pipeline.runner.maven
 
 import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.pipeline.runner.AbstractRunner

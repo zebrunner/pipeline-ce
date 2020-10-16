@@ -3,7 +3,7 @@ package com.zebrunner.jenkins.jobdsl.factory.pipeline
 @Grab('org.testng:testng:6.8.8')
 
 import static com.zebrunner.jenkins.Utils.*
-import org.testng.xml.Xmlcom.zebrunnerSuite
+import org.testng.xml.XmlcomSuite
 import groovy.transform.InheritConstructors
 
 @InheritConstructors

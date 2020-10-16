@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration.zafira
+package com.zebrunner.jenkins.pipeline.integration.zafira
 
 import com.zebrunner.jenkins.pipeline.integration.HttpClient
 import groovy.json.JsonBuilder

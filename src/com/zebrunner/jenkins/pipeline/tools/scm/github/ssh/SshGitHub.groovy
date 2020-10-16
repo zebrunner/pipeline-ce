@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.tools.scm.github.ssh
+package com.zebrunner.jenkins.pipeline.tools.scm.github.ssh
 
 import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.pipeline.tools.scm.ISCM

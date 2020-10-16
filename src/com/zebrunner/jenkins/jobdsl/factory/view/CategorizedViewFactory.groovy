@@ -14,7 +14,7 @@ public class CategorizedViewFactory extends ListViewFactory {
 
     def create() {
         def view = _dslFactory.categorizedJobsView("${folder}/${name}")
-        view.with {com.zebrunner
+        view.with {
             columns {
                 status()
                 weather()

@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.jobdsl.factory
+package com.zebrunner.jenkins.jobdsl.factory
 
 import com.zebrunner.jenkins.Logger
 

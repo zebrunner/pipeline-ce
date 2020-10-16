@@ -1,4 +1,4 @@
-com.zebrunnercom.zebrunnerpackage com.zebrunner.jenkins.pipeline.integration.testrail
+package com.zebrunner.jenkins.pipeline.integration.testrail
 
 
 import com.zebrunner.jenkins.Logger

@@ -1,4 +1,4 @@
-com.zebrunnerpackage com.zebrunner.jenkins.pipeline.runner.maven
+package com.zebrunner.jenkins.pipeline.runner.maven
 
 public class QARunner extends TestNG {
 
