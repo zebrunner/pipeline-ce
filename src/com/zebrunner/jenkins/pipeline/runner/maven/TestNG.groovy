@@ -742,20 +742,27 @@ public class TestNG extends Runner {
         }
     }
 
-	protected void setSeleniumUrl() {
-		def seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
-		logger.info("seleniumUrl: ${seleniumUrl}")
-		if (!isParamEmpty(seleniumUrl) && !Configuration.mustOverride.equals(seleniumUrl)) {
-			// do not override from creds as looks like external service or user overrided this value
-			return
-		}
+    protected void setSeleniumUrl() {
+        def seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
+        logger.debug("Default seleniumUrl: ${seleniumUrl}")
+        if (!isParamEmpty(seleniumUrl) && !Configuration.mustOverride.equals(seleniumUrl)) {
+            logger.debug("do not override seleniumUrl from creds!")
+            return
+        }
 
-		// update SELENIUM_URL parameter based on capabilities.provider. Local "selenium" is default provider
-		def provider = !isParamEmpty(Configuration.get("capabilities.provider")) ? Configuration.get("capabilities.provider") : "selenium"
-		def hubUrl = "${provider}_hub"
-        Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
+        // update SELENIUM_URL parameter based on capabilities.provider. Local "selenium" is default provider
+        def provider = !isParamEmpty(Configuration.get("capabilities.provider")) ? Configuration.get("capabilities.provider") : "selenium"
+        def hubUrl = "${provider}_hub"
+        if (!isParamEmpty(getCredentials(hubUrl))) {
+            Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
+        } else {
+            // no custom SELENIUM_URL detected. use default one
+            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
+        }
 
-	}
+        seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
+        logger.info("seleniumUrl: ${seleniumUrl}")
+    }
 
     protected void setReportingCreds() {
         def zafiraFields = Configuration.get("zafiraFields")
