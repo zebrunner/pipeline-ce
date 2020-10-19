@@ -56,8 +56,8 @@ public class Configuration {
         JACOCO_ENABLE("JACOCO_ENABLE", "false"),
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
 
-        QPS_PIPELINE_GIT_BRANCH("QPS_PIPELINE_GIT_BRANCH", mustOverride),
-        QPS_PIPELINE_GIT_URL("QPS_PIPELINE_GIT_URL", "https://github.com/zebrunner/pipeline-ce.git"),
+        ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),
+        ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
         ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
         GITHUB_HOST("GITHUB_HOST", "github.com"),

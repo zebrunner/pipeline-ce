@@ -51,10 +51,7 @@ public class FactoryRunner {
     }
 
     public void prepare() {
-        String QPS_PIPELINE_GIT_URL = Configuration.get(Configuration.Parameter.QPS_PIPELINE_GIT_URL)
-        String QPS_PIPELINE_GIT_BRANCH = Configuration.get(Configuration.Parameter.QPS_PIPELINE_GIT_BRANCH)
-        scmClient.clone(QPS_PIPELINE_GIT_URL, QPS_PIPELINE_GIT_BRANCH, "pipeline-ce")
-
+        scmClient.clone(Configuration.get(Configuration.Parameter.ZEBRUNNER_PIPELINE), Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION), "pipeline-ce")
         this.isPrepared = true
     }
 }
