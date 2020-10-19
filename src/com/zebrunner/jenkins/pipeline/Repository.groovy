@@ -21,7 +21,7 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 class Repository extends BaseObject {
 
     protected ISCM scmClient
-    protected def pipelineLibrary
+    protected def pipelineLibrary = ""
     protected def runnerClass
     protected def rootFolder
     private static final String SCM_ORG = "scmOrg"
@@ -43,6 +43,8 @@ class Repository extends BaseObject {
         logger.info("Repository->register")
         Configuration.set("GITHUB_ORGANIZATION", Configuration.get(SCM_ORG))
         Configuration.set("GITHUB_HOST", Configuration.get(SCM_HOST))
+        
+        logger.debug("pipelineLibrary: " + this.pipelineLibrary)
         context.node('master') {
             context.timestamps {
                 prepare()
