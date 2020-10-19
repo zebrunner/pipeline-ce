@@ -388,11 +388,11 @@ public class TestNG extends Runner {
     }
 
     protected String getPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runJob()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).runJob()"
     }
 
     protected String getCronPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runCron()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).runCron()"
     }
 
     protected def getJenkinsJobsScanResult(build) {

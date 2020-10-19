@@ -203,27 +203,27 @@ class Repository extends BaseObject {
     }
 
     private String getOnPullRequestScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
     }
 
     private String getOnPushScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
     }
 
     protected String getPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
     }
 
     protected String getMergeScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
     }
 
     protected String getPublishScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
     }
 
     protected String getDeployScript() {
-        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
+        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
     }
 
     protected boolean extendsClass(classes) {
