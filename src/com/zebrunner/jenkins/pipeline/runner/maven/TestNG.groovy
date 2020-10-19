@@ -35,7 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class TestNG extends Runner {
 
-    protected def pipelineLibrary = "" // variable to be overrided on custom private pipeline level
+    protected def library = "" // variable to be overrided on custom private pipeline level
     protected def runnerClass = "com.zebrunner.jenkins.pipeline.runner.maven.TestNG"
     protected def onlyUpdated = false
     protected def uuid
@@ -388,11 +388,11 @@ public class TestNG extends Runner {
     }
 
     protected String getPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runJob()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runJob()"
     }
 
     protected String getCronPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runCron()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).runCron()"
     }
 
     protected def getJenkinsJobsScanResult(build) {
