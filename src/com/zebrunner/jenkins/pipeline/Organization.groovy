@@ -263,10 +263,6 @@ class Organization extends BaseObject {
     }
 
     protected def generateCreds() {
-        logger.debug("INFRA_HOST: " + Configuration.get(Configuration.Parameter.INFRA_HOST))
-        logger.debug("selenium: " + "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
-        registerHubCredentials(this.folderName, "selenium", "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
-
         if (!isParamEmpty(this.reportingServiceUrl) && !isParamEmpty(this.reportingAccessToken)) {
             registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
         }
@@ -274,7 +270,6 @@ class Organization extends BaseObject {
         if (customPipeline?.toBoolean()) {
             registerCustomPipelineCreds(this.folderName, customPipeline)
         }
-
 
     }
 
@@ -284,31 +279,23 @@ class Organization extends BaseObject {
             def provider = Configuration.get("provider")
             // Example: http://demo.qaprosoft.com/selenoid/wd/hub
             def url = Configuration.get("url")
-
-            registerHubCredentials(orgFolderName, provider, url)
-        }
-    }
-
-    protected def registerHubCredentials(orgFolderName, provider, url) {
-        setDisplayNameTemplate('#${BUILD_NUMBER}|${folderName}|${provider}')
-        currentBuild.displayName = getDisplayName()
-        if (isParamEmpty(url)) {
-            throw new RuntimeException("Required 'url' field is missing!")
-        }
-        def hubURLCredName = "${provider}_hub"
-        if (!isParamEmpty(orgFolderName)) {
-            hubURLCredName = "${orgFolderName}" + "-" + hubURLCredName
-        }
-
-        if (isParamEmpty(getCredentials(hubURLCredName))) {
-            if (updateJenkinsCredentials(hubURLCredName, "${provider} URL", Configuration.Parameter.SELENIUM_URL.getKey(), url)) {
-                logger.info("${hubURLCredName} was successfully registered.")
+            
+            setDisplayNameTemplate('#${BUILD_NUMBER}|${folderName}|${provider}')
+            currentBuild.displayName = getDisplayName()
+            
+            if (isParamEmpty(url)) {
+                throw new RuntimeException("Required 'url' field is missing!")
             }
-        }
-        else {
-            logger.info("Skip registration of ${hubURLCredName}")
+            
+            def hubURLCredName = "${provider}_hub"
+            if (!isParamEmpty(orgFolderName)) {
+                hubURLCredName = "${orgFolderName}" + "-" + hubURLCredName
+            }
+
+            updateJenkinsCredentials(hubURLCredName, "${provider} URL", Configuration.Parameter.SELENIUM_URL.getKey(), url)
         }
     }
+
 
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
