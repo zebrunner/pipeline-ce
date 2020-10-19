@@ -162,6 +162,7 @@ class Repository extends BaseObject {
                     "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
                     "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
             
+            logger.debug("verify if custom library used")
             if (!this.pipelineLibrary.isEmpty()) {
                 //load custom library to check inheritance for isTestNGRunner
                 context.library this.pipelineLibrary
@@ -192,7 +193,9 @@ class Repository extends BaseObject {
                 registerObject("build_job", new BuildJobFactory(repoFolder, getPipelineScript(), "build", githubHost, githubOrganization, Configuration.get(REPO), Configuration.get(BRANCH), buildTool, isDockerRunner))
             }
 
+            logger.debug("before - factoryRunner.run(dslObjects)")
             factoryRunner.run(dslObjects)
+            logger.debug("after - factoryRunner.run(dslObjects)")
 
         }
     }
