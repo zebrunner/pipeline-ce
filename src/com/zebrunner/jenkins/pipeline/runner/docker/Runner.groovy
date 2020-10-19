@@ -8,7 +8,6 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Runner extends AbstractRunner {
 	
-	protected def pipelineLibrary
 	protected def runnerClass
 	protected def registry
 	protected def registryCreds
