@@ -198,51 +198,27 @@ class Repository extends BaseObject {
     }
 
     private String getOnPullRequestScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
     }
 
     private String getOnPushScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
     }
 
     protected String getPipelineScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
     }
 
     protected String getMergeScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
     }
 
     protected String getPublishScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
     }
 
     protected String getDeployScript() {
-        if ("Zebrunner-CE".equals(pipelineLibrary)) {
-            return "@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
-        } else {
-            return "@Library(\'Zebrunner-CE\')\n@Library(\'${pipelineLibrary}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
-        }
+        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
     }
 
     protected boolean extendsClass(classes) {

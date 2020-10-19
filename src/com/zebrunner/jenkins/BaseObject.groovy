@@ -27,6 +27,8 @@ public abstract class BaseObject {
     protected def currentBuild
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
     protected final String DISPLAY_NAME_SEPARATOR = "|"
+    
+    protected String zebrunnerPipeline // pipeline name and version!
 
     //this is very important line which should be declared only as a class member!
     protected Configuration configuration = new Configuration(context)
@@ -40,6 +42,8 @@ public abstract class BaseObject {
 
         this.factoryRunner = new FactoryRunner(context)
 
+        //TODO: test if getter works in constructor
+        this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
     }
 
@@ -80,6 +84,19 @@ public abstract class BaseObject {
     protected void clean() {
         context.stage('Wipe out Workspace') {
             context.deleteDir()
+        }
+    }
+    
+    protected String getPipelineLibrary() {
+        return getPipelineLibrary("")
+    }
+    
+    protected String getPipelineLibrary(customPipeline) {
+        if (customPipeline.isEmpty()) {
+            // no custom private pipeline detected!
+            return "@Library(\'${zebrunnerPipeline}\')"
+        } else {
+            return "@Library(\'${zebrunnerPipeline}\')\n@Library(\'${customPipeline}\')"
         }
     }
 }

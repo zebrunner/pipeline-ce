@@ -18,7 +18,6 @@ class Runner extends AbstractRunner {
 	
 	public Runner(context) {
 		super(context)
-		pipelineLibrary = "Zebrunner-CE"
 		runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
 		registry = "${Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)}/${Configuration.get("repo")}"
 		registryCreds = "${Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)}-docker"
@@ -76,7 +75,7 @@ class Runner extends AbstractRunner {
 					currentBuild.displayName = getDisplayName()
 					getScm().clone()
 
-          context.stage("${this.buildTool} build") {
+					context.stage("${this.buildTool} build") {
 						switch (buildTool.toLowerCase()) {
 							case 'maven':
 								context.mavenBuild(Configuration.get('maven_goals'))

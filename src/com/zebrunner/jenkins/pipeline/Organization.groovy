@@ -17,7 +17,6 @@ import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Organization extends BaseObject {
-    private static final String PIPELINE_LIBRARY = "Zebrunner-CE"
     private static final String RUNNER_CLASS = "com.zebrunner.jenkins.pipeline.runner.maven.TestNG"
 
     protected ISCM scmClient
@@ -128,9 +127,9 @@ class Organization extends BaseObject {
             if (!isParamEmpty(folder)) {
                 registerObject("project_folder", new FolderFactory(folder, ""))
             }
-            registerObject("launcher_job", new LauncherJobFactory(folder, getPipelineScript(), "launcher", "Custom job launcher"))
+            registerObject("launcher_job", new LauncherJobFactory(folder, getLauncherScript(), "launcher", "Custom job launcher"))
 
-            registerObject("register_repository_job", new RegisterRepositoryJobFactory(folder, 'RegisterRepository', ''))
+            registerObject("register_repository_job", new RegisterRepositoryJobFactory(folder, getRegisterRepositoryScript(), 'RegisterRepository', ''))
 
             factoryRunner.run(dslObjects)
         }
@@ -247,16 +246,20 @@ class Organization extends BaseObject {
         return integrationParameters
     }
 
-    protected String getPipelineScript() {
-        return "@Library(\'${PIPELINE_LIBRARY}\')\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).runJob()"
+    protected String getLauncherScript() {
+        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).runJob()"
+    }
+    
+    protected String getRegisterRepositoryScript() {
+        return "${getPipelineLibrary()}\nimport com.zebrunner.jenkins.pipeline.Repository;\nnew Repository(this).register()"
     }
 
     protected String getTestRailScript() {
-        return "@Library(\'${PIPELINE_LIBRARY}\')\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendTestRailResults()"
+        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendTestRailResults()"
     }
 
     protected String getQTestScript() {
-        return "@Library(\'${PIPELINE_LIBRARY}\')\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendQTestResults()"
+        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendQTestResults()"
     }
 
     protected def generateCreds() {

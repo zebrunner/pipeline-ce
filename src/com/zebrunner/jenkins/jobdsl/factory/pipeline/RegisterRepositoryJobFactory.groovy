@@ -6,8 +6,9 @@ import groovy.transform.InheritConstructors
 
 @InheritConstructors
 public class RegisterRepositoryJobFactory extends PipelineFactory {
-    public RegisterRepositoryJobFactory(folder, name, jobDesc) {
+    public RegisterRepositoryJobFactory(folder, pipelineScript, name, jobDesc) {
         this.folder = folder
+        this.pipelineScript = pipelineScript
         this.name = name
         this.description = jobDesc
     }
@@ -41,8 +42,4 @@ public class RegisterRepositoryJobFactory extends PipelineFactory {
         return pipelineJob
     }
 
-    //This method is needed for inserting pipeline script into an appropriate field
-    String getPipelineScript() {
-        return "@Library(\'Zebrunner-CE\')\nimport com.zebrunner.jenkins.pipeline.Repository;\nnew Repository(this).register()"
-    }
 }
