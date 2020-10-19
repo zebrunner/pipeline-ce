@@ -162,9 +162,9 @@ class Repository extends BaseObject {
                     "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
                     "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
             
-            logger.debug("verify if custom library used")
-            if (!this.pipelineLibrary.isEmpty()) {
+            if (!isParamEmpty(this.pipelineLibrary)) {
                 //load custom library to check inheritance for isTestNGRunner
+                logger.debug("load custom library to check inheritance for isTestNGRunner: " + this.pipelineLibrary)
                 context.library this.pipelineLibrary
             }
 
