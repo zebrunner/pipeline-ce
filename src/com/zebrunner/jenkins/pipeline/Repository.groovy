@@ -21,7 +21,7 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 class Repository extends BaseObject {
 
     protected ISCM scmClient
-    protected def pipelineLibrary = ""
+    protected def library = ""
     protected def runnerClass
     protected def rootFolder
     private static final String SCM_ORG = "scmOrg"
@@ -35,7 +35,7 @@ class Repository extends BaseObject {
         super(context)
 
         scmClient = new GitHub(context)
-        this.pipelineLibrary = Configuration.get("pipelineLibrary")
+        this.library = Configuration.get("pipelineLibrary")
         this.runnerClass = Configuration.get("runnerClass")
     }
 
@@ -44,7 +44,7 @@ class Repository extends BaseObject {
         Configuration.set("GITHUB_ORGANIZATION", Configuration.get(SCM_ORG))
         Configuration.set("GITHUB_HOST", Configuration.get(SCM_HOST))
         
-        logger.debug("pipelineLibrary: " + this.pipelineLibrary)
+        logger.debug("library: " + this.library)
         context.node('master') {
             context.timestamps {
                 prepare()
@@ -164,10 +164,10 @@ class Repository extends BaseObject {
                     "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
                     "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
             
-            if (!isParamEmpty(this.pipelineLibrary)) {
+            if (!isParamEmpty(this.library)) {
                 //load custom library to check inheritance for isTestNGRunner
-                logger.debug("load custom library to check inheritance for isTestNGRunner: " + this.pipelineLibrary)
-                context.library this.pipelineLibrary
+                logger.debug("load custom library to check inheritance for isTestNGRunner: " + this.library)
+                context.library this.library
             }
 
             def isTestNgRunner = extendsClass([TestNG])
@@ -203,27 +203,27 @@ class Repository extends BaseObject {
     }
 
     private String getOnPullRequestScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPullRequest()"
     }
 
     private String getOnPushScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
     }
 
     protected String getPipelineScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
     }
 
     protected String getMergeScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
     }
 
     protected String getPublishScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).publish()"
     }
 
     protected String getDeployScript() {
-        return "@Library(\'${getPipelineLibrary(pipelineLibrary)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
+        return "@Library(\'${getPipelineLibrary(this.library)}\')\nimport ${runnerClass};\nnew ${runnerClass}(this).deploy()"
     }
 
     protected boolean extendsClass(classes) {

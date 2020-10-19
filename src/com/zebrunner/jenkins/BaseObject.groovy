@@ -92,7 +92,7 @@ public abstract class BaseObject {
     }
     
     protected String getPipelineLibrary(customPipeline) {
-        if (customPipeline.isEmpty()) {
+        if ("Zebrunner-CE".equals(customPipeline) || customPipeline.isEmpty()) {
             // no custom private pipeline detected!
             return "@Library(\'${zebrunnerPipeline}\')"
         } else {
