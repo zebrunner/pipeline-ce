@@ -109,7 +109,7 @@ class Repository extends BaseObject {
     }
 
     protected void prepare() {
-        updateJenkinsCredentials("${this.scmOrg}-${this.repo}", "${githubOrganization} SCM token", this.scmUser, this.scmToken)
+        updateJenkinsCredentials("${this.scmOrg}-${this.repo}", "${this.scmOrg} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
 
@@ -188,8 +188,8 @@ class Repository extends BaseObject {
                 def isDockerRunner = false
 
                 if (extendsClass([com.zebrunner.jenkins.pipeline.runner.docker.Runner])) {
-                    if (isParamEmpty(getCredentials(githubOrganization + '-docker'))) {
-                        updateJenkinsCredentials(githubOrganization + '-docker', 'docker hub creds', Configuration.Parameter.DOCKER_HUB_USERNAME.getValue(), Configuration.Parameter.DOCKER_HUB_PASSWORD.getValue())
+                    if (isParamEmpty(getCredentials("${this.scmOrg}-docker"))) {
+                        updateJenkinsCredentials("${this.scmOrg}-docker", 'docker hub creds', Configuration.Parameter.DOCKER_HUB_USERNAME.getValue(), Configuration.Parameter.DOCKER_HUB_PASSWORD.getValue())
                     }
 
                     isDockerRunner = true
