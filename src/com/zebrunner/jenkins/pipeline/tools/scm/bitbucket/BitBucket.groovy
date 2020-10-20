@@ -1,6 +1,7 @@
 package com.zebrunner.jenkins.pipeline.tools.scm.bitbucket
 
 import com.zebrunner.jenkins.pipeline.tools.scm.Scm
+import com.zebrunner.jenkins.pipeline.Configuration
 
 class BitBucket extends Scm {
 
@@ -26,7 +27,7 @@ class BitBucket extends Scm {
         PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated))*?\$"),
         PR_FILTER_TEXT("prFilterText", "\$x_event_key"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref x-event-key"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x-event-key"),
         PUSH_FILTER_REGEX("pushFilterRegex", "^(master\\srepo:push)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 

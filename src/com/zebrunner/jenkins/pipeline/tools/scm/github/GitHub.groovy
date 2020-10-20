@@ -1,6 +1,7 @@
 package com.zebrunner.jenkins.pipeline.tools.scm.github
 
 import com.zebrunner.jenkins.pipeline.tools.scm.Scm
+import com.zebrunner.jenkins.pipeline.Configuration
 
 class GitHub extends Scm {
 
@@ -27,7 +28,7 @@ class GitHub extends Scm {
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event"),
 
         
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref x_github_event"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event"),
         PUSH_FILTER_REGEX("pushFilterRegex", "^(refs/heads/master\\spush)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 

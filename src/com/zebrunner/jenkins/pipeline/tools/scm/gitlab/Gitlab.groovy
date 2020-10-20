@@ -1,6 +1,7 @@
 package com.zebrunner.jenkins.pipeline.tools.scm.gitlab
 
 import com.zebrunner.jenkins.pipeline.tools.scm.Scm
+import com.zebrunner.jenkins.pipeline.Configuration
 
 class Gitlab extends Scm {
 
@@ -27,7 +28,7 @@ class Gitlab extends Scm {
         PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook)*?\$"),
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref x_gitlab_event"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event"),
         PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
