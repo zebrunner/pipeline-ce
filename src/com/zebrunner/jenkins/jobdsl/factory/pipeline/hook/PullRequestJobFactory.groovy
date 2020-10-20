@@ -85,7 +85,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                                 }
                             }
 
-                            token("abc123")
+                            tokenCredentialId("generic-webhook-token")
                             printContributedVariables(isDebugActive())
                             printPostContent(isDebugActive())
                             silentResponse(false)
