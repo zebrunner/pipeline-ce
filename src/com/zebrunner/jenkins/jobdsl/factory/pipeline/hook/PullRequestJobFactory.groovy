@@ -109,6 +109,7 @@ public class PullRequestJobFactory extends PipelineFactory {
         return "https://api.github.com : ${project}-token"
     }
 
+    @NonCPS
     private def getDesc() {
         return "Verify compilation and/or do Sonar PullRequest analysis"
     }

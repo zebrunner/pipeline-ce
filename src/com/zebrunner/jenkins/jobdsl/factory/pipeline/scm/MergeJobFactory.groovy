@@ -45,6 +45,7 @@ public class MergeJobFactory extends PipelineFactory {
         return pipelineJob
     }
 
+    @NonCPS
     private def getDesc() {
         return "SCM branch merger job"
     }

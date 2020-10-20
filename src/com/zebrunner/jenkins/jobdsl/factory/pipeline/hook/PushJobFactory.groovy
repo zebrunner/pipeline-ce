@@ -94,6 +94,7 @@ public class PushJobFactory extends PipelineFactory {
         return logger.pipelineLogLevel.equals(Logger.LogLevel.DEBUG) ? true : false
     }
 
+    @NonCPS
     private String getDesc() {
         return"To finish GitHub WebHook setup, please, follow the steps below:\n- Go to your GitHub repository\n- Click \"Settings\" tab\n- Click \"Webhooks\" menu option\n" +
                 "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
