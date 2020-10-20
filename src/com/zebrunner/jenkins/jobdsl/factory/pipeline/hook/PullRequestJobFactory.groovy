@@ -86,8 +86,8 @@ public class PullRequestJobFactory extends PipelineFactory {
                             }
 
                             tokenCredentialId("${this.organization}-webhook-token")
-                            printContributedVariables(isDebugActive())
-                            printPostContent(isDebugActive())
+                            printContributedVariables(this.logger.isLogLevelActive(Logger.LogLevel.DEBUG))
+                            printPostContent(this.logger.isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
                             regexpFilterText(webHookArgs.prFilterText)
                             regexpFilterExpression(webHookArgs.prFilterExpression)
@@ -98,11 +98,6 @@ public class PullRequestJobFactory extends PipelineFactory {
 
             return pipelineJob
         }
-    }
-
-    protected def isDebugActive() {
-        logger.debug("LoggerLevel: " + logger.pipelineLogLevel)
-        return logger.pipelineLogLevel.equals(Logger.LogLevel.DEBUG) ? true : false
     }
 
     protected def getGitHubAuthId(project) {

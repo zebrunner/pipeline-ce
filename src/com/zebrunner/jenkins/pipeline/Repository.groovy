@@ -72,6 +72,8 @@ class Repository extends BaseObject {
                 this.scmClient = new BitBucket(context, scmHost, scmOrg, repo, branch)
                 this.scmWebHookArgs = BitBucket.getHookArgsAsMap(BitBucket.HookArgs)
                 break
+            default:
+                throw new RuntimeException("Unsuported scm system")
         }
         
         logger.debug("library: " + this.library)

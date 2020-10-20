@@ -264,7 +264,7 @@ class Organization extends BaseObject {
 
         // register webhook creds as a secret text for each organization/tenant
         if (!isParamEmpty(this.folderName)) {
-            updateJenkinsCredentials("${this.folderName}-webhook-token", "Token usded to configure generic webhook triggers", "CHANGE_ME")
+            updateJenkinsCredentials("${this.folderName}-webhook-token", "Token used to configure generic webhook triggers", "CHANGE_ME")
         }
 
     }

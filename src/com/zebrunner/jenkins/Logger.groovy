@@ -44,4 +44,8 @@ class Logger {
             context.println "[${logLevel}] ${message}"
         }
     }
+
+    public def isLogLevelActive(logLevel) {
+        return pipelineLogLevel.equals(loglevel) ? true : false
+    }
 }
