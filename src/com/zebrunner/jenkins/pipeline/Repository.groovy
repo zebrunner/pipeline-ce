@@ -173,13 +173,20 @@ class Repository extends BaseObject {
             }
 
             def isTestNgRunner = extendsClass([TestNG])
+            
+            def mergeJobDesc = "SCM branch merger job"
+            def prJobDesc = "Verify compilation and/or do Sonar PullRequest analysis"
+            def pushJobDesc = "To finish GitHub WebHook setup, please, follow the steps below:\n- Go to your GitHub repository\n- Click \"Settings\" tab\n- Click \"Webhooks\" menu option\n" +
+                              "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
+                              "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
+
 
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", this.scmHost, this.scmOrg, this.repo, gitUrl))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, scmWebHookArgs))
+            registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", mergeJobDesc, this.scmHost, this.scmOrg, this.repo, gitUrl))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, scmWebHookArgs))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
 

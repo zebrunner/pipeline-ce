@@ -4,7 +4,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
 import com.zebrunner.jenkins.Logger
 
 import groovy.transform.InheritConstructors
-import com.cloudbees.groovy.cps.NonCPS
 
 @InheritConstructors
 public class PullRequestJobFactory extends PipelineFactory {
@@ -16,11 +15,11 @@ public class PullRequestJobFactory extends PipelineFactory {
     def scmRepoUrl
     def webHookArgs
 
-    public PullRequestJobFactory(folder, pipelineScript, jobName, host, organization, repo, branch, scmRepoUrl, webHookArgs) {
+    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, branch, scmRepoUrl, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
-        this.description = getDesc()
+        this.description = desc
         this.host = host
         this.organization = organization
         this.repo = repo
@@ -108,10 +107,5 @@ public class PullRequestJobFactory extends PipelineFactory {
 
     protected def getGitHubAuthId(project) {
         return "https://api.github.com : ${project}-token"
-    }
-
-    @NonCPS
-    private def getDesc() {
-        return "Verify compilation and/or do Sonar PullRequest analysis"
     }
 }

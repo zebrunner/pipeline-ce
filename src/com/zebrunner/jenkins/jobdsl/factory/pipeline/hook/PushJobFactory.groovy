@@ -4,7 +4,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
 import com.zebrunner.jenkins.Logger
 
 import groovy.transform.InheritConstructors
-import com.cloudbees.groovy.cps.NonCPS
 
 @InheritConstructors
 public class PushJobFactory extends PipelineFactory {
@@ -19,11 +18,11 @@ public class PushJobFactory extends PipelineFactory {
     def isTestNgRunner
     def webHookArgs
 
-    public PushJobFactory(folder, pipelineScript, jobName, host, organization, repo, branch, scmRepoUrl, userId, isTestNgRunner, zafiraFields, webHookArgs) {
+    public PushJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, branch, scmRepoUrl, userId, isTestNgRunner, zafiraFields, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
-        this.description = getDesc()
+        this.description = desc
         this.host = host
         this.organization = organization
         this.repo = repo
@@ -93,13 +92,6 @@ public class PushJobFactory extends PipelineFactory {
     protected def isDebugActive() {
         logger.debug("LoggerLevel: " + logger.pipelineLogLevel)
         return logger.pipelineLogLevel.equals(Logger.LogLevel.DEBUG) ? true : false
-    }
-
-    @NonCPS
-    private String getDesc() {
-        return"To finish GitHub WebHook setup, please, follow the steps below:\n- Go to your GitHub repository\n- Click \"Settings\" tab\n- Click \"Webhooks\" menu option\n" +
-                "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
-                "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
     }
 
 }
