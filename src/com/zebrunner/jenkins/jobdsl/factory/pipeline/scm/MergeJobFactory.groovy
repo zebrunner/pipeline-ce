@@ -1,7 +1,9 @@
 package com.zebrunner.jenkins.jobdsl.factory.pipeline.scm
 
-import groovy.transform.InheritConstructors
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
+
+import groovy.transform.InheritConstructors
+import com.cloudbees.groovy.cps.NonCPS
 
 @InheritConstructors
 public class MergeJobFactory extends PipelineFactory {

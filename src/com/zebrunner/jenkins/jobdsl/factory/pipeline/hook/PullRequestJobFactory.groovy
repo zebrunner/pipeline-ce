@@ -4,6 +4,7 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
 import com.zebrunner.jenkins.Logger
 
 import groovy.transform.InheritConstructors
+import com.cloudbees.groovy.cps.NonCPS
 
 @InheritConstructors
 public class PullRequestJobFactory extends PipelineFactory {
