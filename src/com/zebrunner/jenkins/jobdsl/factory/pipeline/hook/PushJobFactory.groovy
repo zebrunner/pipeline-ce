@@ -75,7 +75,7 @@ public class PushJobFactory extends PipelineFactory {
                             }
                            }
                            
-                           tokenCredentialId('generic-webhook-token')
+                           tokenCredentialId("${this.organization}-token")
                            printContributedVariables(isDebugActive())
                            printPostContent(isDebugActive())
                            silentResponse(false)

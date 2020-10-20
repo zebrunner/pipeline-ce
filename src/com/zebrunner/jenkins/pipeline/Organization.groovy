@@ -262,6 +262,11 @@ class Organization extends BaseObject {
             registerCustomPipelineCreds(this.folderName, customPipeline)
         }
 
+        // register webhook creds as a secret text for each organization/tenant
+        if (!isParamEmpty(this.folderName)) {
+            updateJenkinsCredentials("${this.folderName}-webhook-token", "Token usded to configure generic webhook triggers", "CHANGE_ME")
+        }
+
     }
 
     public def registerHubCredentials() {
@@ -378,4 +383,5 @@ class Organization extends BaseObject {
 
         updateJenkinsCredentials(customPipeline, "", Configuration.CREDS_CUSTOM_PIPELINE + "-token", token)
     }
+
 }

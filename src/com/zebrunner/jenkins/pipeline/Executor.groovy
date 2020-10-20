@@ -17,6 +17,8 @@ import static com.zebrunner.jenkins.Utils.*
 import com.cloudbees.plugins.credentials.impl.*
 import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.domains.*
+import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl;
+import hudson.util.Secret
 
 public class Executor {
 
@@ -112,6 +114,16 @@ public class Executor {
         }
     }
 
+    static def updateJenkinsCredentials(id, desc, secret="") {
+        if (!isParamEmpty(id)) {
+            def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
+            def credentials = getCredentials(id)
+            if (credentials) { credentialsStore.removeCredentials(Domain.global(), credentials) }
+            Credentials c = (Credentials) new StringCredentialsImpl(CredentialsScope.GLOBAL, id, desc, Secret.fromString(secret))
+            return credentialsStore.addCredentials(Domain.global(), c)
+        }
+    }
+    
     static def getCredentials(id) {
         return SystemCredentialsProvider.getInstance().getStore().getCredentials(Domain.global()).find {
             it.id.equals(id.toString())
