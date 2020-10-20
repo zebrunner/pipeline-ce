@@ -62,7 +62,7 @@ class Repository extends BaseObject {
         switch (scmHost) {
             case ~/^.*github.*$/:
                 this.scmClient = new GitHub(context, scmHost, scmOrg, repo, branch)
-                this.scmWebHookArgs = Github.getHookArgsAsMap(GitHub.HookArgs)
+                this.scmWebHookArgs = GitHub.getHookArgsAsMap(GitHub.HookArgs)
                 break
             case ~/^.*gitlab.*$/:
                 this.scmClient = new Gitlab(context, scmHost, scmOrg, repo, branch)
