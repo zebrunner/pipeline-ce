@@ -178,8 +178,8 @@ class Repository extends BaseObject {
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
             registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", this.scmHost, this.scmOrg, this.repo, gitUrl))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, userId, isTestNgRunner, zafiraFields))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", this.scmHost, this.scmOrg, this.repo, gitUrl))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", this.scmHost, this.scmOrg, this.repo, gitUrl, scmWebHookArgs))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
 
