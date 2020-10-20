@@ -36,7 +36,7 @@ abstract class Scm implements ISCM {
 		this.repo = repo
 		this.branch = branch
 		this.credentialsId = "$org-$repo"
-		this.scmUrl = setScmUrl()
+		this.scmUrl = setUrl()
 		this.logger = new Logger(context)
 
 		if (Configuration.get("scmURL") != null) {
@@ -154,7 +154,7 @@ abstract class Scm implements ISCM {
 	}
 
 	@NonCPS
-	protected def setScmUrl() {
+	protected def setUrl() {
 		this.scmUrl =  String.format("https://%s/%s/%s", host, org, repo)
 	}
 }
