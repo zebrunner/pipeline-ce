@@ -15,11 +15,11 @@ public class PullRequestJobFactory extends PipelineFactory {
     def scmRepoUrl
     def webHookArgs
 
-    public PullRequestJobFactory(folder, pipelineScript, jobName, jobDesc, host, organization, repo, branch, scmRepoUrl, webHookArgs) {
+    public PullRequestJobFactory(folder, pipelineScript, jobName, host, organization, repo, branch, scmRepoUrl, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
-        this.description = jobDesc
+        this.description = getDesc()
         this.host = host
         this.organization = organization
         this.repo = repo
