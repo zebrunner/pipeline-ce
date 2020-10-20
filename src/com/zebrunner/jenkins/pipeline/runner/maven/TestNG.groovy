@@ -753,10 +753,9 @@ public class TestNG extends Runner {
         // update SELENIUM_URL parameter based on capabilities.provider. Local "selenium" is default provider
         def provider = !isParamEmpty(Configuration.get("capabilities.provider")) ? Configuration.get("capabilities.provider") : "selenium"
         def hubUrl = "${provider}_hub"
-        if (!isParamEmpty(this.organization)) {
-            hubUrl = "${this.organization}-${provider}_hub"
-        }
-        if (!isParamEmpty(getCredentials(hubUrl))) {
+        
+
+        if (!isParamEmpty(getToken(hubUrl))) {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
         } else {
             // no custom SELENIUM_URL detected. use default one
