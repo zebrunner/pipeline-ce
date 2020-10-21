@@ -139,5 +139,9 @@ public class PipelineFactory extends JobFactory {
         return scheduling
     }
 
+    public def isLogLevelActive(level) {
+        return pipelineLogLevel.equals(level) ? true : false
+    }
+
 
 }

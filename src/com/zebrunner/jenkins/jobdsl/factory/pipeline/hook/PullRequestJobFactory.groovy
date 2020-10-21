@@ -86,8 +86,8 @@ public class PullRequestJobFactory extends PipelineFactory {
                             }
 
                             tokenCredentialId("${this.organization}-webhook-token")
-                            printContributedVariables(this.logger.isLogLevelActive(Logger.LogLevel.DEBUG))
-                            printPostContent(this.logger.isLogLevelActive(Logger.LogLevel.DEBUG))
+                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
+                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
                             regexpFilterText(webHookArgs.prFilterText)
                             regexpFilterExpression(webHookArgs.prFilterExpression)
