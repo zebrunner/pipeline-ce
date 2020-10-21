@@ -140,7 +140,7 @@ public class PipelineFactory extends JobFactory {
     }
 
     public def isLogLevelActive(level) {
-        return pipelineLogLevel.equals(level) ? true : false
+        return logger.pipelineLogLevel.equals(level) ? true : false
     }
 
 
