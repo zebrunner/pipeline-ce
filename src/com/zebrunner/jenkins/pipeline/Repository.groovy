@@ -57,7 +57,11 @@ class Repository extends BaseObject {
         i.e. repo name is everything after latest "/" and without .git 
 */
         
-        this.repo = last(repoUrl.split("/")).replace(".git", "");
+        def items = this.repoUrl.split("/")
+        if (items.length < 1) {
+            throw new RuntimeException("Unable to parse repository name from '${repoUrl}' value!")
+        }
+        this.repo = items[items.length - 1].replace(".git", "")
         
         this.branch = Configuration.get(BRANCH)
         this.scmUser = Configuration.get(SCM_USER)
