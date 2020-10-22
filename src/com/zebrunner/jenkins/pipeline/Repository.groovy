@@ -19,16 +19,12 @@ class Repository extends BaseObject {
 
     protected def library = ""
     protected def runnerClass
-    protected def repoUrl // git repo url (https or ssh)
-    protected def repo
     
     protected def rootFolder
     protected def branch
     protected def scmUser
     protected def scmToken
 
-    private static final String REPO_URL = "repoUrl"
-    
     private static final String BRANCH = "branch"
     private static final String SCM_USER = "scmUser"
     private static final String SCM_TOKEN = "scmToken"
@@ -41,27 +37,6 @@ class Repository extends BaseObject {
 
     public void register() {
         logger.info("Repository->register")
-        
-        this.repoUrl = Configuration.get(REPO_URL)
-        
-/*      Find repo name from repository url value (https or ssh)
-        
-        For example carina-demo:
-        https://github.com/owner/carina-demo.git
-        git@github.com:owner/carina-demo.git
-        
-        java-testng:
-        git@gitlab.com:zebrunner/ce/agent/java-testng.git
-        https://gitlab.com/zebrunner/ce/agent/java-testng.git
-        
-        i.e. repo name is everything after latest "/" and without .git 
-*/
-        
-        def items = this.repoUrl.split("/")
-        if (items.length < 1) {
-            throw new RuntimeException("Unable to parse repository name from '${repoUrl}' value!")
-        }
-        this.repo = items[items.length - 1].replace(".git", "")
         
         this.branch = Configuration.get(BRANCH)
         this.scmUser = Configuration.get(SCM_USER)

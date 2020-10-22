@@ -26,6 +26,9 @@ public abstract class BaseObject {
     
     // organization folder name of the current job/runner
     protected String organization = ""
+    
+    protected def repoUrl // git repo url (https or ssh)
+    protected def repo
 
     protected def currentBuild
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
@@ -35,6 +38,8 @@ public abstract class BaseObject {
 
     //this is very important line which should be declared only as a class member!
     protected Configuration configuration = new Configuration(context)
+    
+    private static final String REPO_URL = "repoUrl"
 
     public BaseObject(context) {
         this.context = context
@@ -43,6 +48,27 @@ public abstract class BaseObject {
 
         this.factoryRunner = new FactoryRunner(context)
         initOrganization()
+        
+        this.repoUrl = Configuration.get(REPO_URL)
+        
+/*      Find repo name from repository url value (https or ssh)
+        
+        For example carina-demo:
+        https://github.com/owner/carina-demo.git
+        git@github.com:owner/carina-demo.git
+        
+        java-testng:
+        git@gitlab.com:zebrunner/ce/agent/java-testng.git
+        https://gitlab.com/zebrunner/ce/agent/java-testng.git
+        
+        i.e. repo name is everything after latest "/" and without .git
+*/
+        
+        def items = this.repoUrl.split("/")
+        if (items.length < 1) {
+            throw new RuntimeException("Unable to parse repository name from '${repoUrl}' value!")
+        }
+        this.repo = items[items.length - 1].replace(".git", "")
 
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
