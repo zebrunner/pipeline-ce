@@ -47,7 +47,7 @@ class BuildJobFactory extends PipelineFactory {
                 }
 
                 configure stringParam('branch', branch, "SCM repository branch containing sources for component build")
-                configure booleanParam('fork', false, "Reuse forked repository for ${repo}.")
+                configure booleanParam('fork', false, "Reuse forked repository.")
                 configure addExtensibleChoice('BuildPriority', "gc_BUILD_PRIORITY", "Priority of execution. Lower number means higher priority", "3")
                 configure stringParam('email_list', "", 'List of Users to be emailed after the build')
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
