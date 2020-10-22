@@ -28,7 +28,7 @@ class BitBucket extends Scm {
         PR_FILTER_TEXT("prFilterText", "\$x_event_key"),
 
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x-event-key"),
-        PUSH_FILTER_REGEX("pushFilterRegex", "^(master\\srepo:push)*?\$"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 
         private final String key
