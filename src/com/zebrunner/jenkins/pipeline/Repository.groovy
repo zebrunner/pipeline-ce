@@ -43,15 +43,27 @@ class Repository extends BaseObject {
         logger.info("Repository->register")
         
         this.repoUrl = Configuration.get(REPO_URL)
-        //TODO: calculate repo, org and host value from using repoUrl!
-        this.repo = "UNDEFINED"
+        
+/*      Find repo name from repository url value (https or ssh)
+        
+        For example carina-demo:
+        https://github.com/owner/carina-demo.git
+        git@github.com:owner/carina-demo.git
+        
+        java-testng:
+        git@gitlab.com:zebrunner/ce/agent/java-testng.git
+        https://gitlab.com/zebrunner/ce/agent/java-testng.git
+        
+        i.e. repo name is everything after latest "/" and without .git 
+*/
+        
+        this.repo = last(repoUrl.split("/")).replace(".git", "");
         
         this.branch = Configuration.get(BRANCH)
         this.scmUser = Configuration.get(SCM_USER)
         this.scmToken = Configuration.get(SCM_TOKEN)
 
-        logger.debug("repoUrl: $repoUrl branch: $branch")
-
+        logger.debug("repoUrl: ${this.repoUrl}; repo: ${this.repo}; branch: ${this.branch}")
 
         logger.debug("library: " + this.library)
         context.node('master') {
