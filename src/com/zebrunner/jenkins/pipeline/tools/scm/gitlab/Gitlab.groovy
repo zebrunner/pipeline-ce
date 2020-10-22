@@ -44,5 +44,12 @@ class Gitlab extends Scm {
     protected String branchSpec() {
         return String.format(branchSpec, Configuration.get('pr_source_branch'))
     }
+    
+    @Override
+    public def getWebHookArgs() {
+        return hookArgs.values().collectEntries {
+            [(it.getKey()): it.getValue()]
+        }
+    }
 
 }

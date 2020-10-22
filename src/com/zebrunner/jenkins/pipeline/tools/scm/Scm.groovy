@@ -20,10 +20,9 @@ abstract class Scm implements ISCM {
 	protected def branch
 	protected def credentialsId
     
-    enum HookArgs {
-        //empty
-    }
-
+    protected abstract String branchSpec()
+    public abstract def webHookArgs()
+    
 	Scm(context) { 
 		this.context = context
 		this.logger = new Logger(context)
@@ -32,8 +31,6 @@ abstract class Scm implements ISCM {
 		this.branch = Configuration.get("branch")
 		this.credentialsId = Configuration.get("credentialsId")
 	}
-
-	protected abstract String branchSpec()
 
 	public def clone() {
 		clone(true)
@@ -137,9 +134,5 @@ abstract class Scm implements ISCM {
 		}
 	}
 */
-
-    public def getWebHookArgs()
-		return hookArgs.values().collectEntries { [(it.getKey()): it.getValue()] }
-	}
 
 }

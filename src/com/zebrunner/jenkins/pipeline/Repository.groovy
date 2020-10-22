@@ -165,8 +165,8 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmClient.getWebHookArgs()))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, scmClient.getWebHookArgs()))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, scmClient.webHookArgs()))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
 

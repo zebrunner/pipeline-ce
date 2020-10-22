@@ -41,10 +41,17 @@ class GitHub extends Scm {
 
         public String getValue() { return value }
     }
-
+    
     @Override
     protected String branchSpec() {
         return String.format(branchSpec, Configuration.get('pr_number'))
+    }
+    
+    @Override
+    public def getWebHookArgs() {
+        return hookArgs.values().collectEntries {
+            [(it.getKey()): it.getValue()]
+        }
     }
 
 }
