@@ -21,6 +21,9 @@ public abstract class BaseObject {
     protected Map dslObjects
 
     protected ISCM scmClient
+    
+    // organization folder name of the current job/runner
+    protected String organization = ""
 
     protected def currentBuild
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
@@ -37,6 +40,7 @@ public abstract class BaseObject {
         this.dslObjects = new LinkedHashMap()
 
         this.factoryRunner = new FactoryRunner(context)
+        initOrganization()
 
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
@@ -99,5 +103,31 @@ public abstract class BaseObject {
         } else {
             return "@Library(\'${zebrunnerPipeline}\')\n@Library(\'${customPipeline}\')"
         }
+    }
+    
+    @NonCPS
+    protected void initOrganization() {
+        String jobName = context.env.getEnvironment().get("JOB_NAME")
+        //Configuration.get(Configuration.Parameter.JOB_NAME)
+        int nameCount = Paths.get(jobName).getNameCount()
+
+        def orgFolderName = ""
+        if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
+            // testrail-updater - i.e. empty org name
+            orgFolderName = ""
+        } else if (nameCount == 2 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
+            // stage/testrail-updater - i.e. stage
+            orgFolderName = Paths.get(jobName).getName(0).toString()
+        } else if (nameCount == 2) {
+            // carina-demo/API_Demo_Test - i.e. empty orgFolderName
+            orgFolderName = ""
+        } else if (nameCount == 3) { //TODO: need to test use-case with views!
+            // qaprosoft/carina-demo/API_Demo_Test - i.e. orgFolderName=qaprosoft
+            orgFolderName = Paths.get(jobName).getName(0).toString()
+        } else {
+            throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
+        }
+
+        this.organization = orgFolderName
     }
 }

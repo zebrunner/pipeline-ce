@@ -38,7 +38,6 @@ public class PullRequestJobFactory extends PipelineFactory {
                 stringParam('repo', repo, 'Your GitHub repository for scanning')
                 configure addHiddenParameter('branch', '', branch)
                 configure addHiddenParameter('GITHUB_HOST', '', host)
-                configure addHiddenParameter('GITHUB_ORGANIZATION', '', organization)
                 stringParam('pr_number', '', '')
                 stringParam('pr_repository', '', '')
                 stringParam('pr_source_branch', '', '')
@@ -100,7 +99,4 @@ public class PullRequestJobFactory extends PipelineFactory {
         }
     }
 
-    protected def getGitHubAuthId(project) {
-        return "https://api.github.com : ${project}-token"
-    }
 }

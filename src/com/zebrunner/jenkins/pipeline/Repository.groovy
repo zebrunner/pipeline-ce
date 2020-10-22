@@ -21,7 +21,6 @@ class Repository extends BaseObject {
     protected def runnerClass
     protected def repoUrl // git repo url (https or ssh)
     protected def scmHost
-    protected def scmOrg
     protected def repo
     
     protected def rootFolder
@@ -46,7 +45,6 @@ class Repository extends BaseObject {
         
         this.repoUrl = Configuration.get(REPO_URL)
         //TODO: calculate repo, org and host value from using repoUrl!
-        this.scmOrg = "UNDEFINED"
         this.scmHost = "UNDEFINED"
         this.repo = "UNDEFINED"
         
@@ -92,7 +90,7 @@ class Repository extends BaseObject {
     }
 
     protected void prepare() {
-        updateJenkinsCredentials("${this.scmOrg}-${this.repo}", "${this.scmOrg} SCM token", this.scmUser, this.scmToken)
+        updateJenkinsCredentials("${this.organization}-${this.repo}", "${this.organization} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
 
@@ -132,13 +130,12 @@ class Repository extends BaseObject {
                 }
             }
             
-            logger.debug("organization: ${this.scmOrg}")
+            logger.debug("organization: ${this.organization}")
             logger.debug("rootFolder: " + this.rootFolder)
 
             if (!"/".equals(this.rootFolder)) {
                 //For both cases when rootFolder exists job was started with existing organization value,
                 //so it should be used by default
-                Configuration.set(Configuration.Parameter.GITHUB_ORGANIZATION, this.scmOrg)
                 repoFolder = this.rootFolder + "/" + repoFolder
             }
 
@@ -165,8 +162,8 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, scmClient.webHookArgs()))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.organization, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.organization, this.repo, this.branch, this.repoUrl, scmClient.webHookArgs()))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
 
@@ -175,16 +172,16 @@ class Repository extends BaseObject {
                 def isDockerRunner = false
 
                 if (extendsClass([com.zebrunner.jenkins.pipeline.runner.docker.Runner])) {
-                    if (isParamEmpty(getCredentials("${this.scmOrg}-docker"))) {
-                        updateJenkinsCredentials("${this.scmOrg}-docker", 'docker hub creds', Configuration.Parameter.DOCKER_HUB_USERNAME.getValue(), Configuration.Parameter.DOCKER_HUB_PASSWORD.getValue())
+                    if (isParamEmpty(getCredentials("${this.organization}-docker"))) {
+                        updateJenkinsCredentials("${this.organization}-docker", 'docker hub creds', Configuration.Parameter.DOCKER_HUB_USERNAME.getValue(), Configuration.Parameter.DOCKER_HUB_PASSWORD.getValue())
                     }
 
                     isDockerRunner = true
-                    registerObject("deploy_job", new DeployJobFactory(repoFolder, getDeployScript(), "deploy", this.scmHost, this.scmOrg, this.repo))
-                    registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.scmHost, this.scmOrg, this.repo, this.branch))
+                    registerObject("deploy_job", new DeployJobFactory(repoFolder, getDeployScript(), "deploy", this.scmHost, this.repo))
+                    registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.scmHost, this.repo, this.branch))
                 }
 
-                registerObject("build_job", new BuildJobFactory(repoFolder, getPipelineScript(), "build", this.scmHost, this.scmOrg, this.repo, this.branch, buildTool, isDockerRunner))
+                registerObject("build_job", new BuildJobFactory(repoFolder, getPipelineScript(), "build", this.scmHost, this.repo, this.branch, buildTool, isDockerRunner))
             }
 
             logger.debug("before - factoryRunner.run(dslObjects)")

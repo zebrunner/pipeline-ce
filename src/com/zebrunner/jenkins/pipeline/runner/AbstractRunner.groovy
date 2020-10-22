@@ -14,9 +14,6 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 public abstract class AbstractRunner extends BaseObject {
     SonarClient sc
     
-    // organization folder name of the current job/runner
-    protected String organization = ""
-
     public AbstractRunner(context) {
         super(context)
         sc = new SonarClient(context)
@@ -24,7 +21,6 @@ public abstract class AbstractRunner extends BaseObject {
         def host = Configuration.get("GITHUB_HOST")
         def org = Configuration.get("GITHUB_ORGANIZATION")
         
-        initOrganization()
         setDisplayNameTemplate('#${BUILD_NUMBER}|${Configuration.get("branch")}')
     }
 
@@ -72,32 +68,6 @@ public abstract class AbstractRunner extends BaseObject {
     /*
      * Determined current organization folder by job name
      */
-
-    @NonCPS
-    protected void initOrganization() {
-        String jobName = context.env.getEnvironment().get("JOB_NAME")
-        //Configuration.get(Configuration.Parameter.JOB_NAME)
-        int nameCount = Paths.get(jobName).getNameCount()
-
-        def orgFolderName = ""
-        if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
-            // testrail-updater - i.e. empty org name
-            orgFolderName = ""
-        } else if (nameCount == 2 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
-            // stage/testrail-updater - i.e. stage
-            orgFolderName = Paths.get(jobName).getName(0).toString()
-        } else if (nameCount == 2) {
-            // carina-demo/API_Demo_Test - i.e. empty orgFolderName
-            orgFolderName = ""
-        } else if (nameCount == 3) { //TODO: need to test use-case with views!
-            // qaprosoft/carina-demo/API_Demo_Test - i.e. orgFolderName=qaprosoft
-            orgFolderName = Paths.get(jobName).getName(0).toString()
-        } else {
-            throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
-        }
-
-        this.organization = orgFolderName
-    }
 
     /*
      * Get token key from Jenkins credentials based on organization

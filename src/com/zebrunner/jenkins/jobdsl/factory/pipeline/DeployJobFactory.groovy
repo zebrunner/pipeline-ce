@@ -7,15 +7,13 @@ class DeployJobFactory extends PipelineFactory {
 
 	def host
 	def repo
-	def organization
 
-	public DeployJobFactory(folder, pipelineScript, jobName, host, organization, repo) {
+	public DeployJobFactory(folder, pipelineScript, jobName, host, repo) {
 		this.name = jobName
 		this.folder = folder
 		this.pipelineScript = pipelineScript
 		this.host = host
 		this.repo = repo
-		this.organization = organization
 	}
 
 	def create() {
@@ -29,7 +27,6 @@ class DeployJobFactory extends PipelineFactory {
 				configure stringParam('RELEASE_VERSION', '', '')
 				configure addHiddenParameter('repo', '', repo)
 				configure addHiddenParameter('GITHUB_HOST', '', host)
-				configure addHiddenParameter('GITHUB_ORGANIZATION', '', organization)
 			}
 		}
 
