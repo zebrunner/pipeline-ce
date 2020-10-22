@@ -145,6 +145,7 @@ public abstract class BaseObject {
      *  Find repo name from repository url value (https or ssh)
      * @return organization String
      */
+    @NonCPS
     protected def initRepo(url) {
         /*
          * https://github.com/owner/carina-demo.git or git@github.com:owner/carina-demo.git to carina-demo
