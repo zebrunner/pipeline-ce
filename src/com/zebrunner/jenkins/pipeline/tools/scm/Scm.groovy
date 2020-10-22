@@ -19,6 +19,10 @@ abstract class Scm implements ISCM {
     
 	protected def branch
 	protected def credentialsId
+    
+    enum HookArgs {
+        //empty
+    }
 
 	Scm(context) { 
 		this.context = context
@@ -134,7 +138,7 @@ abstract class Scm implements ISCM {
 	}
 */
 
-	static def getHookArgsAsMap(hookArgs) {
+    public def getWebHookArgs()
 		return hookArgs.values().collectEntries { [(it.getKey()): it.getValue()] }
 	}
 

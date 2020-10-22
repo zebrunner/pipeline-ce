@@ -7,6 +7,7 @@ class GitHub extends Scm {
 
     GitHub(context) {
         super(context)
+        
         this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
         this.branchSpec = "origin/pr/%s/merge"
     }

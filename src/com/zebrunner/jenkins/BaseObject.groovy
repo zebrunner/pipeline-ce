@@ -21,7 +21,6 @@ public abstract class BaseObject {
     protected Map dslObjects
 
     protected ISCM scmClient
-    protected def scmWebHookArgs
 
     protected def currentBuild
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
@@ -46,15 +45,12 @@ public abstract class BaseObject {
         switch (gitType) {
             case "github":
                 this.scmClient = new GitHub(context)
-                this.scmWebHookArgs = GitHub.getHookArgsAsMap(GitHub.HookArgs)
                 break
             case "gitlab":
                 this.scmClient = new Gitlab(context)
-                this.scmWebHookArgs = Gitlab.getHookArgsAsMap(Gitlab.HookArgs)
                 break
             case "bitbucket":
                 this.scmClient = new BitBucket(context)
-                this.scmWebHookArgs = BitBucket.getHookArgsAsMap(BitBucket.HookArgs)
                 break
             default:
                 throw new RuntimeException("Unsuported source control management: ${gitType}!")
