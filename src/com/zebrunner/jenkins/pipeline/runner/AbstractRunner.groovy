@@ -6,7 +6,6 @@ import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
 import com.zebrunner.jenkins.pipeline.tools.scm.gitlab.Gitlab
 import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 import com.zebrunner.jenkins.pipeline.integration.sonar.SonarClient
-import java.nio.file.Paths
 
 import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
