@@ -23,23 +23,9 @@ public abstract class AbstractRunner extends BaseObject {
 
         def host = Configuration.get("GITHUB_HOST")
         def org = Configuration.get("GITHUB_ORGANIZATION")
-        def repo = Configuration.get("repo")
-        def branch = Configuration.get("branch")
-
-        switch (host.toLowerCase()) {
-            case ~/^.*github.*$/:
-                this.scmClient = new GitHub(context, host, org, repo, branch)
-                break
-            case ~/^.*gitlab.*$/:
-                this.scmClient = new Gitlab(context, host, org, repo, branch)
-                break
-            case ~/^.*bitbucket.*$/:
-                this.scmClient = new BitBucket(context, host, org, repo, branch)
-                break
-        }
         
         initOrganization()
-        setDisplayNameTemplate('#${BUILD_NUMBER}|${branch}')
+        setDisplayNameTemplate('#${BUILD_NUMBER}|${Configuration.get("branch")}')
     }
 
     //Methods
@@ -54,12 +40,6 @@ public abstract class AbstractRunner extends BaseObject {
      * Execute custom pipeline/jobdsl steps from Jenkinsfile
      */
     
-    @NonCPS
-    public def setSshClient() {
-        sc.setSshClient()
-        super.setSshClient()
-    }
-
     protected void jenkinsFileScan() {
         def isCustomPipelineEnabled = getToken(Configuration.CREDS_CUSTOM_PIPELINE)
 

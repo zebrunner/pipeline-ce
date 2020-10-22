@@ -5,14 +5,10 @@ import com.zebrunner.jenkins.pipeline.Configuration
 
 class GitHub extends Scm {
 
-    GitHub(context, host, org, repo, branch) {
-        super(context, host, org, repo, branch)
-        this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-        this.branchSpec = "origin/pr/%s/merge"
-    }
-
     GitHub(context) {
         super(context)
+        this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
+        this.branchSpec = "origin/pr/%s/merge"
     }
 
     enum HookArgs {

@@ -60,6 +60,7 @@ public class Configuration {
         ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
         ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
+        GIT_TYPE("github.com"),
         GITHUB_HOST("GITHUB_HOST", "github.com"),
         GITHUB_ORGANIZATION("GITHUB_ORGANIZATION", "qaprosoft"),
 

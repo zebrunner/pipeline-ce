@@ -1446,17 +1446,6 @@ public class TestNG extends Runner {
                       zoomCoverageChart: false])
     }
 
-    public void mergeBranch() {
-        context.node("master") {
-            logger.info("Runner->onBranchMerge")
-            def sourceBranch = Configuration.get("branch")
-            def targetBranch = Configuration.get("targetBranch")
-            def forcePush = Configuration.get("forcePush").toBoolean()
-            scmSshClient.clone()
-            scmSshClient.push(sourceBranch, targetBranch, forcePush)
-        }
-    }
-
     def getSettingsFileProviderContent(fileId){
         context.configFileProvider([context.configFile(fileId: fileId, variable: "MAVEN_SETTINGS")]) {
             context.readFile context.env.MAVEN_SETTINGS

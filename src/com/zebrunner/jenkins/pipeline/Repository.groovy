@@ -6,7 +6,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.PublishJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.DeployJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.hook.PullRequestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.hook.PushJobFactory
-import com.zebrunner.jenkins.jobdsl.factory.pipeline.scm.MergeJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
 import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
@@ -29,16 +28,13 @@ class Repository extends BaseObject {
     protected def repo
     
     protected def rootFolder
-    protected def scmWebHookArgs
     protected def branch
-    protected def scmType
     protected def scmUser
     protected def scmToken
 
     private static final String REPO_URL = "repoUrl"
     
     private static final String BRANCH = "branch"
-    private static final String SCM_TYPE = "scmType"
     private static final String SCM_USER = "scmUser"
     private static final String SCM_TOKEN = "scmToken"
 
@@ -58,29 +54,12 @@ class Repository extends BaseObject {
         this.repo = "UNDEFINED"
         
         this.branch = Configuration.get(BRANCH)
-        this.scmType = Configuration.get(SCM_TYPE)
         this.scmUser = Configuration.get(SCM_USER)
         this.scmToken = Configuration.get(SCM_TOKEN)
 
         logger.debug("repoUrl: $repoUrl branch: $branch")
 
-        switch (scmType) {
-            case "github":
-                this.scmClient = new GitHub(context, scmHost, scmOrg, repo, branch)
-                this.scmWebHookArgs = GitHub.getHookArgsAsMap(GitHub.HookArgs)
-                break
-            case "gitlab":
-                this.scmClient = new Gitlab(context, scmHost, scmOrg, repo, branch)
-                this.scmWebHookArgs = Gitlab.getHookArgsAsMap(Gitlab.HookArgs)
-                break
-            case "bitbucket":
-                this.scmClient = new BitBucket(context, scmHost, scmOrg, repo, branch)
-                this.scmWebHookArgs = BitBucket.getHookArgsAsMap(BitBucket.HookArgs)
-                break
-            default:
-                throw new RuntimeException("Unsuported source control management: ${scmType}!")
-        }
-        
+
         logger.debug("library: " + this.library)
         context.node('master') {
             context.timestamps {
@@ -180,7 +159,6 @@ class Repository extends BaseObject {
 
             def isTestNgRunner = extendsClass([TestNG])
             
-            def mergeJobDesc = "SCM branch merger job"
             def prJobDesc = "Verify compilation and/or do Sonar PullRequest analysis"
             def pushJobDesc = "To finish GitHub WebHook setup, please, follow the steps below:\n- Go to your GitHub repository\n- Click \"Settings\" tab\n- Click \"Webhooks\" menu option\n" +
                               "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
@@ -190,7 +168,6 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", mergeJobDesc, this.scmHost, this.scmOrg, this.repo, this.repoUrl))
             registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
             registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, scmWebHookArgs))
 
@@ -230,10 +207,6 @@ class Repository extends BaseObject {
 
     protected String getPipelineScript() {
         return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
-    }
-
-    protected String getMergeScript() {
-        return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).mergeBranch()"
     }
 
     protected String getPublishScript() {

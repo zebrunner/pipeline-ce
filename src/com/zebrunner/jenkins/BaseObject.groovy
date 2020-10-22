@@ -5,7 +5,6 @@ import com.zebrunner.jenkins.pipeline.Configuration
 import com.zebrunner.jenkins.pipeline.tools.scm.ISCM
 
 import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
-import com.zebrunner.jenkins.pipeline.tools.scm.github.ssh.SshGitHub
 
 import static com.zebrunner.jenkins.Utils.replaceMultipleSymbolsToOne
 
@@ -20,9 +19,7 @@ public abstract class BaseObject {
     protected Map dslObjects
 
     protected ISCM scmClient
-    protected ISCM scmSshClient
-
-    protected boolean isSsh = false
+    protected def scmWebHookArgs
 
     protected def currentBuild
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
@@ -36,15 +33,30 @@ public abstract class BaseObject {
     public BaseObject(context) {
         this.context = context
         this.logger = new Logger(context)
-        this.scmClient = new GitHub(context)
-        this.scmSshClient = new SshGitHub(context)
         this.dslObjects = new LinkedHashMap()
 
         this.factoryRunner = new FactoryRunner(context)
 
-        //TODO: test if getter works in constructor
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
+        
+        def String gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
+        switch (gitType) {
+            case "github":
+                this.scmClient = new GitHub(context)
+                this.scmWebHookArgs = GitHub.getHookArgsAsMap(GitHub.HookArgs)
+                break
+            case "gitlab":
+                this.scmClient = new Gitlab(context)
+                this.scmWebHookArgs = Gitlab.getHookArgsAsMap(Gitlab.HookArgs)
+                break
+            case "bitbucket":
+                this.scmClient = new BitBucket(context)
+                this.scmWebHookArgs = BitBucket.getHookArgsAsMap(BitBucket.HookArgs)
+                break
+            default:
+                throw new RuntimeException("Unsuported source control management: ${gitType}!")
+        }
     }
 
     protected String getDisplayName() {
@@ -59,17 +71,8 @@ public abstract class BaseObject {
         this.displayNameTemplate = template
     }
 
-    @NonCPS
-    public def setSshClient() {
-        this.isSsh = true
-    }
-
     public def getScm() {
-        if (this.isSsh) {
-            return this.scmSshClient
-        } else {
-            return this.scmClient
-        }
+        return this.scmClient
     }
     
     protected void registerObject(name, object) {
