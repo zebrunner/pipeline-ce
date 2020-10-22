@@ -8,26 +8,22 @@ import groovy.transform.InheritConstructors
 @InheritConstructors
 public class PushJobFactory extends PipelineFactory {
 
-    def host
     def organization
-    def repo
+    def repoUrl
     def branch
-    def scmRepoUrl
     def userId
     def zafiraFields
     def isTestNgRunner
     def webHookArgs
 
-    public PushJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, branch, scmRepoUrl, userId, isTestNgRunner, zafiraFields, webHookArgs) {
+    public PushJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, userId, isTestNgRunner, zafiraFields, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
         this.description = desc
-        this.host = host
         this.organization = organization
-        this.repo = repo
+        this.repoUrl = repoUrl
         this.branch = branch
-        this.scmRepoUrl = scmRepoUrl
         this.userId = userId
         this.isTestNgRunner = isTestNgRunner
         this.zafiraFields = zafiraFields
@@ -39,13 +35,9 @@ public class PushJobFactory extends PipelineFactory {
 
         pipelineJob.with {
 
-            //TODO: think about other parameters to support DevOps CI operations
             parameters {
-                configure addHiddenParameter('GITHUB_HOST', '', host)
-                configure addHiddenParameter('GITHUB_ORGANIZATION', '', organization)
-                stringParam('repo', repo, 'GitHub repository for scanning')
-                //TODO: analyze howto support several gc_GIT_BRACH basing on project
-                stringParam('branch', this.branch, "SCM repository branch to run against")
+                configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                stringParam('branch', this.branch, "repository branch to run against")
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }

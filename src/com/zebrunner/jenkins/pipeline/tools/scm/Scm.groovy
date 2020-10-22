@@ -15,54 +15,36 @@ abstract class Scm implements ISCM {
 	protected def prRefSpec
 	protected def branchSpec
 	
-	protected def host
-	protected def org
-	protected def repo
+    protected def repoUrl // https or ssh repository url
+    
 	protected def branch
 	protected def credentialsId
-	protected def scmUrl
-	protected def apiUrl
-	protected def sshUrl
-
+    
+    protected abstract String branchSpec()
+    public abstract def webHookArgs()
+    
 	Scm(context) { 
 		this.context = context
 		this.logger = new Logger(context)
+
+		this.repoUrl = Configuration.get("repoUrl")
+		this.branch = Configuration.get("branch")
+		this.credentialsId = Configuration.get("credentialsId")
 	}
-
-	Scm(context, host, org, repo, branch) {
-		this.context = context
-		this.host = host
-		this.org = org
-		this.repo = repo
-		this.branch = branch
-		this.credentialsId = "$org-$repo"
-		this.scmUrl = setUrl()
-		this.logger = new Logger(context)
-
-		if (Configuration.get("scmURL") != null) {
-			gitHtmlUrl = Configuration.get("scmURL")
-			credentialsId = ''
-		}
-	}
-
-	protected abstract String branchSpec()
 
 	public def clone() {
 		clone(true)
 	}
 
 	public def clone(isShallow) {
-		context.stage('Checkout Scm Repository') {
-			logger.info("Scm->clone")
+		context.stage('Checkout Repository') {
+			logger.info("Git->clone; shallow: ${isShallow}")
 			def fork = !isParamEmpty(Configuration.get("fork")) ? Configuration.get("fork").toBoolean() : false
 			def userId = Configuration.get("BUILD_USER_ID")
-			def gitUrl = Configuration.resolveVars(scmUrl)
-			def credentialsId =  "${this.org}-${this.repo}"
+			def gitUrl = this.repoUrl
 
-			logger.info("SCM_HOST: ${this.host}")
-			logger.info("SCM_ORGANIZATION: ${this.org}")
-			logger.info("SCM_URL: ${this.scmUrl}")
-			logger.info("CREDENTIALS_ID: ${credentialsId}")
+			logger.info("REPO_URL: ${this.repoUrl}")
+			logger.info("CREDENTIALS_ID: ${this.credentialsId}")
 
 			if (fork) {
 				def tokenName = "token_$userId"
@@ -71,8 +53,9 @@ abstract class Scm implements ISCM {
 					def userName = ""
 					def userPassword = ""
 					context.withCredentials([context.usernamePassword(credentialsId: tokenName, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+						throw new RuntimeException("Cloning via fork is unsupported now!")
 						gitUrl = "https://${scmHost}/${context.env.USERNAME}/${repo}"
-						credentialsId = tokenName
+						this.credentialsId = tokenName
 						userName = context.env.USERNAME
 						userPassword = context.env.PASSWORD
 					}
@@ -82,36 +65,35 @@ abstract class Scm implements ISCM {
 				}
 			}
 
-			Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
-			Configuration.set("scm_url", scmVars.GIT_URL)
+			Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+			Configuration.set("scm_url", gitUrl)
 			Configuration.set("scm_branch", branch)
 			Configuration.set("scm_commit", scmVars.GIT_COMMIT)
 		}
 	}
 
+	//TODO: try to remove below method or combine with above clone operation
 	public def clone(gitUrl, branch, subFolder) {
-		context.stage('Checkout GitHub Repository') {
-			logger.info("GitHub->clone\nGIT_URL: ${gitUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+		context.stage('Checkout Repository') {
+			logger.info("Git->clone\nREPO_URL: ${gitUrl}\nbranch: ${branch}")
+			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
 
 	public def clonePR() {
-		context.stage('Checkout GitHub Repository') {
+		context.stage('Checkout Repository') {
 			def branch = Configuration.get("pr_source_branch")
 			def prNumber = Configuration.get('pr_number')
-			def gitUrl = Configuration.resolveVars(scmUrl)
-			logger.info("GitHub->clonePR\nGIT_URL: ${gitUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(gitUrl, branchSpec(), ".", true, false, prRefSpec, credentialsId)
+			logger.info("Git->clonePR\nREPO_URL: ${this.repoUrl}\nbranch: ${branch}")
+			context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
 		}
 	}
 
 	public def clonePush() {
-		context.stage('Checkout GitHub Repository') {
+		context.stage('Checkout Repository') {
 			def branch = Configuration.get("branch")
-			def gitUrl = Configuration.resolveVars(scmUrl)
-			logger.info("GitHub->clone\nGIT_URL: ${gitUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(gitUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			logger.info("Git->clonePush\nREPO_URL: ${this.repoUrl}\nbranch: ${branch}")
+			context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
 
@@ -123,8 +105,9 @@ abstract class Scm implements ISCM {
 																			  [$class: 'CloneOption', noTags: true, reference: '', shallow: shallow, timeout: 15]],
 										  submoduleCfg                     : [],
 										  userRemoteConfigs                : [[url: gitUrl, refspec: refspecValue, credentialsId: credentialsIdValue]]],
-							  changelog: changelog,
-							  poll     : false]
+                                          changelog: changelog,
+                                          poll     : false
+                             ]
 		if (subFolder != null) {
 			def subfolderExtension = [[$class: 'RelativeTargetDirectory', relativeTargetDir: subFolder]]
 			checkoutParams.get("scm")["extensions"] = subfolderExtension
@@ -132,33 +115,4 @@ abstract class Scm implements ISCM {
 		return checkoutParams
 	}
 
-	public def mergePR() {
-		//merge pull request
-		def org = Configuration.get("GITHUB_ORGANIZATION")
-		def repo = Configuration.get("repo")
-		def ghprbPullId = Configuration.get("ghprbPullId")
-
-		def ghprbCredentialsId = Configuration.get("ghprbCredentialsId")
-		logger.info("ghprbCredentialsId: " + ghprbCredentialsId)
-		context.withCredentials([context.usernamePassword(credentialsId: "${ghprbCredentialsId}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-			logger.debug("USERNAME: ${context.env.USERNAME}")
-			logger.debug("PASSWORD: ${context.env.PASSWORD}")
-			logger.debug("curl -u ${context.env.USERNAME}:${context.env.PASSWORD} -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge")
-			//context.sh "curl -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge?access_token=${context.env.PASSWORD}"
-			context.sh "curl -u ${context.env.USERNAME}:${context.env.PASSWORD} -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge"
-		}
-	}
-
-	static def getHookArgsAsMap(hookArgs) {
-		return hookArgs.values().collectEntries { [(it.getKey()): it.getValue()] }
-	}
-
-	@NonCPS
-	protected def setUrl() {
-		this.scmUrl =  String.format("https://%s/%s/%s", host, org, repo)
-	}
-
-	public def setUrl(url) {
-		this.scmUrl = url
-	}
 }

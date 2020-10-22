@@ -16,8 +16,6 @@ class SonarClient extends HttpClient {
 
     public String getGoals(isPullRequest=false) {
         def goals = ""
-        def scmProvider = Configuration.get(Configuration.Parameter.GITHUB_HOST)
-
         if (isParamEmpty(serviceUrl)) {
             logger.warn("The url for the sonarqube server is not configured, sonarqube scan will be skipped!")
             return goals
@@ -32,19 +30,27 @@ class SonarClient extends HttpClient {
 
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
-            if (scmProvider.contains("github")) {
-                goals += " -Dsonar.pullrequest.provider=Github \
+
+            def gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
+            switch (gitType) {
+                case "github":
+                    goals += " -Dsonar.pullrequest.provider=Github \
                            -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")} \
                            -Dsonar.scm.revision=${Configuration.get("pr_sha")} "
-            } else if (scmProvider.contains("bitbucket")) {
-                goals += " -Dsonar.pullrequest.bitbucket.repositorySlug=${Configuration.get("pr_repository")} \
-                          -Dsonar.pullrequest.provider=BitbucketServer"
-            } else if (scmProvider.contains("gitlab")) {
-                goals += " -Dsonar.pullrequest.gitlab.repositorySlug=${Configuration.get("pr_repository")} \
+                    break
+                case "gitlab":
+                    goals += " -Dsonar.pullrequest.gitlab.repositorySlug=${Configuration.get("pr_repository")} \
                            -Dsonar.scm.revision=${Configuration.get("pr_sha")} \
                            -Dsonar.pullrequest.provider=GitlabServer"
+                    break
+                case "bitbucket":
+                    goals += " -Dsonar.pullrequest.bitbucket.repositorySlug=${Configuration.get("pr_repository")} \
+                          -Dsonar.pullrequest.provider=BitbucketServer"
+                    break
+                default:
+                    throw new RuntimeException("Unsuported source control management: ${gitType}!")
             }
-
+            
             goals += " -Dsonar.pullrequest.key=${Configuration.get("pr_number")} \
                     -Dsonar.pullrequest.branch=${Configuration.get("pr_source_branch")} \
                     -Dsonar.pullrequest.base=${Configuration.get("pr_target_branch")}"

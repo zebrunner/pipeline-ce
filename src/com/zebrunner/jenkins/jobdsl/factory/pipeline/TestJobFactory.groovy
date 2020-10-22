@@ -9,9 +9,7 @@ import groovy.transform.InheritConstructors
 @InheritConstructors
 public class TestJobFactory extends PipelineFactory {
 
-    def host
-    def repo
-    def organization
+    def repoUrl
     def branch
     def sub_project
     def zafira_project
@@ -22,14 +20,11 @@ public class TestJobFactory extends PipelineFactory {
     def threadCount
     def dataProviderThreadCount
 
-    public TestJobFactory(folder, pipelineScript, host, repo, organization, branch,
-                          sub_project, zafira_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
+    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, zafira_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
         this.folder = folder
         this.description = jobDesc
         this.pipelineScript = pipelineScript
-        this.host = host
-        this.repo = repo
-        this.organization = organization
+        this.repoUrl = repoUrl
         this.branch = branch
         this.sub_project = sub_project
         this.zafira_project = zafira_project
@@ -81,7 +76,7 @@ public class TestJobFactory extends PipelineFactory {
                     description('Environment to test against')
                 }
 
-                booleanParam('fork', false, "Reuse forked repository for ${repo}.")
+                booleanParam('fork', false, "Reuse forked repository.")
                 //booleanParam('debug', false, 'Check to start tests in remote debug mode.')
 
                 //** Requires Active Choices Plug-in v1.2+ **//*
@@ -162,10 +157,8 @@ public class TestJobFactory extends PipelineFactory {
                 if (!isParamEmpty(nodeLabel)) {
                     configure addHiddenParameter('node_label', 'customized node label', nodeLabel)
                 }
-                configure stringParam('branch', this.branch, "SCM repository branch to run against")
-                configure addHiddenParameter('repo', '', repo)
-                configure addHiddenParameter('GITHUB_HOST', '', host)
-                configure addHiddenParameter('GITHUB_ORGANIZATION', '', organization)
+                configure stringParam('branch', this.branch, "repository branch to run against")
+                configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
                 configure addHiddenParameter('zafira_project', '', zafira_project)
                 configure addHiddenParameter('suite', '', suiteName)

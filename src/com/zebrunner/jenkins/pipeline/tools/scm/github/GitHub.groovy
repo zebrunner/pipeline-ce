@@ -5,14 +5,11 @@ import com.zebrunner.jenkins.pipeline.Configuration
 
 class GitHub extends Scm {
 
-    GitHub(context, host, org, repo, branch) {
-        super(context, host, org, repo, branch)
-        this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-        this.branchSpec = "origin/pr/%s/merge"
-    }
-
     GitHub(context) {
         super(context)
+        
+        this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
+        this.branchSpec = "origin/pr/%s/merge"
     }
 
     enum HookArgs {
@@ -44,10 +41,17 @@ class GitHub extends Scm {
 
         public String getValue() { return value }
     }
-
+    
     @Override
     protected String branchSpec() {
         return String.format(branchSpec, Configuration.get('pr_number'))
+    }
+    
+    @Override
+    public def webHookArgs() {
+        return HookArgs.values().collectEntries {
+            [(it.getKey()): it.getValue()]
+        }
     }
 
 }

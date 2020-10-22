@@ -60,12 +60,7 @@ public class Configuration {
         ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
         ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
-        GITHUB_HOST("GITHUB_HOST", "github.com"),
-        GITHUB_API_URL("GITHUB_API_URL", "https://api.\${GITHUB_HOST}/"),
-        GITHUB_ORGANIZATION("GITHUB_ORGANIZATION", "qaprosoft"),
-        GITHUB_HTML_URL("GITHUB_HTML_URL", "https://\${GITHUB_HOST}/\${GITHUB_ORGANIZATION}"),
-        GITHUB_OAUTH_TOKEN("GITHUB_OAUTH_TOKEN", mustOverride, true),
-        GITHUB_SSH_URL("GITHUB_SSH_URL", "git@\${GITHUB_HOST}:\${GITHUB_ORGANIZATION}"),
+        GIT_TYPE("GIT_TYPE", "github"),
 
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 

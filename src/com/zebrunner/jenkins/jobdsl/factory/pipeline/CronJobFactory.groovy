@@ -10,22 +10,18 @@ import static com.zebrunner.jenkins.Utils.*
 @InheritConstructors
 public class CronJobFactory extends PipelineFactory {
 
-    def host
-    def repo
-    def organization
+    def repoUrl
     def branch
     def suitePath
     def scheduling
     def orgRepoScheduling
 
-    public CronJobFactory(folder, pipelineScript, cronJobName, host, repo, organization, branch, suitePath, jobDesc, orgRepoScheduling) {
+    public CronJobFactory(folder, pipelineScript, cronJobName, repoUrl, branch, suitePath, jobDesc, orgRepoScheduling) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.description = jobDesc
         this.name = cronJobName
-        this.host = host
-        this.repo = repo
-        this.organization = organization
+        this.repoUrl = repoUrl
         this.branch = branch
         this.suitePath = suitePath
         this.orgRepoScheduling = orgRepoScheduling
@@ -57,9 +53,7 @@ public class CronJobFactory extends PipelineFactory {
                     editable(true)
                     description('Environment to test against')
                 }
-                configure addHiddenParameter('repo', '', repo)
-                configure addHiddenParameter('GITHUB_HOST', '', host)
-                configure addHiddenParameter('GITHUB_ORGANIZATION', '', organization)
+                configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
 
