@@ -42,10 +42,9 @@ abstract class Scm implements ISCM {
 			def fork = !isParamEmpty(Configuration.get("fork")) ? Configuration.get("fork").toBoolean() : false
 			def userId = Configuration.get("BUILD_USER_ID")
 			def gitUrl = this.repoUrl
-			def credentialsId =  "${this.org}-${this.repo}"
 
 			logger.info("REPO_URL: ${this.repoUrl}")
-			logger.info("CREDENTIALS_ID: ${credentialsId}")
+			logger.info("CREDENTIALS_ID: ${this.credentialsId}")
 
 			if (fork) {
 				def tokenName = "token_$userId"
@@ -56,7 +55,7 @@ abstract class Scm implements ISCM {
 					context.withCredentials([context.usernamePassword(credentialsId: tokenName, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
 						throw new RuntimeException("Cloning via fork is unsupported now!")
 						gitUrl = "https://${scmHost}/${context.env.USERNAME}/${repo}"
-						credentialsId = tokenName
+						this.credentialsId = tokenName
 						userName = context.env.USERNAME
 						userPassword = context.env.PASSWORD
 					}
