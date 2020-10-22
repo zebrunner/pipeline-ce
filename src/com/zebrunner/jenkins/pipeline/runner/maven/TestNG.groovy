@@ -876,7 +876,6 @@ public class TestNG extends Runner {
                 "GITHUB_API_URL",
                 "GITHUB_ORGANIZATION",
                 "GITHUB_HTML_URL",
-                "GITHUB_SSH_URL",
                 "SELENIUM_URL",
                 "TESTRAIL_SERVICE_URL",
                 "TESTRAIL_USERNAME",
