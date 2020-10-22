@@ -20,7 +20,6 @@ class Repository extends BaseObject {
     protected def library = ""
     protected def runnerClass
     
-    protected def rootFolder
     protected def branch
     protected def scmUser
     protected def scmToken
@@ -56,8 +55,8 @@ class Repository extends BaseObject {
         // execute new _trigger-<repo> to regenerate other views/jobs/etc
         def onPushJobLocation = this.repo + "/onPush-" + this.repo
 
-        if (!isParamEmpty(this.rootFolder)) {
-            onPushJobLocation = this.rootFolder + "/" + onPushJobLocation
+        if (!isParamEmpty(this.organization)) {
+            onPushJobLocation = this.organization + "/" + onPushJobLocation
         }
 
         context.build job: onPushJobLocation,
@@ -104,30 +103,13 @@ class Repository extends BaseObject {
                 logger.debug("reportingRefreshToken: " + reportingRefreshToken)
             }
 
-            // Folder from which RegisterRepository job was started
-            // Important! using getOrgFolderNam from Utils is prohibited here!
-            this.rootFolder = Paths.get(Configuration.get(Configuration.Parameter.JOB_NAME)).getName(0).toString()
-            if ("RegisterRepository".equals(this.rootFolder)) {
-                // use case when RegisterRepository is on root!
-                this.rootFolder = "/"
-                if (!isParamEmpty(reportingServiceUrl) && !isParamEmpty(reportingRefreshToken)) {
-                    Organization.registerReportingCredentials("", reportingServiceUrl, reportingRefreshToken)
-                }
-            } else {
-                if (!isParamEmpty(reportingServiceUrl) && !isParamEmpty(reportingRefreshToken)) {
-                    Organization.registerReportingCredentials(repoFolder, reportingServiceUrl, reportingRefreshToken)
-                }
+            if (!isParamEmpty(reportingServiceUrl) && !isParamEmpty(reportingRefreshToken)) {
+                Organization.registerReportingCredentials(this.organization, reportingServiceUrl, reportingRefreshToken)
             }
             
             logger.debug("organization: ${this.organization}")
-            logger.debug("rootFolder: " + this.rootFolder)
 
-            if (!"/".equals(this.rootFolder)) {
-                //For both cases when rootFolder exists job was started with existing organization value,
-                //so it should be used by default
-                repoFolder = this.rootFolder + "/" + repoFolder
-            }
-
+            repoFolder = this.organization + "/" + repoFolder
             logger.debug("repoFolder: " + repoFolder)
 
             // Support DEV related CI workflow

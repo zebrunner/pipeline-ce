@@ -17,9 +17,6 @@ public abstract class AbstractRunner extends BaseObject {
         super(context)
         sc = new SonarClient(context)
 
-        def host = Configuration.get("GITHUB_HOST")
-        def org = Configuration.get("GITHUB_ORGANIZATION")
-        
         setDisplayNameTemplate('#${BUILD_NUMBER}|${Configuration.get("branch")}')
     }
 
@@ -53,15 +50,6 @@ public abstract class AbstractRunner extends BaseObject {
                 context.jobDsl targets: 'Jenkinsfile'
             }
         }
-    }
-
-    /*
-     * Get organization folder value
-     * @return organization String
-     */
-
-    protected def getOrgFolder() {
-        return this.organization
     }
 
     /*

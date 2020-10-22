@@ -18,8 +18,8 @@ class Runner extends AbstractRunner {
 	public Runner(context) {
 		super(context)
 		runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
-		registry = "${Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)}/${Configuration.get("repo")}"
-		registryCreds = "${Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)}-docker"
+		registry = "${this.organization}/${this.repo}"
+		registryCreds = "${this.organization}-docker"
 		releaseName = "1.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
 		buildTool = Configuration.get("build_tool")
 		dockerFile = Configuration.get("DOCKERFILE")

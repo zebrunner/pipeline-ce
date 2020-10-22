@@ -115,24 +115,4 @@ abstract class Scm implements ISCM {
 		return checkoutParams
 	}
 
-    //TODO: remove api calls to github.com from common pipeline code!
-/*
-	public def mergePR() {
-		//merge pull request
-		def org = Configuration.get("GITHUB_ORGANIZATION")
-		def repo = Configuration.get("repo")
-		def ghprbPullId = Configuration.get("ghprbPullId")
-
-		def ghprbCredentialsId = Configuration.get("ghprbCredentialsId")
-		logger.info("ghprbCredentialsId: " + ghprbCredentialsId)
-		context.withCredentials([context.usernamePassword(credentialsId: "${ghprbCredentialsId}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-			logger.debug("USERNAME: ${context.env.USERNAME}")
-			logger.debug("PASSWORD: ${context.env.PASSWORD}")
-			logger.debug("curl -u ${context.env.USERNAME}:${context.env.PASSWORD} -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge")
-			//context.sh "curl -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge?access_token=${context.env.PASSWORD}"
-			context.sh "curl -u ${context.env.USERNAME}:${context.env.PASSWORD} -X PUT -d '{\"commit_title\": \"Merge pull request\"}'  https://api.github.com/repos/${org}/${repo}/pulls/${ghprbPullId}/merge"
-		}
-	}
-*/
-
 }

@@ -182,9 +182,7 @@ public class TestNG extends Runner {
     }
 
     def generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch){
-        def host = Configuration.get(Configuration.Parameter.GITHUB_HOST)
-        def organization = Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)
-		
+	
         // VIEWS
         registerObject("cron", new ListViewFactory(repoFolder, 'CRON', '.*cron.*'))
         //registerObject(project, new ListViewFactory(jobFolder, project.toUpperCase(), ".*${project}.*"))
@@ -869,8 +867,6 @@ public class TestNG extends Runner {
                 "ZEBRUNNER_PIPELINE",
                 "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
-                "GITHUB_HOST",
-                "GITHUB_ORGANIZATION",
                 "SELENIUM_URL",
                 "TESTRAIL_SERVICE_URL",
                 "TESTRAIL_USERNAME",

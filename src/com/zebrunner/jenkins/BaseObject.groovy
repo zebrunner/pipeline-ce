@@ -47,28 +47,10 @@ public abstract class BaseObject {
         this.dslObjects = new LinkedHashMap()
 
         this.factoryRunner = new FactoryRunner(context)
-        initOrganization()
+        this.organization = initOrg()
         
         this.repoUrl = Configuration.get(REPO_URL)
-        
-/*      Find repo name from repository url value (https or ssh)
-        
-        For example carina-demo:
-        https://github.com/owner/carina-demo.git
-        git@github.com:owner/carina-demo.git
-        
-        java-testng:
-        git@gitlab.com:zebrunner/ce/agent/java-testng.git
-        https://gitlab.com/zebrunner/ce/agent/java-testng.git
-        
-        i.e. repo name is everything after latest "/" and without .git
-*/
-        
-        def items = this.repoUrl.split("/")
-        if (items.length < 1) {
-            throw new RuntimeException("Unable to parse repository name from '${repoUrl}' value!")
-        }
-        this.repo = items[items.length - 1].replace(".git", "")
+        this.repo = initRepo(this.repoUrl)
 
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
@@ -134,7 +116,7 @@ public abstract class BaseObject {
     }
     
     @NonCPS
-    protected void initOrganization() {
+    private def initOrg() {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         //Configuration.get(Configuration.Parameter.JOB_NAME)
         int nameCount = Paths.get(jobName).getNameCount()
@@ -156,6 +138,24 @@ public abstract class BaseObject {
             throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
         }
 
-        this.organization = orgFolderName
+        return orgFolderName
     }
+
+    /*       
+     *  Find repo name from repository url value (https or ssh)
+     * @return organization String
+     */
+    private def initRepo(url) {
+        /*
+         * https://github.com/owner/carina-demo.git or git@github.com:owner/carina-demo.git to carina-demo
+         * 
+         * https://gitlab.com/zebrunner/ce/agent/java-testng.git or git@gitlab.com:zebrunner/ce/agent/java-testng.git to java-testng 
+         */
+         def items = url.split("/")
+         if (items.length < 1) {
+             throw new RuntimeException("Unable to parse repository name from '${url}' value!")
+         }
+         return items[items.length - 1].replace(".git", "")
+    }
+
 }
