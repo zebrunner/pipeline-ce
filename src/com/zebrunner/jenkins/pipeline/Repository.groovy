@@ -8,9 +8,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.hook.PullRequestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.hook.PushJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
-import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
-import com.zebrunner.jenkins.pipeline.tools.scm.gitlab.Gitlab
-import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 import com.zebrunner.jenkins.pipeline.runner.maven.TestNG
 import com.zebrunner.jenkins.pipeline.runner.maven.Runner
 import java.nio.file.Paths
