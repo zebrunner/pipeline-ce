@@ -8,23 +8,19 @@ import groovy.transform.InheritConstructors
 @InheritConstructors
 public class PullRequestJobFactory extends PipelineFactory {
 
-    def host
     def organization
-    def repo
+    def repoUrl
     def branch
-    def scmRepoUrl
     def webHookArgs
 
-    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, branch, scmRepoUrl, webHookArgs) {
+    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
         this.description = desc
-        this.host = host
         this.organization = organization
-        this.repo = repo
+        this.repoUrl = repoUrl
         this.branch = branch
-        this.scmRepoUrl = scmRepoUrl
         this.webHookArgs = webHookArgs
     }
 
@@ -35,9 +31,8 @@ public class PullRequestJobFactory extends PipelineFactory {
         pipelineJob.with {
 
             parameters {
-                stringParam('repo', repo, 'Your GitHub repository for scanning')
+                configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('branch', '', branch)
-                configure addHiddenParameter('GITHUB_HOST', '', host)
                 stringParam('pr_number', '', '')
                 stringParam('pr_repository', '', '')
                 stringParam('pr_source_branch', '', '')
