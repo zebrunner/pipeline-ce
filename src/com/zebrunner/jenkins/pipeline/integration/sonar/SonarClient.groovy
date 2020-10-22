@@ -30,11 +30,12 @@ class SonarClient extends HttpClient {
 
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
+
             def gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
             switch (gitType) {
                 case "github":
                     goals += " -Dsonar.pullrequest.provider=Github \
-                           -Dsonar.pullrequest.github.repository=sandinosanchez/${Configuration.get("pr_repository")} \
+                           -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")} \
                            -Dsonar.scm.revision=${Configuration.get("pr_sha")} "
                     break
                 case "gitlab":
