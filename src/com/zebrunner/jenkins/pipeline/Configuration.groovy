@@ -61,9 +61,7 @@ public class Configuration {
         ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
         GITHUB_HOST("GITHUB_HOST", "github.com"),
-        GITHUB_API_URL("GITHUB_API_URL", "https://api.\${GITHUB_HOST}/"),
         GITHUB_ORGANIZATION("GITHUB_ORGANIZATION", "qaprosoft"),
-        GITHUB_HTML_URL("GITHUB_HTML_URL", "https://\${GITHUB_HOST}/\${GITHUB_ORGANIZATION}"),
 
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 

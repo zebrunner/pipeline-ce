@@ -23,19 +23,22 @@ class Repository extends BaseObject {
 
     protected def library = ""
     protected def runnerClass
-    protected def rootFolder
-    protected def scmWebHookArgs
+    protected def repoUrl // git repo url (https or ssh)
     protected def scmHost
     protected def scmOrg
     protected def repo
+    
+    protected def rootFolder
+    protected def scmWebHookArgs
     protected def branch
+    protected def scmType
     protected def scmUser
     protected def scmToken
 
-    private static final String SCM_ORG = "scmOrg"
-    private static final String SCM_HOST = "scmHost"
-    private static final String REPO = "repo"
+    private static final String REPO_URL = "repoUrl"
+    
     private static final String BRANCH = "branch"
+    private static final String SCM_TYPE = "scmType"
     private static final String SCM_USER = "scmUser"
     private static final String SCM_TOKEN = "scmToken"
 
@@ -47,33 +50,35 @@ class Repository extends BaseObject {
 
     public void register() {
         logger.info("Repository->register")
-        Configuration.set("GITHUB_ORGANIZATION", Configuration.get(SCM_ORG))
-        Configuration.set("GITHUB_HOST", Configuration.get(SCM_HOST))
-
-        this.scmHost = Configuration.get(SCM_HOST)
-        this.scmOrg = Configuration.get(SCM_ORG)
-        this.repo = Configuration.get(REPO)
+        
+        this.repoUrl = Configuration.get(REPO_URL)
+        //TODO: calculate repo, org and host value from using repoUrl!
+        this.scmOrg = "UNDEFINED"
+        this.scmHost = "UNDEFINED"
+        this.repo = "UNDEFINED"
+        
         this.branch = Configuration.get(BRANCH)
+        this.scmType = Configuration.get(SCM_TYPE)
         this.scmUser = Configuration.get(SCM_USER)
         this.scmToken = Configuration.get(SCM_TOKEN)
 
-        logger.debug("scmHost: $scmHost scmOrg: $scmOrg repo: $repo branch: $branch")
+        logger.debug("repoUrl: $repoUrl branch: $branch")
 
-        switch (scmHost) {
-            case ~/^.*github.*$/:
+        switch (scmType) {
+            case "github":
                 this.scmClient = new GitHub(context, scmHost, scmOrg, repo, branch)
                 this.scmWebHookArgs = GitHub.getHookArgsAsMap(GitHub.HookArgs)
                 break
-            case ~/^.*gitlab.*$/:
+            case "gitlab":
                 this.scmClient = new Gitlab(context, scmHost, scmOrg, repo, branch)
                 this.scmWebHookArgs = Gitlab.getHookArgsAsMap(Gitlab.HookArgs)
                 break
-            case ~/^.*bitbucket.*$/:
+            case "bitbucket":
                 this.scmClient = new BitBucket(context, scmHost, scmOrg, repo, branch)
                 this.scmWebHookArgs = BitBucket.getHookArgsAsMap(BitBucket.HookArgs)
                 break
             default:
-                throw new RuntimeException("Unsuported scm system")
+                throw new RuntimeException("Unsuported source control management: ${scmType}!")
         }
         
         logger.debug("library: " + this.library)
@@ -86,7 +91,7 @@ class Repository extends BaseObject {
         }
 
         // execute new _trigger-<repo> to regenerate other views/jobs/etc
-        def onPushJobLocation = Configuration.get(REPO) + "/onPush-" + Configuration.get(REPO)
+        def onPushJobLocation = this.repo + "/onPush-" + this.repo
 
         if (!isParamEmpty(this.rootFolder)) {
             onPushJobLocation = this.rootFolder + "/" + onPushJobLocation
@@ -95,7 +100,7 @@ class Repository extends BaseObject {
         context.build job: onPushJobLocation,
             propagate: true,
             parameters: [
-                    context.string(name: 'repo', value: Configuration.get(REPO)),
+                    context.string(name: 'repoUrl', value: this.repoUrl),
                     context.string(name: 'branch', value: Configuration.get(BRANCH)),
                     context.booleanParam(name: 'onlyUpdated', value: false),
                     context.string(name: 'removedConfigFilesAction', value: 'DELETE'),
@@ -165,7 +170,6 @@ class Repository extends BaseObject {
 
             // Support DEV related CI workflow
             // TODO: analyze do we need system jobs for QA repo... maybe prametrize CreateRepository call
-            def gitUrl = Configuration.resolveVars("${Configuration.get(Configuration.Parameter.GITHUB_HTML_URL)}/${this.repo}")
             def userId = isParamEmpty(Configuration.get("userId")) ? '' : Configuration.get("userId")
             
             if (!isParamEmpty(this.library)) {
@@ -186,9 +190,9 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", mergeJobDesc, this.scmHost, this.scmOrg, this.repo, gitUrl))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, gitUrl, scmWebHookArgs))
+            registerObject("merge_job", new MergeJobFactory(repoFolder, getMergeScript(), "CutBranch-${this.repo}", mergeJobDesc, this.scmHost, this.scmOrg, this.repo, this.repoUrl))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, userId, isTestNgRunner, zafiraFields, scmWebHookArgs))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.scmHost, this.scmOrg, this.repo, this.branch, this.repoUrl, scmWebHookArgs))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
 
