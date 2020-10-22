@@ -48,7 +48,7 @@ class GitHub extends Scm {
     }
     
     @Override
-    public def getWebHookArgs() {
+    public def webHookArgs() {
         return hookArgs.values().collectEntries {
             [(it.getKey()): it.getValue()]
         }
