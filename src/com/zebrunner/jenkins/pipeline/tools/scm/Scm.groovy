@@ -74,8 +74,8 @@ abstract class Scm implements ISCM {
 
 	public def clone(gitUrl, branch, subFolder) {
 		context.stage('Checkout Repository') {
-			logger.info("Git->clone\nREPO_URL: ${repoUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(this.repoUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			logger.info("Git->clone\nREPO_URL: ${gitUrl}\nbranch: ${branch}")
+			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
 		}
 	}
 
