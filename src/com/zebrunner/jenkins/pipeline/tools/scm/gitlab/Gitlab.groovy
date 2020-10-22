@@ -47,7 +47,7 @@ class Gitlab extends Scm {
     
     @Override
     public def webHookArgs() {
-        return hookArgs.values().collectEntries {
+        return HookArgs.values().collectEntries {
             [(it.getKey()): it.getValue()]
         }
     }
