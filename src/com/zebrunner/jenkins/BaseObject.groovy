@@ -127,7 +127,7 @@ public abstract class BaseObject {
         if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
             // testrail-updater - i.e. empty org name
             orgFolderName = ""
-        } else if (nameCount == 2 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
+        } else if (nameCount == 2 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
             // stage/testrail-updater - i.e. stage
             orgFolderName = Paths.get(jobName).getName(0).toString()
         } else if (nameCount == 2) {
