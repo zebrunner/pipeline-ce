@@ -184,7 +184,6 @@ public class TestNG extends Runner {
     def generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch){
         def host = Configuration.get(Configuration.Parameter.GITHUB_HOST)
         def organization = Configuration.get(Configuration.Parameter.GITHUB_ORGANIZATION)
-        def repo = Configuration.get("repo")
 		
         // VIEWS
         registerObject("cron", new ListViewFactory(repoFolder, 'CRON', '.*cron.*'))
@@ -268,19 +267,17 @@ public class TestNG extends Runner {
             }
 
             //pipeline job
-            //TODO: review each argument to TestJobFactory and think about removal
-            //TODO: verify suiteName duplication here and generate email failure to the owner and admin_emails
-            def jobDesc = "project: ${repo}; zafira_project: ${currentZafiraProject}; owner: ${suiteOwner}"
+            def jobDesc = "zafira_project: ${currentZafiraProject}; owner: ${suiteOwner}"
             branch = getSuiteParameter(Configuration.get("branch"), "jenkinsDefaultGitBranch", currentSuite)
-            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), host, repo, organization, branch, subProject, currentZafiraProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
+            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentZafiraProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
 
 			//cron job
             if (!isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))) {
                 def cronJobNames = currentSuite.getParameter("jenkinsRegressionPipeline")
                 for (def cronJobName : cronJobNames.split(",")) {
                     cronJobName = cronJobName.trim()
-					def cronDesc = "project: ${repo}; type: cron"
-					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, host, repo, organization, branch, currentSuitePath, cronDesc, orgRepoScheduling)
+					def cronDesc = "type: cron"
+					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, this.repoUrl, branch, currentSuitePath, cronDesc, orgRepoScheduling)
 
 					if (!dslObjects.containsKey(cronJobName)) {
 						// register CronJobFactory only if its declaration is missed
