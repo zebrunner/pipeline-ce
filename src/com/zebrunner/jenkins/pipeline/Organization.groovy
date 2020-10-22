@@ -7,8 +7,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.QTestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestRailJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.RegisterRepositoryJobFactory
 import com.zebrunner.jenkins.pipeline.integration.zebrunner.ZebrunnerUpdater
-import com.zebrunner.jenkins.pipeline.tools.scm.ISCM
-import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
 import com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty
 import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
 import jenkins.security.ApiTokenProperty
@@ -17,30 +15,23 @@ import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Organization extends BaseObject {
+    
     private static final String RUNNER_CLASS = "com.zebrunner.jenkins.pipeline.runner.maven.TestNG"
 
-    protected ISCM scmClient
     protected ZebrunnerUpdater zebrunnerUpdater
 
     protected def folderName
     protected def reportingServiceUrl
     protected def reportingAccessToken
-    protected def sonarGithubOAuth
     protected def customPipeline
 
 
     public Organization(context) {
         super(context)
-        scmClient = new GitHub(context)
-
-        zebrunnerUpdater = new ZebrunnerUpdater(context)
-
+        this.zebrunnerUpdater = new ZebrunnerUpdater(context)
         this.folderName = Configuration.get("folderName")
-
         this.reportingServiceUrl = Configuration.get("reportingServiceUrl")
         this.reportingAccessToken = Configuration.get("reportingAccessToken")
-
-        this.sonarGithubOAuth = Configuration.get("sonarGithubOAuth")
         this.customPipeline = Configuration.get("customPipeline")
     }
 
@@ -271,6 +262,11 @@ class Organization extends BaseObject {
             registerCustomPipelineCreds(this.folderName, customPipeline)
         }
 
+        // register webhook creds as a secret text for each organization/tenant
+        if (!isParamEmpty(this.folderName)) {
+            updateJenkinsCredentials("${this.folderName}-webhook-token", "Token used to configure generic webhook triggers", "CHANGE_ME")
+        }
+
     }
 
     public def registerHubCredentials() {
@@ -387,4 +383,5 @@ class Organization extends BaseObject {
 
         updateJenkinsCredentials(customPipeline, "", Configuration.CREDS_CUSTOM_PIPELINE + "-token", token)
     }
+
 }

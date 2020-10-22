@@ -1,10 +1,13 @@
 package com.zebrunner.jenkins.pipeline.runner
 
 import com.zebrunner.jenkins.BaseObject
+import com.zebrunner.jenkins.pipeline.Configuration
+import com.zebrunner.jenkins.pipeline.tools.scm.github.GitHub
+import com.zebrunner.jenkins.pipeline.tools.scm.gitlab.Gitlab
+import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 import com.zebrunner.jenkins.pipeline.integration.sonar.SonarClient
 import java.nio.file.Paths
 
-import com.zebrunner.jenkins.pipeline.Configuration
 import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
 
@@ -16,8 +19,24 @@ public abstract class AbstractRunner extends BaseObject {
 
     public AbstractRunner(context) {
         super(context)
-        
         sc = new SonarClient(context)
+
+        def host = Configuration.get("GITHUB_HOST")
+        def org = Configuration.get("GITHUB_ORGANIZATION")
+        def repo = Configuration.get("repo")
+        def branch = Configuration.get("branch")
+
+        switch (host.toLowerCase()) {
+            case ~/^.*github.*$/:
+                this.scmClient = new GitHub(context, host, org, repo, branch)
+                break
+            case ~/^.*gitlab.*$/:
+                this.scmClient = new Gitlab(context, host, org, repo, branch)
+                break
+            case ~/^.*bitbucket.*$/:
+                this.scmClient = new BitBucket(context, host, org, repo, branch)
+                break
+        }
         
         initOrganization()
         setDisplayNameTemplate('#${BUILD_NUMBER}|${branch}')

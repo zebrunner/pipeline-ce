@@ -44,4 +44,5 @@ class Logger {
             context.println "[${logLevel}] ${message}"
         }
     }
+    
 }

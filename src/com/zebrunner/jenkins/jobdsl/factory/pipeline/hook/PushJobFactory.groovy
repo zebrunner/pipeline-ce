@@ -1,7 +1,9 @@
 package com.zebrunner.jenkins.jobdsl.factory.pipeline.hook
 
-import groovy.transform.InheritConstructors
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
+import com.zebrunner.jenkins.Logger
+
+import groovy.transform.InheritConstructors
 
 @InheritConstructors
 public class PushJobFactory extends PipelineFactory {
@@ -14,12 +16,13 @@ public class PushJobFactory extends PipelineFactory {
     def userId
     def zafiraFields
     def isTestNgRunner
+    def webHookArgs
 
-    public PushJobFactory(folder, pipelineScript, jobName, jobDesc, host, organization, repo, branch, scmRepoUrl, userId, isTestNgRunner, zafiraFields) {
+    public PushJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, branch, scmRepoUrl, userId, isTestNgRunner, zafiraFields, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
-        this.description = jobDesc
+        this.description = desc
         this.host = host
         this.organization = organization
         this.repo = repo
@@ -28,21 +31,13 @@ public class PushJobFactory extends PipelineFactory {
         this.userId = userId
         this.isTestNgRunner = isTestNgRunner
         this.zafiraFields = zafiraFields
+        this.webHookArgs = webHookArgs
     }
 
     def create() {
         def pipelineJob = super.create()
 
         pipelineJob.with {
-            properties {
-                //TODO: add SCM artifacts
-                githubProjectUrl(scmRepoUrl)
-                pipelineTriggers {
-                    triggers {
-                        githubPush()
-                    }
-                }
-            }
 
             //TODO: think about other parameters to support DevOps CI operations
             parameters {
@@ -59,11 +54,39 @@ public class PushJobFactory extends PipelineFactory {
                 choiceParam('removedViewAction', ['IGNORE', 'DELETE'], '')
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
                 configure addHiddenParameter('zafiraFields', '', zafiraFields)
+                configure addHiddenParameter('ref', '', '')
             }
 
-            /** Git Stuff **/
+            properties {
+                pipelineTriggers {
+                    triggers {
+                      genericTrigger {
+                           genericVariables {
+                            genericVariable {
+                             key("ref")
+                             value(webHookArgs.refJsonPath)
+                            }
+                           }
 
+                           genericHeaderVariables {
+                            genericHeaderVariable {
+                             key(webHookArgs.eventName)
+                             regexpFilter("")
+                            }
+                           }
+                           
+                           tokenCredentialId("${this.organization}-webhook-token")
+                           printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
+                           printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
+                           silentResponse(false)
+                           regexpFilterText(webHookArgs.pushFilterText)
+                           regexpFilterExpression(webHookArgs.prFilterExpression)
+                        }
+                    }
+                }
+            }
         }
         return pipelineJob
     }
+
 }

@@ -1,7 +1,8 @@
 package com.zebrunner.jenkins.jobdsl.factory.pipeline.scm
 
-import groovy.transform.InheritConstructors
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.PipelineFactory
+
+import groovy.transform.InheritConstructors
 
 @InheritConstructors
 public class MergeJobFactory extends PipelineFactory {
@@ -11,11 +12,11 @@ public class MergeJobFactory extends PipelineFactory {
     def repo
     def scmRepoUrl
 
-    public MergeJobFactory(folder, pipelineScript, jobName, jobDesc, host, organization, repo, scmRepoUrl) {
+    public MergeJobFactory(folder, pipelineScript, jobName, desc, host, organization, repo, scmRepoUrl) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
-        this.description = jobDesc
+        this.description = desc
         this.host = host
         this.organization = organization
         this.repo = repo
@@ -43,5 +44,9 @@ public class MergeJobFactory extends PipelineFactory {
 
         }
         return pipelineJob
+    }
+
+    private def getDesc() {
+        return "SCM branch merger job"
     }
 }

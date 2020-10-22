@@ -34,8 +34,6 @@ public class PipelineFactory extends JobFactory {
             description "${description}"
             logRotator { numToKeep logRotator }
 
-            authenticationToken('ciStart')
-
             properties {
                 disableResume()
                 durabilityHint { hint("PERFORMANCE_OPTIMIZED") }
@@ -139,6 +137,10 @@ public class PipelineFactory extends JobFactory {
             scheduling = multilineValue
         }
         return scheduling
+    }
+
+    public def isLogLevelActive(level) {
+        return logger.pipelineLogLevel.equals(level) ? true : false
     }
 
 
