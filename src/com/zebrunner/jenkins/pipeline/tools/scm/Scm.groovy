@@ -41,7 +41,7 @@ abstract class Scm implements ISCM {
 			logger.info("Git->clone; shallow: ${isShallow}")
 			def fork = !isParamEmpty(Configuration.get("fork")) ? Configuration.get("fork").toBoolean() : false
 			def userId = Configuration.get("BUILD_USER_ID")
-			def gitUrl = Configuration.resolveVars(scmUrl)
+			def gitUrl = this.repoUrl
 			def credentialsId =  "${this.org}-${this.repo}"
 
 			logger.info("REPO_URL: ${this.repoUrl}")
@@ -54,7 +54,7 @@ abstract class Scm implements ISCM {
 					def userName = ""
 					def userPassword = ""
 					context.withCredentials([context.usernamePassword(credentialsId: tokenName, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        throw new RuntimeException("Cloning via fork is unsupported now!")
+						throw new RuntimeException("Cloning via fork is unsupported now!")
 						gitUrl = "https://${scmHost}/${context.env.USERNAME}/${repo}"
 						credentialsId = tokenName
 						userName = context.env.USERNAME
@@ -66,8 +66,8 @@ abstract class Scm implements ISCM {
 				}
 			}
 
-			Map scmVars = context.checkout getCheckoutParams(this.repoUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
-			Configuration.set("scm_url", this.repoUrl)
+			Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			Configuration.set("scm_url", gitUrl)
 			Configuration.set("scm_branch", branch)
 			Configuration.set("scm_commit", scmVars.GIT_COMMIT)
 		}
