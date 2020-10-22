@@ -65,17 +65,18 @@ abstract class Scm implements ISCM {
 				}
 			}
 
-			Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, null, isShallow, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 			Configuration.set("scm_url", gitUrl)
 			Configuration.set("scm_branch", branch)
 			Configuration.set("scm_commit", scmVars.GIT_COMMIT)
 		}
 	}
 
+	//TODO: try to remove below method or combine with above clone operation
 	public def clone(gitUrl, branch, subFolder) {
 		context.stage('Checkout Repository') {
 			logger.info("Git->clone\nREPO_URL: ${gitUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
 
@@ -84,7 +85,7 @@ abstract class Scm implements ISCM {
 			def branch = Configuration.get("pr_source_branch")
 			def prNumber = Configuration.get('pr_number')
 			logger.info("Git->clonePR\nREPO_URL: ${this.repoUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, credentialsId)
+			context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
 		}
 	}
 
@@ -92,7 +93,7 @@ abstract class Scm implements ISCM {
 		context.stage('Checkout Repository') {
 			def branch = Configuration.get("branch")
 			logger.info("Git->clonePush\nREPO_URL: ${this.repoUrl}\nbranch: ${branch}")
-			context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", credentialsId)
+			context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
 
