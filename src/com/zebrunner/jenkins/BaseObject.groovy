@@ -118,8 +118,10 @@ public abstract class BaseObject {
     @NonCPS
     protected def initOrg() {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
+        logger.debug("jobName: ${jobName}")
         //Configuration.get(Configuration.Parameter.JOB_NAME)
         int nameCount = Paths.get(jobName).getNameCount()
+        logger.debug("nameCount: ${nameCount}")
 
         def orgFolderName = ""
         if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
@@ -138,6 +140,7 @@ public abstract class BaseObject {
             throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
         }
 
+        logger.debug("orgFolderName: ${orgFolderName}")
         return orgFolderName
     }
 
