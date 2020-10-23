@@ -57,7 +57,7 @@ public abstract class BaseObject {
         
         def String gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
 
-        logger.info("gitType: $gitType")
+        context.println "gitType: $gitType"
 
         switch (gitType) {
             case "github":
