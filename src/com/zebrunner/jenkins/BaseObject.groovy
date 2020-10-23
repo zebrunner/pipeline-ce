@@ -150,6 +150,10 @@ public abstract class BaseObject {
      */
     @NonCPS
     protected def initRepo(url) {
+        if (url == null) {
+            // use-case for several management jobs like registerOrganization
+            return ""
+        }
         /*
          * https://github.com/owner/carina-demo.git or git@github.com:owner/carina-demo.git to carina-demo
          * 
