@@ -16,20 +16,11 @@ public class RegisterRepositoryJobFactory extends PipelineFactory {
     def create() {
         logger.info("RegisterRepositoryJobFactory->create")
         def pipelineJob = super.create()
-        def repo = ""
-        if ("qaprosoft".equals(this.folder) || "".equals(this.folder)) {
-            repo = "carina-demo"
-        }
-        def org = "qaprosoft"
-        if (!this.folder.isEmpty()) {
-            org = this.folder
-        }
 
         pipelineJob.with {
             parameters {
-                configure stringParam('scmHost', 'github.com', 'Source Control Management host')
-                configure stringParam('scmOrg', org, 'Source Control Management organization')
-                configure stringParam('repo', repo, 'Repository for scanning')
+                configure addExtensibleChoice('scmType', "gc_GIT_TYPE", "Version control system type", "github")
+                configure stringParam('repoUrl', "https://github.com/qaprosoft/carina-demo.git", 'Repository for scanning')
                 configure stringParam('branch', 'master', 'SCM repository branch to run against')
                 configure stringParam('scmUser', '', 'SCM user')
                 configure stringParam('scmToken', '', 'CSM token with read permissions')
