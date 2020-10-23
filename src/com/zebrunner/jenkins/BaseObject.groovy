@@ -56,6 +56,9 @@ public abstract class BaseObject {
         currentBuild = context.currentBuild
         
         def String gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
+
+        logger.info("gitType: $gitType")
+
         switch (gitType) {
             case "github":
                 this.scmClient = new GitHub(context)
