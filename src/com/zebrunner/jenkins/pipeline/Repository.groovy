@@ -32,6 +32,7 @@ class Repository extends BaseObject {
         super(context)
         this.library = Configuration.get("pipelineLibrary")
         this.runnerClass = Configuration.get("runnerClass")
+        Configuration.set(Configuration.Parameter.GIT_TYPE, Configuration.get("scmType"))
     }
 
     public void register() {
