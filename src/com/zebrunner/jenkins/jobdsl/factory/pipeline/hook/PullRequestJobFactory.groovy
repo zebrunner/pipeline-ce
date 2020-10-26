@@ -38,7 +38,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                 configure addHiddenParameter('pr_source_branch', '', '')
                 configure addHiddenParameter('pr_target_branch', '', '')
                 configure addHiddenParameter('pr_action', '', '')
-                configure addHiddenParameter('pr_sha')
+                configure addHiddenParameter('pr_sha', '', '')
                 configure addHiddenParameter('gitType', '', webHookArgs.gitType)
             }
 
