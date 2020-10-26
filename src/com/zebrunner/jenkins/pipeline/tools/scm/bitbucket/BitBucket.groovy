@@ -12,7 +12,7 @@ class BitBucket extends Scm {
     }
 
     enum HookArgs {
-        GIT_TYPE("gitType", "bitbucket"),
+        GIT_TYPE("scmType", "bitbucket"),
         HEADER_EVENT_NAME("eventName", "x-event-key"),
 
         PR_ACTION("prAction", ""),

@@ -13,7 +13,7 @@ class GitHub extends Scm {
     }
 
     enum HookArgs {
-        GIT_TYPE("gitType", "github"),
+        GIT_TYPE("scmType", "github"),
         HEADER_EVENT_NAME("eventName", "x-github-event"),
 
         PR_ACTION("prAction", "\$.action"),
@@ -45,7 +45,6 @@ class GitHub extends Scm {
     
     @Override
     protected String branchSpec() {
-        logger.info("github")
         return String.format(branchSpec, Configuration.get('pr_number'))
     }
     

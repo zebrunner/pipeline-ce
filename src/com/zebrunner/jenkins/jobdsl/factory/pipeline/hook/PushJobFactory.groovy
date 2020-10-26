@@ -47,7 +47,7 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
                 configure addHiddenParameter('zafiraFields', '', zafiraFields)
                 configure addHiddenParameter('ref', '', '')
-                configure addHiddenParameter('scmType', '', webHookArgs.gitType)
+                configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
             properties {

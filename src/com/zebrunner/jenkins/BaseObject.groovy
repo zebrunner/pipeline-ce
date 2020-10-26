@@ -55,7 +55,8 @@ public abstract class BaseObject {
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
-        def String gitType = Configuration.get("scmType") ? Configuration.get("scmType") : Configuration.get(Configuration.Parameter.GIT_TYPE)
+        // get scmType from build args otherwise default to github
+        def String gitType = Configuration.get("scmType") ? Configuration.get("scmType") : "github"
         switch (gitType) {
             case "github":
                 this.scmClient = new GitHub(context)
