@@ -45,6 +45,7 @@ class GitHub extends Scm {
     
     @Override
     protected String branchSpec() {
+        logger.info("github")
         return String.format(branchSpec, Configuration.get('pr_number'))
     }
     

@@ -43,6 +43,7 @@ class Gitlab extends Scm {
 
     @Override
     protected String branchSpec() {
+        logger.info("gitlab")
         return String.format(branchSpec, Configuration.get('pr_source_branch'))
     }
     
