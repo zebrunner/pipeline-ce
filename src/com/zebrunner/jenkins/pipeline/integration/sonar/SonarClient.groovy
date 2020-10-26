@@ -31,8 +31,7 @@ class SonarClient extends HttpClient {
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
 
-            def gitType = Configuration.get("scmtype")
-            logger.info("gitType: $gitType")
+            def gitType = Configuration.get("scmType")
             switch (gitType) {
                 case "github":
                     goals += " -Dsonar.pullrequest.provider=Github \
