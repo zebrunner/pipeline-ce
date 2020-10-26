@@ -8,7 +8,7 @@ class Gitlab extends Scm {
     Gitlab(context) {
         super(context)
         this.prRefSpec = "+refs/merge-requests/*:refs/remotes/merge-requests/pr/*"
-        this.branchSpec = "%s"
+        this.branchSpec = "refs/merge-requests/:$s/head"
     }
 
     enum HookArgs {
@@ -43,8 +43,8 @@ class Gitlab extends Scm {
 
     @Override
     protected String branchSpec() {
-        logger.info("gitlab\nprRefSpec: ${this.prRefSpec}\nbranchSpec: ${String.format(this.branchSpec, Configuration.get('pr_source_branch'))}")
-        return String.format(branchSpec, Configuration.get('pr_source_branch'))
+        logger.info("gitlab\nprRefSpec: ${this.prRefSpec}\nbranchSpec: ${String.format(this.branchSpec, Configuration.get('pr_sha'))}")
+        return String.format(branchSpec, Configuration.get('pr_sha'))
     }
     
     @Override
