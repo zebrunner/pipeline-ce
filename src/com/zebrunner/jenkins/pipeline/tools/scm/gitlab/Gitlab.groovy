@@ -7,8 +7,8 @@ class Gitlab extends Scm {
 
     Gitlab(context) {
         super(context)
-        this.prRefSpec = "+refs/merge-requests/*:refs/remotes/merge-requests/pr/*"
-        this.branchSpec = "%s"
+        this.prRefSpec = "+refs/merge-requests/*:refs/remotes/origin/merge-requests/pr/*"
+        this.branchSpec = "refs/merge-requests/%s/merge"
     }
 
     enum HookArgs {
