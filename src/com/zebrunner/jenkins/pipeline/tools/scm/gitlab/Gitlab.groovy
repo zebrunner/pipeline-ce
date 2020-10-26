@@ -12,6 +12,7 @@ class Gitlab extends Scm {
     }
 
     enum HookArgs {
+        GIT_TYPE("gitType", "gitlab"),
         HEADER_EVENT_NAME("eventName", "x-gitlab-event"),
 
         PR_ACTION("prAction", "\$.object_attributes.state"),

@@ -13,6 +13,7 @@ class GitHub extends Scm {
     }
 
     enum HookArgs {
+        GIT_TYPE("gitType", "github"),
         HEADER_EVENT_NAME("eventName", "x-github-event"),
 
         PR_ACTION("prAction", "\$.action"),
