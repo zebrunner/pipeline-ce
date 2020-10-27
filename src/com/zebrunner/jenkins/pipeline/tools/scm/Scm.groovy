@@ -100,7 +100,7 @@ abstract class Scm implements ISCM {
 										  branches                         : [[name: branch]],
 										  doGenerateSubmoduleConfigurations: false,
 										  extensions                       : [[$class: 'CheckoutOption', timeout: 15],
-																			  [$class: 'CloneOption', honorRefspec: true, noTags: true, reference: '', shallow: shallow, timeout: 15]],
+																			  [$class: 'CloneOption', noTags: true, reference: '', shallow: shallow, timeout: 15]],
 										  submoduleCfg                     : [],
 										  userRemoteConfigs                : [[url: gitUrl, refspec: refspecValue, credentialsId: credentialsIdValue]]],
                                           changelog: changelog,
