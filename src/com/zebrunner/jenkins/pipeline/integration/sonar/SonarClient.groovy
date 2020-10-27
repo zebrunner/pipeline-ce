@@ -46,6 +46,7 @@ class SonarClient extends HttpClient {
                 case "bitbucket":
                     goals += " -Dsonar.pullrequest.bitbucket.repositorySlug=${Configuration.get("pr_repository")} \
                                -Dsonar.pullrequest.bitbucket.projectKey=${Configuration.get("pr_sha")} \
+                               -Dcom.github.mc1arke.sonarqube.plugin.branch.pullrequest.bitbucket.url=https://api.bitbucket.org \
                                -Dsonar.pullrequest.provider=BitbucketServer"
                     break
                 default:
