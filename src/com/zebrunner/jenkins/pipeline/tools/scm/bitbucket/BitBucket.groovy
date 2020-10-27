@@ -16,9 +16,9 @@ class BitBucket extends Scm {
         HEADER_EVENT_NAME("eventName", "x-event-key"),
 
         PR_ACTION("prAction", ""),
-        PR_SHA("prSha", ""),
+        PR_SHA("prSha", "\$.repository.project.key"),
         PR_NUMBER("prNumber", "\$.pullrequest.id"),
-        PR_REPO("prRepo", "\$.pullrequest.destination.repository.name"),
+        PR_REPO("prRepo", "\$.pullrequest.destination.repository.full_name"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pullrequest.source.branch.name"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pullrequest.destination.branch.name"),
         PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated))*?\$"),
