@@ -104,7 +104,7 @@ abstract class Scm implements ISCM {
 										  submoduleCfg                     : [],
 										  userRemoteConfigs                : [[url: gitUrl, refspec: refspecValue, credentialsId: credentialsIdValue]]],
                                           changelog: changelog,
-                                          poll     : false
+                                          poll     : true
                              ]
 		if (subFolder != null) {
 			def subfolderExtension = [[$class: 'RelativeTargetDirectory', relativeTargetDir: subFolder]]
