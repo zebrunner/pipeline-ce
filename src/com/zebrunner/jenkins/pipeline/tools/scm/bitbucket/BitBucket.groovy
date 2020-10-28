@@ -7,8 +7,8 @@ class BitBucket extends Scm {
 
     BitBucket(context) {
         super(context)
-        this.prRefSpec = '+refs/pull-requests/*:refs/pull-requests/*'
-        this.branchSpec = "origin/%s"
+        this.prRefSpec = ''
+        this.branchSpec = "refs/remotes/origin/pr-test9%s"
     }
 
     enum HookArgs {
@@ -24,7 +24,7 @@ class BitBucket extends Scm {
         PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated))*?\$"),
         PR_FILTER_TEXT("prFilterText", "\$x_event_key"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x-event-key"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_event_key"),
         PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 
