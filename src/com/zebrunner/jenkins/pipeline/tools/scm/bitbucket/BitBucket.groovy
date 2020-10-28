@@ -8,7 +8,7 @@ class BitBucket extends Scm {
     BitBucket(context) {
         super(context)
         this.prRefSpec = ''
-        this.branchSpec = "refs/remotes/origin/pr-test9%s"
+        this.branchSpec = "refs/remotes/origin/%s"
     }
 
     enum HookArgs {
