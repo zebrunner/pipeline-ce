@@ -7,7 +7,7 @@ class BitBucket extends Scm {
 
     BitBucket(context) {
         super(context)
-        this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
+        this.prRefSpec = '+refs/pull-requests/*:refs/pull-requests/*'
         this.branchSpec = "%s"
     }
 
