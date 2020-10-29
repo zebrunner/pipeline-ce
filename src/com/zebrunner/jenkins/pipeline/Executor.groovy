@@ -128,11 +128,6 @@ public class Executor {
         }
     }
 
-    static def removeCredentials(id) {
-        def creds = getCredentials(id)
-        if (creds) { SystemCredentialsProvider.getInstance().getStore().removeCredentials(Domain.global(), creds) }
-    }
-
     static boolean isMobile() {
         if (isParamEmpty(Configuration.get("job_type"))) {
             return false
