@@ -117,8 +117,6 @@ public class Executor {
     static def updateJenkinsCredentials(id, desc, secret="") {
         if (!isParamEmpty(id)) {
             def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
-            def credentials = getCredentials(id)
-            if (credentials) { credentialsStore.removeCredentials(Domain.global(), credentials) }
             Credentials c = (Credentials) new StringCredentialsImpl(CredentialsScope.GLOBAL, id, desc, Secret.fromString(secret))
             return credentialsStore.addCredentials(Domain.global(), c)
         }
@@ -128,6 +126,11 @@ public class Executor {
         return SystemCredentialsProvider.getInstance().getStore().getCredentials(Domain.global()).find {
             it.id.equals(id.toString())
         }
+    }
+
+    static def removeCredentials(id) {
+        def creds = getCredentials(id)
+        if (creds) { SystemCredentialsProvider.getInstance().getStore().removeCredentials(Domain.global(), creds) }
     }
 
     static boolean isMobile() {
