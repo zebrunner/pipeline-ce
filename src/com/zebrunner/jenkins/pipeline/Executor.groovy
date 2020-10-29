@@ -128,10 +128,10 @@ public class Executor {
         }
     }
 
-    static def removeCredentials(credentialList) {
+    static def removeCredentials(credentialsList) {
         def credentialsDeleted = credentialsList.collect()
         def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
-        credentialList.removeAll { getCredentials(it) && credentialsStore.removeCredentials(Domain.global(), getCredentials(it)) }
+        credentialsList.removeAll { getCredentials(it) && credentialsStore.removeCredentials(Domain.global(), getCredentials(it)) }
         return credentialsDeleted.minus(credentialsList)
     }
 
