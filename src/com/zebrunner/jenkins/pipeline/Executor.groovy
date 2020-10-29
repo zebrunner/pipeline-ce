@@ -130,7 +130,7 @@ public class Executor {
 
     static def removeCredentials(credentialList) {
         def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
-        credentialList.removeAll { getCredentials(it) && credentialsStore.removeCredentials(Domain.global(), it) }
+        credentialList.removeAll { getCredentials(it) && credentialsStore.removeCredentials(Domain.global(), getCredentials(it) }
     }
 
     static boolean isMobile() {
