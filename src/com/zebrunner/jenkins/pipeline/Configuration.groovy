@@ -60,8 +60,6 @@ public class Configuration {
         ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
         ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
-        GIT_TYPE("GIT_TYPE", "github"),
-
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 
         SELENIUM_URL("SELENIUM_URL", mustOverride, true),

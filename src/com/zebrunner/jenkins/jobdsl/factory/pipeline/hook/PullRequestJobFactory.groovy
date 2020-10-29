@@ -33,12 +33,13 @@ public class PullRequestJobFactory extends PipelineFactory {
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('branch', '', branch)
-                stringParam('pr_number', '', '')
-                stringParam('pr_repository', '', '')
-                stringParam('pr_source_branch', '', '')
-                stringParam('pr_target_branch', '', '')
-                stringParam('pr_action', '', '')
-                stringParam('pr_sha')
+                configure addHiddenParameter('pr_number', '', '')
+                configure addHiddenParameter('pr_repository', '', '')
+                configure addHiddenParameter('pr_source_branch', '', '')
+                configure addHiddenParameter('pr_target_branch', '', '')
+                configure addHiddenParameter('pr_action', '', '')
+                configure addHiddenParameter('pr_sha', '', '')
+                configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
             properties {
@@ -79,7 +80,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                                 }
                             }
 
-                            tokenCredentialId("${this.organization}-webhook-token")
+                            tokenCredentialId("${this.organization}-${this.webHookArgs.scmType}-webhook-token")
                             printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                             printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)

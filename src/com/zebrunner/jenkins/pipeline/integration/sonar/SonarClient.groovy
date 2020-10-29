@@ -31,21 +31,22 @@ class SonarClient extends HttpClient {
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
 
-            def gitType = Configuration.get(Configuration.Parameter.GIT_TYPE)
+            def gitType = Configuration.get("scmType")
             switch (gitType) {
                 case "github":
                     goals += " -Dsonar.pullrequest.provider=Github \
-                           -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")} \
-                           -Dsonar.scm.revision=${Configuration.get("pr_sha")} "
+                               -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")} \
+                               -Dsonar.scm.revision=${Configuration.get("pr_sha")} "
                     break
                 case "gitlab":
                     goals += " -Dsonar.pullrequest.gitlab.repositorySlug=${Configuration.get("pr_repository")} \
-                           -Dsonar.scm.revision=${Configuration.get("pr_sha")} \
-                           -Dsonar.pullrequest.provider=GitlabServer"
+                               -Dsonar.scm.revision=${Configuration.get("pr_sha")} \
+                               -Dsonar.pullrequest.provider=GitlabServer"
                     break
                 case "bitbucket":
                     goals += " -Dsonar.pullrequest.bitbucket.repositorySlug=${Configuration.get("pr_repository")} \
-                          -Dsonar.pullrequest.provider=BitbucketServer"
+                               -Dsonar.pullrequest.bitbucket.projectKey=${Configuration.get("pr_sha")} \
+                               -Dsonar.pullrequest.provider=BitbucketServer"
                     break
                 default:
                     throw new RuntimeException("Unsuported source control management: ${gitType}!")

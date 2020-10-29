@@ -47,6 +47,7 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
                 configure addHiddenParameter('zafiraFields', '', zafiraFields)
                 configure addHiddenParameter('ref', '', '')
+                configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
             properties {
@@ -67,7 +68,7 @@ public class PushJobFactory extends PipelineFactory {
                             }
                            }
                            
-                           tokenCredentialId("${this.organization}-webhook-token")
+                           tokenCredentialId("${this.organization}-${this.webHookArgs.scmType}-webhook-token")
                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)

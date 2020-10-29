@@ -7,11 +7,12 @@ class Gitlab extends Scm {
 
     Gitlab(context) {
         super(context)
-        this.prRefSpec = "+refs/merge-requests/*:refs/remotes/merge-requests/pr/*"
-        this.branchSpec = "%s"
+        this.prRefSpec = ""
+        this.branchSpec = "refs/remotes/origin/%s"
     }
 
     enum HookArgs {
+        GIT_TYPE("scmType", "gitlab"),
         HEADER_EVENT_NAME("eventName", "x-gitlab-event"),
 
         PR_ACTION("prAction", "\$.object_attributes.state"),
