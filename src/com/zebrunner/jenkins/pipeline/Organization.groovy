@@ -60,6 +60,8 @@ class Organization extends BaseObject {
                 def userName = folder + "-user"
                 deleteFolder(folder)
                 deleteUser(userName)
+                logger.info("removing gw creds")
+                removeCredentials(["sandinosanchez-github-webhook-token"])
                 clean()
             }
         }
