@@ -80,7 +80,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                                 }
                             }
 
-                            tokenCredentialId("${this.organization}-webhook-token")
+                            tokenCredentialId("${this.organization}-${this.webHookArgs.scmType}-webhook-token")
                             printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                             printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
