@@ -17,6 +17,7 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 class Organization extends BaseObject {
     
     private static final String RUNNER_CLASS = "com.zebrunner.jenkins.pipeline.runner.maven.TestNG"
+    private static final String DELETE_ORG_REGEX = "^(%s-.*-webhook-token)*?\$"
 
     protected ZebrunnerUpdater zebrunnerUpdater
 
@@ -62,8 +63,7 @@ class Organization extends BaseObject {
 
                 deleteFolder(folder)
                 deleteUser(userName)
-                credentialsDeleted = removeCredentials(["sandinosanchez-github-webhook-token"])
-                logger.debug("Credentials removed: $credentialsDeleted" )
+                removeCredentials("^($folder-.*-webhook-token)*?\$")
                 clean()
             }
         }

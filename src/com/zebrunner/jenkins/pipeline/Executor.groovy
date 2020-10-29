@@ -128,11 +128,16 @@ public class Executor {
         }
     }
 
-    static def removeCredentials(credentialsList) {
-        def credentialsDeleted = credentialsList.collect()
+    static def getCredentialsRegEx(regex) {
+        return SystemCredentialsProvider.getInstance().getStore().getCredentials(Domain.global()).findAll {
+            it.id.matches(regex)
+        }
+    }
+
+    static def removeCredentials(regex) {
         def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
-        credentialsList.removeAll { getCredentials(it) && credentialsStore.removeCredentials(Domain.global(), getCredentials(it)) }
-        return credentialsDeleted.minus(credentialsList)
+        def credentialsToDelete = getCredentialsRegEx(regex)
+        credentialsToDelete.each { credentialsStore.removeCredentials(Domain.global(), it) }
     }
 
     static boolean isMobile() {
