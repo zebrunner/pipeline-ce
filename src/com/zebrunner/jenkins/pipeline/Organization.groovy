@@ -17,7 +17,6 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 class Organization extends BaseObject {
     
     private static final String RUNNER_CLASS = "com.zebrunner.jenkins.pipeline.runner.maven.TestNG"
-    private static final String DELETE_ORG_REGEX = "^(%s-.*-webhook-token)*?\$"
 
     protected ZebrunnerUpdater zebrunnerUpdater
 
@@ -59,8 +58,6 @@ class Organization extends BaseObject {
             context.timestamps {
                 def folder = Configuration.get("folderName")
                 def userName = folder + "-user"
-                def credentialsDeleted = ""
-
                 deleteFolder(folder)
                 deleteUser(userName)
                 removeCredentials("^($folder-.*-webhook-token)*?\$")
