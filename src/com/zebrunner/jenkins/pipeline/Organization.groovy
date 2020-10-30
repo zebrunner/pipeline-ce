@@ -53,13 +53,14 @@ class Organization extends BaseObject {
     }
 
     public def delete() {
-        logger.info("Organization->register")
+        logger.info("Organization->delete")
         context.node('master') {
             context.timestamps {
                 def folder = Configuration.get("folderName")
                 def userName = folder + "-user"
                 deleteFolder(folder)
                 deleteUser(userName)
+                removeCredentials("^($folder-.*-webhook-token)*?\$")
                 clean()
             }
         }
