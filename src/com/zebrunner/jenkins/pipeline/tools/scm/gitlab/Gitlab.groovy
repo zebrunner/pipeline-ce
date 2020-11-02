@@ -24,10 +24,10 @@ class Gitlab extends Scm {
         PR_SOURCE_BRANCH("prSourceBranch", "\$.object_attributes.source_branch"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.object_attributes.target_branch"),
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event \$repoUrl"),
-        PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook\\s(\$sshUrl|\$httpUrl))*?\$"),
+        PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook\\s(\$ssh_url|\$http_url))*?\$"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event ${this.repoUrl}"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook\\s(\$sshUrl|\$httpUrl))*?\$"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event \$repoUrl"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook\\s(\$ssh_url|\$http_url))*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key

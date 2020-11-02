@@ -20,14 +20,14 @@ class BitBucket extends Scm {
         PR_ACTION("prAction", ""),
         PR_SHA("prSha", "\$.repository.workspace.slug"),
         PR_NUMBER("prNumber", "\$.pullrequest.id"),
-        PR_REPO_NAME("prRepoName", "\$.pullrequest.source.repository.name"),
+        PR_REPO_NAME("prRepo", "\$.pullrequest.source.repository.name"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pullrequest.source.branch.name"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pullrequest.destination.branch.name"),
         PR_FILTER_TEXT("prFilterText", "\$x_event_key \$repoUrl.split('/')[3]/\$repoUrl.split('/')[4].replace('.git'), '')"),
-        PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated)\\s\$httpUrl)*?\$"),
+        PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated)\\s\$http_url)*?\$"),
 
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_event_key \$repoUrl.split('/')[3]/\$repoUrl.split('/')[4].replace('.git'), '')"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push\\s\$httpRepoUrl)*?\$"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push\\s\$http_url)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 
         private final String key
