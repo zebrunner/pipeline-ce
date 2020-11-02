@@ -14,6 +14,8 @@ class GitHub extends Scm {
 
     enum HookArgs {
         GIT_TYPE("scmType", "github"),
+        SSH_RUL("sshUrl", "\$.repository.ssh_url"),
+        HTTP_URL("httpUrl", "\$.repository.clone_url"),
         HEADER_EVENT_NAME("eventName", "x-github-event"),
 
         PR_ACTION("prAction", "\$.action"),
@@ -22,12 +24,12 @@ class GitHub extends Scm {
         PR_REPO("prRepo", "\$.pull_request.base.repo.full_name"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pull_request.head.ref"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pull_request.base.ref"),
-        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\spull_request)*?\$"),
-        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event"),
+        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event \$repoUrl"),
+        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\spull_request\\s(\$sshUrl|\$httpUrl))*?\$)*?\$"),
 
         
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush)*?\$"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event \$repoUrl"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush\\s(\$sshUrl|\$httpUrl))*?\$)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key

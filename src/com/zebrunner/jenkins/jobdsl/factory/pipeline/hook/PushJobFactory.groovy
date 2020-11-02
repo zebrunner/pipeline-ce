@@ -47,6 +47,8 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
                 configure addHiddenParameter('zafiraFields', '', zafiraFields)
                 configure addHiddenParameter('ref', '', '')
+                configure addHiddenParameter('httpUrl', '', '')
+                configure addHiddenParameter('sshUrl', '', '')
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
@@ -58,6 +60,14 @@ public class PushJobFactory extends PipelineFactory {
                             genericVariable {
                              key("ref")
                              value(webHookArgs.refJsonPath)
+                            }
+                            genericVariable {
+                             key("sshUrl")
+                             value(webHookArgs.sshUrl)
+                            }
+                            genericVariable {
+                             key("httpUrl")
+                             value(webHookArgs.httpUrl)
                             }
                            }
 

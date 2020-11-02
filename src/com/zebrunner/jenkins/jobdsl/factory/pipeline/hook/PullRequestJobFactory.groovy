@@ -39,6 +39,8 @@ public class PullRequestJobFactory extends PipelineFactory {
                 configure addHiddenParameter('pr_target_branch', '', '')
                 configure addHiddenParameter('pr_action', '', '')
                 configure addHiddenParameter('pr_sha', '', '')
+                configure addHiddenParameter('httpUrl', '', '')
+                configure addHiddenParameter('sshUrl', '', '')
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
@@ -70,6 +72,14 @@ public class PullRequestJobFactory extends PipelineFactory {
                                 genericVariable {
                                     key("pr_sha")
                                     value(webHookArgs.prSha)
+                                }
+                                genericVariable {
+                                    key("sshUrl")
+                                    value(webHookArgs.sshUrl)
+                                }
+                                genericVariable {
+                                    key("httpUrl")
+                                    value(webHookArgs.httpUrl)
                                 }
                             }
 

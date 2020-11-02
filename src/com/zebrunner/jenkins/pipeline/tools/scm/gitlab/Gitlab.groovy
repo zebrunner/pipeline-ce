@@ -13,6 +13,8 @@ class Gitlab extends Scm {
 
     enum HookArgs {
         GIT_TYPE("scmType", "gitlab"),
+        SSH_RUL("sshUrl", "\$.project.ssh_url"),
+        HTTP_URL("httpUrl", "\$.project.http_url"),
         HEADER_EVENT_NAME("eventName", "x-gitlab-event"),
 
         PR_ACTION("prAction", "\$.object_attributes.state"),
@@ -21,11 +23,11 @@ class Gitlab extends Scm {
         PR_REPO("prRepo", "\$.project.id"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.object_attributes.source_branch"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.object_attributes.target_branch"),
-        PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook)*?\$"),
-        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event"),
+        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event \$repoUrl"),
+        PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook\\s(\$sshUrl|\$httpUrl))*?\$"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook)*?\$"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event ${this.repoUrl}"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook\\s(\$sshUrl|\$httpUrl))*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key
