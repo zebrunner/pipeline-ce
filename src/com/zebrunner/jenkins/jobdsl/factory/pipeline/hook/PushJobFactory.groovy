@@ -82,8 +82,8 @@ public class PushJobFactory extends PipelineFactory {
                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)
-                           regexpFilterText(webHookArgs.pushFilterText)
-                           regexpFilterExpression(webHookArgs.pushFilterExpression)
+                           regexpFilterText(webHookArgs.pushFilterText.format(this.repoUrl))
+                           regexpFilterExpression(webHookArgs.pushFilterExpression.format(resolverUrl(this.repoUrl)))
                         }
                     }
                 }

@@ -24,12 +24,12 @@ class GitHub extends Scm {
         PR_REPO("prRepo", "\$.pull_request.base.repo.full_name"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pull_request.head.ref"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pull_request.base.ref"),
-        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event \$repoUrl"),
-        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\spull_request\\s(\$ssh_rul|\$http_url))*?\$"),
+        PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event %s"),
+        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\spull_request\\s%s*?\$"),
 
         
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event \$repoUrl"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush\\s(\$ssh_url|\$http_url))*?\$"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event %s"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush\\s%s)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key
