@@ -144,6 +144,6 @@ public class PipelineFactory extends JobFactory {
     }
 
     public def resolveUrl(url) {
-        return url.contains("git@") : "\$ssh_url" ? "\$http_url"
+        return url.contains("git@") ? "\$ssh_url" : "\$http_url"
     }
 }
