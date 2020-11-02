@@ -95,7 +95,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                             printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
                             regexpFilterText(webHookArgs.prFilterText.format(this.repoUrl))
-                            regexpFilterExpression(webHookArgs.prFilterExpression.format(resolverUrl(this.repoUrl)))
+                            regexpFilterExpression(webHookArgs.prFilterExpression.format(resolveUrl(this.repoUrl)))
                         }
                     }
                 }
