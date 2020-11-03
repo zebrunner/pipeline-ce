@@ -15,7 +15,7 @@ class BitBucket extends Scm {
         GIT_TYPE("scmType", "bitbucket"),
         HEADER_EVENT_NAME("eventName", "x-event-key"),
         SSH_RUL("sshUrl", ""),
-        HTTP_URL("httpUrl", "\$.pullrequest.destination.repository.full_name"),
+        HTTP_URL("httpUrl", "\$.repository.full_name"),
 
         PR_ACTION("prAction", ""),
         PR_SHA("prSha", "\$.repository.workspace.slug"),
