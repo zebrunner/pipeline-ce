@@ -24,7 +24,7 @@ class Gitlab extends Scm {
         PR_SOURCE_BRANCH("prSourceBranch", "\$.object_attributes.source_branch"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.object_attributes.target_branch"),
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event %s"),
-        PR_FILTER_REGEX("prFilterExpression", "^(opened|reopened)\\s(Merge\\sRequest\\sHook\\s%s*?\$"),
+        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\sMerge\\sRequest\\sHook\\s%s)*?\$"),
 
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event %s"),
         PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook\\s%s)*?\$"),

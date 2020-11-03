@@ -44,6 +44,7 @@ public class PullRequestJobFactory extends PipelineFactory {
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
+
             properties {
                 pipelineTriggers {
                     triggers {

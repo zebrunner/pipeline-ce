@@ -23,11 +23,11 @@ class BitBucket extends Scm {
         PR_REPO("prRepo", "\$.pullrequest.source.repository.name"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pullrequest.source.branch.name"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pullrequest.destination.branch.name"),
-        PR_FILTER_TEXT("prFilterText", "\$x_event_key"),
-        PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated))*?\$"),
+        PR_FILTER_TEXT("prFilterText", "\$x_event_key %s"),
+        PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated)\\s%s)*?\$"),
 
-        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_event_key"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push)*?\$"),
+        PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_event_key %s"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push\\s%s)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 
         private final String key
