@@ -52,7 +52,9 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
-            def regexpFilterExpression = "bitbucket".equals(webHookArgs.scmType) ? repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "") : String.format(webHookArgs.prFilterExpression, this.repoUrl)
+            def regexpFilterExpression = "bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.prFilterExpression, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.prFilterExpression, this.repoUrl)
+
+            logger.info("regexpFilterExpression: $regexpFilterExpression")
 
             properties {
                 pipelineTriggers {
@@ -93,5 +95,6 @@ public class PushJobFactory extends PipelineFactory {
         }
         return pipelineJob
     }
+
 
 }
