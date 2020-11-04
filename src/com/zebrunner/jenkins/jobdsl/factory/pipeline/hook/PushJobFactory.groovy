@@ -47,6 +47,8 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
                 configure addHiddenParameter('zafiraFields', '', zafiraFields)
                 configure addHiddenParameter('ref', '', '')
+                configure addHiddenParameter('http_url', '', '')
+                configure addHiddenParameter('ssh_url', '', '')
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
 
@@ -58,6 +60,14 @@ public class PushJobFactory extends PipelineFactory {
                             genericVariable {
                              key("ref")
                              value(webHookArgs.refJsonPath)
+                            }
+                            genericVariable {
+                             key("ssh_url")
+                             value(webHookArgs.sshUrl)
+                            }
+                            genericVariable {
+                             key("http_url")
+                             value(webHookArgs.httpUrl)
                             }
                            }
 
@@ -72,8 +82,9 @@ public class PushJobFactory extends PipelineFactory {
                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)
-                           regexpFilterText(webHookArgs.pushFilterText)
-                           regexpFilterExpression(webHookArgs.pushFilterExpression)
+                           regexpFilterText(String.format(webHookArgs.pushFilterText, resolveUrl(this.repoUrl)))
+                           regexpFilterExpression("bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.pushFilterExpression, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.pushFilterExpression, this.repoUrl)
+)
                         }
                     }
                 }
@@ -81,5 +92,6 @@ public class PushJobFactory extends PipelineFactory {
         }
         return pipelineJob
     }
+
 
 }

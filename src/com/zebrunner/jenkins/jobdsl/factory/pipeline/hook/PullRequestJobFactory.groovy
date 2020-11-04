@@ -39,8 +39,11 @@ public class PullRequestJobFactory extends PipelineFactory {
                 configure addHiddenParameter('pr_target_branch', '', '')
                 configure addHiddenParameter('pr_action', '', '')
                 configure addHiddenParameter('pr_sha', '', '')
+                configure addHiddenParameter('http_url', '', '')
+                configure addHiddenParameter('ssh_url', '', '')
                 configure addHiddenParameter('scmType', '', webHookArgs.scmType)
             }
+
 
             properties {
                 pipelineTriggers {
@@ -71,6 +74,14 @@ public class PullRequestJobFactory extends PipelineFactory {
                                     key("pr_sha")
                                     value(webHookArgs.prSha)
                                 }
+                                genericVariable {
+                                    key("ssh_url")
+                                    value(webHookArgs.sshUrl)
+                                }
+                                genericVariable {
+                                    key("http_url")
+                                    value(webHookArgs.httpUrl)
+                                }
                             }
 
                             genericHeaderVariables {
@@ -84,8 +95,8 @@ public class PullRequestJobFactory extends PipelineFactory {
                             printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                             printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
-                            regexpFilterText(webHookArgs.prFilterText)
-                            regexpFilterExpression(webHookArgs.prFilterExpression)
+                            regexpFilterText(String.format(webHookArgs.prFilterText, resolveUrl(this.repoUrl)))
+                            regexpFilterExpression(String.format(webHookArgs.prFilterExpression, this.repoUrl))
                         }
                     }
                 }

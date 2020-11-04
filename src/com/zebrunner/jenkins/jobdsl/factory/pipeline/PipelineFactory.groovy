@@ -143,5 +143,7 @@ public class PipelineFactory extends JobFactory {
         return logger.pipelineLogLevel.equals(level) ? true : false
     }
 
-
+    public def resolveUrl(url) {
+        return url.contains("git@") ? "\$ssh_url" : "\$http_url"
+    }
 }
