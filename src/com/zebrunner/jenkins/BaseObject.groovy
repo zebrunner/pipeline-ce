@@ -52,9 +52,6 @@ public abstract class BaseObject {
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
         
-        //hotfix to init valid credentialsId object reference
-        Configuration.set("credentialsId", "${this.organization}-${this.repo}")
-
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
@@ -73,6 +70,9 @@ public abstract class BaseObject {
             default:
                 throw new RuntimeException("Unsuported source control management: ${gitType}!")
         }
+        
+        //hotfix to init valid credentialsId object reference
+        this.scmClient.setCredentialsId("${this.organization}-${this.repo}")
     }
 
     protected String getDisplayName() {
