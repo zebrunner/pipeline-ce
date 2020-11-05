@@ -32,6 +32,7 @@ abstract class Scm implements ISCM {
 		
 	}
 
+    @NonCPS
     public def setCredentialsId(credentialsId) {
         this.credentialsId = credentialsId
     }
