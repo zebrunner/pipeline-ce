@@ -81,7 +81,6 @@ class Repository extends BaseObject {
         if (!getCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token")) {
             updateJenkinsCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token", "Token used to configure generic webhook triggers", "CHANGE_ME")
         }
-        Configuration.set("credentialsId", "${this.organization}-${this.repo}")
         updateJenkinsCredentials("${this.organization}-${this.repo}", "${this.organization} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
