@@ -73,6 +73,7 @@ public class Configuration {
         JOB_BASE_NAME("JOB_BASE_NAME", mustOverride),
         BUILD_NUMBER("BUILD_NUMBER", mustOverride),
 
+        SCREEN_RECORD_HOST("screen_record_host", "http://\${INFRA_HOST}/video/%s"),
         SCREEN_RECORD_FTP("screen_record_ftp", "ftp://\${INFRA_HOST}/%s.mp4"),
         SCREEN_RECORD_USER("screen_record_user", "qpsdemo"),
         SCREEN_RECORD_PASS("screen_record_pass", "qpsdemo"),
