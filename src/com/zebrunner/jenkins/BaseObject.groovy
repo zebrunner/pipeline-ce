@@ -167,7 +167,11 @@ public abstract class BaseObject {
          if (items.length < 1) {
              throw new RuntimeException("Unable to parse repository name from '${url}' value!")
          }
-         return items[items.length - 1].replace(".git", "")
+         
+         def repoName = items[items.length - 1].replace(".git", "")
+         
+         context.println "repoName: ${repoName}"
+         return repoName
     }
 
 }
