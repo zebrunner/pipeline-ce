@@ -73,6 +73,10 @@ public class Configuration {
         JOB_BASE_NAME("JOB_BASE_NAME", mustOverride),
         BUILD_NUMBER("BUILD_NUMBER", mustOverride),
 
+        // TODO: parameter is deprecated and should be removed in 1.5 release: https://github.com/zebrunner/pipeline-ce/issues/49
+        // it is restored for the compatibility with 6.4 carina and original 1.10.0 selenoid
+        SCREEN_RECORD_HOST("screen_record_host", "http://\${INFRA_HOST}/video/%s"),
+        
         SCREEN_RECORD_FTP("screen_record_ftp", "ftp://\${INFRA_HOST}/%s.mp4"),
         SCREEN_RECORD_USER("screen_record_user", "qpsdemo"),
         SCREEN_RECORD_PASS("screen_record_pass", "qpsdemo"),
