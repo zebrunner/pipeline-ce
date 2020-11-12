@@ -29,8 +29,13 @@ abstract class Scm implements ISCM {
 
 		this.repoUrl = Configuration.get("repoUrl")
 		this.branch = Configuration.get("branch")
-		this.credentialsId = Configuration.get("credentialsId")
+		
 	}
+
+    @NonCPS
+    public def setCredentialsId(credentialsId) {
+        this.credentialsId = credentialsId
+    }
 
 	public def clone() {
 		clone(true)

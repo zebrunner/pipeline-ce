@@ -51,7 +51,7 @@ public abstract class BaseObject {
         
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
-
+        
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
@@ -70,6 +70,13 @@ public abstract class BaseObject {
             default:
                 throw new RuntimeException("Unsuported source control management: ${gitType}!")
         }
+        
+        //hotfix to init valid credentialsId object reference
+        def credId = "${this.repo}"
+        if (!this.organization.isEmpty()) {
+            credId = "${this.organization}-${this.repo}"
+        }
+        this.scmClient.setCredentialsId(credId)
     }
 
     protected String getDisplayName() {
@@ -164,7 +171,11 @@ public abstract class BaseObject {
          if (items.length < 1) {
              throw new RuntimeException("Unable to parse repository name from '${url}' value!")
          }
-         return items[items.length - 1].replace(".git", "")
+         
+         def repoName = items[items.length - 1].replace(".git", "")
+         
+         context.println "repoName: ${repoName}"
+         return repoName
     }
 
 }
