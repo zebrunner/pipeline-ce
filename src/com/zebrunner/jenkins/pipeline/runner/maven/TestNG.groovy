@@ -701,7 +701,10 @@ public class TestNG extends Runner {
         }
 
         //general mobile capabilities
-        Configuration.set("capabilities.provider", "mcloud")
+        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
+            // set for mobile tests mcloud as default provider if nothing is specified by end-user
+            Configuration.set("capabilities.provider", "mcloud")
+        }
 
 
         // ATTENTION! Obligatory remove device from the params otherwise
