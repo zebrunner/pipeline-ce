@@ -72,7 +72,11 @@ public abstract class BaseObject {
         }
         
         //hotfix to init valid credentialsId object reference
-        this.scmClient.setCredentialsId("${this.organization}-${this.repo}")
+        def credId = "${this.repo}"
+        if (!this.organization.isEmpty()) {
+            credId = "${this.organization}-${this.repo}"
+        }
+        this.scmClient.setCredentialsId(credId)
     }
 
     protected String getDisplayName() {
