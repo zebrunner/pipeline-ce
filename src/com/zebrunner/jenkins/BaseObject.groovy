@@ -27,7 +27,7 @@ public abstract class BaseObject {
     // organization folder name of the current job/runner
     protected String organization = ""
     
-    protected def repoUrl = ""// git repo url (https or ssh)
+    protected def repoUrl // git repo url (https or ssh)
     protected def repo
 
     protected def currentBuild
@@ -50,7 +50,7 @@ public abstract class BaseObject {
         this.organization = initOrg()
         
         this.repoUrl = Configuration.get(REPO_URL)
-        if (repoUrl.isEmpty() && Configuration.get("scmURL") != null && !Configuration.get("scmURL").isEmpty()){
+        if (this.repoUrl == null && Configuration.get("scmURL") != null && !Configuration.get("scmURL").isEmpty()){
             // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
             this.repoUrl = Configuration.get("scmURL")
             Configuration.set(REPO_URL, this.repoUrl)
