@@ -51,9 +51,8 @@ public abstract class BaseObject {
         
         this.repoUrl = Configuration.get(REPO_URL)
         if (this.repoUrl == null && Configuration.get("scmURL") != null && !Configuration.get("scmURL").isEmpty()){
-            // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
+            // TODO: remove later this hotfix when zebrunner provide valid repoUrl arg
             this.repoUrl = Configuration.get("scmURL")
-            Configuration.set(REPO_URL, this.repoUrl)
         }
         this.repo = initRepo(this.repoUrl)
         
