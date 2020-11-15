@@ -488,7 +488,7 @@ public class TestNG extends Runner {
         
         if (!isParamEmpty(Configuration.get("scmURL"))){
             // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
-            this.repo = Configuration.get("scmURL")
+            this.repoUrl = Configuration.get("scmURL")
         }
         
         logger.info("TestNG->runJob")
