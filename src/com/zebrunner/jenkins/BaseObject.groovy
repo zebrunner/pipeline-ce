@@ -50,6 +50,10 @@ public abstract class BaseObject {
         this.organization = initOrg()
         
         this.repoUrl = Configuration.get(REPO_URL)
+        if (!isParamEmpty(Configuration.get("scmURL"))){
+            // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
+            this.repoUrl = Configuration.get("scmURL")
+        }
         this.repo = initRepo(this.repoUrl)
         
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
