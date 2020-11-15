@@ -486,9 +486,9 @@ public class TestNG extends Runner {
         setReportingCreds()
         setSeleniumUrl()
         
-        //TODO: test if we should support scmURL
         if (!isParamEmpty(Configuration.get("scmURL"))){
-            scmClient.setUrl(Configuration.get("scmURL"))
+            // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
+            this.repo = Configuration.get("scmURL")
         }
         
         logger.info("TestNG->runJob")
