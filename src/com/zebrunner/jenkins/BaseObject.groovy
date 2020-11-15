@@ -50,7 +50,7 @@ public abstract class BaseObject {
         this.organization = initOrg()
         
         this.repoUrl = Configuration.get(REPO_URL)
-        if (!isParamEmpty(Configuration.get("scmURL"))){
+        if (Configuration.get("scmURL") != null && !Configuration.get("scmURL").isEmpty()){
             // TODO: remova later this hotfix when zebrunner provide valid repoUrl arg
             this.repoUrl = Configuration.get("scmURL")
         }
