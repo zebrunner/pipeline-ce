@@ -78,10 +78,21 @@ class Repository extends BaseObject {
     }
 
     protected void prepare() {
-        if (!getCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token")) {
-            updateJenkinsCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token", "Token used to configure generic webhook triggers", "CHANGE_ME")
+        def webhookTokenCreds = "${Configuration.get("scmType")}-webhook-token"
+        if (!isParamEmpty(this.organization)) {
+            webhookTokenCreds = "${this.organization}-${Configuration.get("scmType")}-webhook-token"
         }
-        updateJenkinsCredentials("${this.organization}-${this.repo}", "${this.organization} SCM token", this.scmUser, this.scmToken)
+        
+        if (!getCredentials(webhookTokenCreds)) {
+            updateJenkinsCredentials(webhookTokenCreds", "Token used to configure generic webhook triggers", "CHANGE_ME")
+        }
+        
+        
+        def scmTokenCreds = "${this.repo}"
+        if (!isParamEmpty(this.organization)) {
+            scmTokenCreds = "${this.organization}-${this.repo}"
+        }
+        updateJenkinsCredentials(scmTokenCreds, "${this.repo} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
 
