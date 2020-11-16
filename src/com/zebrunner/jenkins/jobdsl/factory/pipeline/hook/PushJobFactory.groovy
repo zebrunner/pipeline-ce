@@ -79,7 +79,7 @@ public class PushJobFactory extends PipelineFactory {
                            }
                            
                            def webhookTokenCreds = "${this.webHookArgs.scmType}-webhook-token"
-                           if (!isParamEmpty(this.organization)) {
+                           if (this.organization != null && !this.organization.isEmpty()) {
                                webhookTokenCreds = "${this.organization}-${this.webHookArgs.scmType}-webhook-token"
                            }
                            
