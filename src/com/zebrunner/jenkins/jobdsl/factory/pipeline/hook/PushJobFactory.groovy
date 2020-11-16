@@ -78,7 +78,12 @@ public class PushJobFactory extends PipelineFactory {
                             }
                            }
                            
-                           tokenCredentialId("${this.organization}-${this.webHookArgs.scmType}-webhook-token")
+                           def webhookTokenCreds = "${this.webHookArgs.scmType}-webhook-token"
+                           if (!isParamEmpty(this.organization)) {
+                               webhookTokenCreds = "${this.organization}-${this.webHookArgs.scmType}-webhook-token"
+                           }
+                           
+                           tokenCredentialId(webhookTokenCreds)
                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)

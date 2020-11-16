@@ -486,11 +486,6 @@ public class TestNG extends Runner {
         setReportingCreds()
         setSeleniumUrl()
         
-        //TODO: test if we should support scmURL
-        if (!isParamEmpty(Configuration.get("scmURL"))){
-            scmClient.setUrl(Configuration.get("scmURL"))
-        }
-        
         logger.info("TestNG->runJob")
         uuid = getUUID()
         logger.info("UUID: " + uuid)
