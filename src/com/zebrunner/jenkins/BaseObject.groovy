@@ -158,7 +158,7 @@ public abstract class BaseObject {
 
     /*       
      *  Find repo name from repository url value (https or ssh)
-     * @return organization String
+     * @return repository String
      */
     @NonCPS
     protected def initRepo(url) {
