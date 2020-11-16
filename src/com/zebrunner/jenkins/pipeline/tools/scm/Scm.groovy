@@ -28,6 +28,11 @@ abstract class Scm implements ISCM {
 		this.logger = new Logger(context)
 
 		this.repoUrl = Configuration.get("repoUrl")
+        if (this.repoUrl == null && Configuration.get("scmURL") != null && !Configuration.get("scmURL").isEmpty()){
+            // TODO: remove later this hotfix when zebrunner provide valid repoUrl arg
+            this.repoUrl = Configuration.get("scmURL")
+        }
+
 		this.branch = Configuration.get("branch")
 		
 	}
