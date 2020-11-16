@@ -71,7 +71,7 @@ abstract class Scm implements ISCM {
                             throw new RuntimeException("Cloning fork repositories via ssh not supported yet!") 
                         } else {
                             // https cloning, f.e. https://github.com/owner/carina-demo.git - between 3rd and 4th slash
-                            def gitOrg = repoUrl.split("/")[2]
+                            def gitOrg = repoUrl.split("/")[3]
                             gitUrl = this.repoUrl.replaceAll(gitOrg, "${context.env.USERNAME}")
                         }
 						this.credentialsId = tokenName
