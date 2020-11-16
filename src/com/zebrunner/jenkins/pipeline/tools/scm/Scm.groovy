@@ -57,6 +57,7 @@ abstract class Scm implements ISCM {
 			logger.info("CREDENTIALS_ID: ${this.credentialsId}")
 
 			if (fork) {
+                //TODO: find better way to regexp https or ssh connect and replace organization by user
 				def tokenName = "token_$userId"
                 logger.debug("tokenName: ${tokenName}" )
 				def userCredentials = getCredentials(tokenName)
@@ -64,8 +65,15 @@ abstract class Scm implements ISCM {
 					def userName = ""
 					def userPassword = ""
 					context.withCredentials([context.usernamePassword(credentialsId: tokenName, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-						// throw new RuntimeException("Cloning via fork is unsupported now!")
-						gitUrl = "https://${scmHost}/${context.env.USERNAME}/${repo}"
+                        // parse and replace organization git name to owner
+                        if (repoUrl.contains("git@") && repoUrl.contains(":")) {
+                            // this is ssh url, f.e. git@github.com:owner/carina-demo.git - between ":" and slash
+                            throw new RuntimeException("Cloning fork repositories via ssh not supported yet!") 
+                        } else {
+                            // https cloning, f.e. https://github.com/owner/carina-demo.git - between 3rd and 4th slash
+                            def gitOrg = repoUrl.split("/")[2]
+                            gitUrl = this.repoUrl.replaceAll(gitOrg, "${context.env.USERNAME}")
+                        }
 						this.credentialsId = tokenName
 						userName = context.env.USERNAME
 						userPassword = context.env.PASSWORD
