@@ -10,6 +10,7 @@ import com.zebrunner.jenkins.pipeline.integration.zebrunner.ZebrunnerUpdater
 import com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty
 import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
 import jenkins.security.ApiTokenProperty
+import hudson.security.ProjectMatrixAuthorizationStrategy
 
 import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
@@ -58,9 +59,9 @@ class Organization extends BaseObject {
             context.timestamps {
                 def folder = Configuration.get("folderName")
                 def userName = folder + "-user"
-                deleteFolder(folder)
+                removeCredentials("$folder-.*") //remove all organization/folder related credentials
                 deleteUser(userName)
-                removeCredentials("^($folder-.*-webhook-token)*?\$")
+                deleteFolder(folder)
                 clean()
             }
         }
@@ -107,7 +108,7 @@ class Organization extends BaseObject {
         context.stage("Delete user") {
             def user = User.getById(userName, false)
             if (!isParamEmpty(user)) {
-                // deleteUserGlobalPermissions(userName)
+                deleteUserGlobalPermissions(userName)
                 user.delete()
             }
         }
@@ -175,11 +176,23 @@ class Organization extends BaseObject {
         authStrategy.add(hudson.model.Hudson.READ, userName)
     }
 
-/*    protected def deleteUserGlobalPermissions(userName){
+    protected def deleteUserGlobalPermissions(userName){
         def authStrategy = Jenkins.instance.getAuthorizationStrategy()
-        authStrategy.remove(hudson.model.Hudson.READ, userName)
+        logger.debug("authStrategy: " + authStrategy.dump())
+
+        if(authStrategy instanceof ProjectMatrixAuthorizationStrategy){
+            logger.info("ProjectMatrixAuthorizationStrategy detected as expected...")
+
+            //getting all granted permissions
+            def permissions = authStrategy.getGrantedPermissions()
+            for (Set<String> permissionUsers:permissions.values()) {
+                // remove any project-based permission for current user
+                permissionUsers.remove(userName)
+            }
+        } else {
+            logger.error("Project-based Matrix Authorization Strategy not in use!")
+        }
     }
-*/
 
     protected def grantUserFolderPermissions(folderName, userName) {
         def folder = getJenkinsFolderByName(folderName)
