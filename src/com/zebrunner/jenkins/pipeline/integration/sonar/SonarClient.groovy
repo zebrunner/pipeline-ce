@@ -35,8 +35,7 @@ class SonarClient extends HttpClient {
             switch (gitType) {
                 case "github":
                     goals += " -Dsonar.pullrequest.provider=Github \
-                               -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")} \
-                               -Dsonar.scm.revision=${Configuration.get("pr_sha")} "
+                               -Dsonar.pullrequest.github.repository=${Configuration.get("pr_repository")}"
                     break
                 case "gitlab":
                     goals += " -Dsonar.pullrequest.gitlab.repositorySlug=${Configuration.get("pr_repository")} \
