@@ -1075,11 +1075,6 @@ public class TestNG extends Runner {
     public void runCron() {
         logger.info("TestNG->runCron")
         context.node("master") {
-            //TODO: test if we should support scmURL
-            if (!isParamEmpty(Configuration.get("scmURL"))){
-                scmClient.setUrl(Configuration.get("scmURL"))
-            }
-
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
