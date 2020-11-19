@@ -97,6 +97,7 @@ abstract class Scm implements ISCM {
 	public def clonePR() {
 		context.stage('Checkout Repository') {
 			logger.info("Git->clonePR\nREPO_URL: ${this.repoUrl}\nbranch: ${Configuration.get("pr_source_branch")}")
+            logger.info("prRefSpec: ${prRefSpec}")
 			context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
 		}
 	}
