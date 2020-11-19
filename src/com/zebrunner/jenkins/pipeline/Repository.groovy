@@ -32,14 +32,15 @@ class Repository extends BaseObject {
         super(context)
         this.library = Configuration.get("pipelineLibrary")
         this.runnerClass = Configuration.get("runnerClass")
+        
+        this.scmUser = Configuration.get(SCM_USER)
+        this.scmToken = Configuration.get(SCM_TOKEN)
     }
 
     public void register() {
         logger.info("Repository->register")
         
         this.branch = Configuration.get(BRANCH)
-        this.scmUser = Configuration.get(SCM_USER)
-        this.scmToken = Configuration.get(SCM_TOKEN)
 
         logger.debug("repoUrl: ${this.repoUrl}; repo: ${this.repo}; branch: ${this.branch}")
 
