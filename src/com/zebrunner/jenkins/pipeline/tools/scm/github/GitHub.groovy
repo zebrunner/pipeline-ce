@@ -9,7 +9,10 @@ class GitHub extends Scm {
         super(context)
         
         this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-        this.branchSpec = "origin/pr/%s/merge"
+        // this.branchSpec = "origin/pr/%s/merge"
+        // #70: above branchSpec can't get latest commit so reused sha1 for PR checker!
+        this.branchSpec = "%s"
+        
     }
 
     enum HookArgs {
@@ -47,7 +50,7 @@ class GitHub extends Scm {
     
     @Override
     protected String branchSpec() {
-        return String.format(branchSpec, Configuration.get('pr_number'))
+        return String.format(branchSpec, Configuration.get('pr_sha'))
     }
     
     @Override

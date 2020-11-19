@@ -89,23 +89,23 @@ abstract class Scm implements ISCM {
 	//TODO: try to remove below method or combine with above clone operation
 	public def clone(gitUrl, branch, subFolder) {
 		context.stage('Checkout Repository') {
-			logger.info("Git->clone\nREPO_URL: ${gitUrl}\nbranch: ${branch}")
+			logger.debug("REPO_URL: ${gitUrl}\n branch: ${branch}")
 			context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
 
-	public def clonePR() {
-		context.stage('Checkout Repository') {
-			logger.info("Git->clonePR\nREPO_URL: ${this.repoUrl}\nbranch: ${Configuration.get("pr_source_branch")}")
-            logger.info("prRefSpec: ${prRefSpec}")
-			context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
-		}
-	}
+    public def clonePR() {
+        context.stage('Checkout Repository') {
+            logger.debug("REPO_URL: ${this.repoUrl}\n prRefSpec: ${prRefSpec}\n branchSpec: ${branchSpec()}")
+
+            context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
+        }
+    }
 
 	public def clonePush() {
 		context.stage('Checkout Repository') {
 			def branch = Configuration.get("branch")
-			logger.info("Git->clonePush\nREPO_URL: ${this.repoUrl}\nbranch: ${branch}")
+			logger.debug("REPO_URL: ${this.repoUrl}\n branch: ${branch}")
 			context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
 		}
 	}
