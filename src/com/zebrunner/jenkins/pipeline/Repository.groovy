@@ -21,20 +21,13 @@ class Repository extends BaseObject {
     protected def runnerClass
     
     protected def branch
-    protected def scmUser
-    protected def scmToken
 
     private static final String BRANCH = "branch"
-    private static final String SCM_USER = "scmUser"
-    private static final String SCM_TOKEN = "scmToken"
 
     public Repository(context) {
         super(context)
         this.library = Configuration.get("pipelineLibrary")
         this.runnerClass = Configuration.get("runnerClass")
-        
-        this.scmUser = Configuration.get(SCM_USER)
-        this.scmToken = Configuration.get(SCM_TOKEN)
     }
 
     public void register() {
@@ -215,17 +208,6 @@ class Repository extends BaseObject {
         logger.debug("buildTool: " + buildTool)
 
         return buildTool
-    }
-
-    public def registerCredentials() {
-        context.stage("Register Credentials") {
-            def jenkinsUser = !isParamEmpty(Configuration.get("jenkinsUser")) ? Configuration.get("jenkinsUser") : getBuildUser(context.currentBuild)
-            if (updateJenkinsCredentials("token_" + jenkinsUser, jenkinsUser + " SCM token", this.scmUser, this.scmToken)) {
-                logger.info(jenkinsUser + " credentials were successfully registered.")
-            } else {
-                throw new RuntimeException("Required fields are missing.")
-            }
-        }
     }
 
 }

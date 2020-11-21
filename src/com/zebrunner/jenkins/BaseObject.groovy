@@ -23,6 +23,8 @@ public abstract class BaseObject {
     protected Map dslObjects
 
     protected ISCM scmClient
+    protected def scmUser
+    protected def scmToken
     
     // organization folder name of the current job/runner
     protected String organization = ""
@@ -40,6 +42,8 @@ public abstract class BaseObject {
     protected Configuration configuration = new Configuration(context)
     
     private static final String REPO_URL = "repoUrl"
+    private static final String SCM_USER = "scmUser"
+    private static final String SCM_TOKEN = "scmToken"
 
     public BaseObject(context) {
         this.context = context
@@ -49,6 +53,8 @@ public abstract class BaseObject {
         this.factoryRunner = new FactoryRunner(context)
         this.organization = initOrg()
         
+        this.scmUser = Configuration.get(SCM_USER)
+        this.scmToken = Configuration.get(SCM_TOKEN)        
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
         

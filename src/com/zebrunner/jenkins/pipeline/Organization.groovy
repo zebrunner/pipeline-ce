@@ -299,6 +299,17 @@ class Organization extends BaseObject {
             updateJenkinsCredentials(hubURLCredName, "${provider} URL", Configuration.Parameter.SELENIUM_URL.getKey(), url)
         }
     }
+    
+    public def registerUserCredentials() {
+        context.stage("Register User Credentials") {
+            def jenkinsUser = !isParamEmpty(Configuration.get("jenkinsUser")) ? Configuration.get("jenkinsUser") : getBuildUser(context.currentBuild)
+            if (updateJenkinsCredentials("token_" + jenkinsUser, jenkinsUser + " SCM token", this.scmUser, this.scmToken)) {
+                logger.info(jenkinsUser + " credentials were successfully registered.")
+            } else {
+                throw new RuntimeException("User credentials were not registered successfully!")
+            }
+        }
+    }
 
 
     public def registerReportingCredentials() {
