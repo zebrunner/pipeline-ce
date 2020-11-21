@@ -1412,7 +1412,8 @@ public class TestNG extends Runner {
     public void rerunJobs(){
         context.stage('Rerun Tests'){
             //updates zafira credentials with values from Jenkins Credentials (if present)
-			setReportingCreds()
+            this.organization = Configuration.get("folderName")
+            setReportingCreds()
             zafiraUpdater.smartRerun()
         }
     }
