@@ -77,7 +77,7 @@ class Runner extends AbstractRunner {
 					context.stage("${this.buildTool} build") {
 						switch (buildTool.toLowerCase()) {
 							case 'maven':
-								context.mavenBuild(Configuration.get('maven_goals'))
+								context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
 								break
 							case 'gradle':
 								context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
