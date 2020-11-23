@@ -105,7 +105,7 @@ public abstract class AbstractRunner extends BaseObject {
     }
     
     /*
-     * Get custom maven settings xml IDbased on organization
+     * Get custom maven settings xml ID based on organization
      *
      * @return maven settings ID
      */
