@@ -21,12 +21,8 @@ class Repository extends BaseObject {
     protected def runnerClass
     
     protected def branch
-    protected def scmUser
-    protected def scmToken
 
     private static final String BRANCH = "branch"
-    private static final String SCM_USER = "scmUser"
-    private static final String SCM_TOKEN = "scmToken"
 
     public Repository(context) {
         super(context)
@@ -38,8 +34,6 @@ class Repository extends BaseObject {
         logger.info("Repository->register")
         
         this.branch = Configuration.get(BRANCH)
-        this.scmUser = Configuration.get(SCM_USER)
-        this.scmToken = Configuration.get(SCM_TOKEN)
 
         logger.debug("repoUrl: ${this.repoUrl}; repo: ${this.repo}; branch: ${this.branch}")
 
@@ -78,10 +72,21 @@ class Repository extends BaseObject {
     }
 
     protected void prepare() {
-        if (!getCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token")) {
-            updateJenkinsCredentials("${this.organization}-${Configuration.get("scmType")}-webhook-token", "Token used to configure generic webhook triggers", "CHANGE_ME")
+        def webhookTokenCreds = "${Configuration.get("scmType")}-webhook-token"
+        if (!isParamEmpty(this.organization)) {
+            webhookTokenCreds = "${this.organization}-${Configuration.get("scmType")}-webhook-token"
         }
-        updateJenkinsCredentials("${this.organization}-${this.repo}", "${this.organization} SCM token", this.scmUser, this.scmToken)
+        
+        if (!getCredentials(webhookTokenCreds)) {
+            updateJenkinsCredentials(webhookTokenCreds, "Token used to configure generic webhook triggers", "CHANGE_ME")
+        }
+        
+        
+        def scmTokenCreds = "${this.repo}"
+        if (!isParamEmpty(this.organization)) {
+            scmTokenCreds = "${this.organization}-${this.repo}"
+        }
+        updateJenkinsCredentials(scmTokenCreds, "${this.repo} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
 
@@ -203,17 +208,6 @@ class Repository extends BaseObject {
         logger.debug("buildTool: " + buildTool)
 
         return buildTool
-    }
-
-    public def registerCredentials() {
-        context.stage("Register Credentials") {
-            def jenkinsUser = !isParamEmpty(Configuration.get("jenkinsUser")) ? Configuration.get("jenkinsUser") : getBuildUser(context.currentBuild)
-            if (updateJenkinsCredentials("token_" + jenkinsUser, jenkinsUser + " SCM token", this.scmUser, this.scmToken)) {
-                logger.info(jenkinsUser + " credentials were successfully registered.")
-            } else {
-                throw new RuntimeException("Required fields are missing.")
-            }
-        }
     }
 
 }

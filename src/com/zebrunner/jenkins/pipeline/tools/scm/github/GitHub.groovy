@@ -9,7 +9,10 @@ class GitHub extends Scm {
         super(context)
         
         this.prRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-        this.branchSpec = "origin/pr/%s/merge"
+        // this.branchSpec = "origin/pr/%s/merge"
+        // #70: above branchSpec can't get latest commit so reused sha1 for PR checker!
+        this.branchSpec = "%s"
+        
     }
 
     enum HookArgs {
@@ -25,7 +28,7 @@ class GitHub extends Scm {
         PR_SOURCE_BRANCH("prSourceBranch", "\$.pull_request.head.ref"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.pull_request.base.ref"),
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_github_event %s"),
-        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\spull_request\\s%s)*?\$"),
+        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened|synchronize)\\spull_request\\s%s)*?\$"),
 
         
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event %s"),
@@ -47,7 +50,7 @@ class GitHub extends Scm {
     
     @Override
     protected String branchSpec() {
-        return String.format(branchSpec, Configuration.get('pr_number'))
+        return String.format(branchSpec, Configuration.get('pr_sha'))
     }
     
     @Override

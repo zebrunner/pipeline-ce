@@ -23,6 +23,8 @@ public abstract class BaseObject {
     protected Map dslObjects
 
     protected ISCM scmClient
+    protected def scmUser
+    protected def scmToken
     
     // organization folder name of the current job/runner
     protected String organization = ""
@@ -40,6 +42,8 @@ public abstract class BaseObject {
     protected Configuration configuration = new Configuration(context)
     
     private static final String REPO_URL = "repoUrl"
+    private static final String SCM_USER = "scmUser"
+    private static final String SCM_TOKEN = "scmToken"
 
     public BaseObject(context) {
         this.context = context
@@ -49,9 +53,11 @@ public abstract class BaseObject {
         this.factoryRunner = new FactoryRunner(context)
         this.organization = initOrg()
         
+        this.scmUser = Configuration.get(SCM_USER)
+        this.scmToken = Configuration.get(SCM_TOKEN)        
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
-
+        
         this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
@@ -70,6 +76,13 @@ public abstract class BaseObject {
             default:
                 throw new RuntimeException("Unsuported source control management: ${gitType}!")
         }
+        
+        //hotfix to init valid credentialsId object reference
+        def credId = "${this.repo}"
+        if (!this.organization.isEmpty()) {
+            credId = "${this.organization}-${this.repo}"
+        }
+        this.scmClient.setCredentialsId(credId)
     }
 
     protected String getDisplayName() {
@@ -147,7 +160,7 @@ public abstract class BaseObject {
 
     /*       
      *  Find repo name from repository url value (https or ssh)
-     * @return organization String
+     * @return repository String
      */
     @NonCPS
     protected def initRepo(url) {
@@ -164,7 +177,11 @@ public abstract class BaseObject {
          if (items.length < 1) {
              throw new RuntimeException("Unable to parse repository name from '${url}' value!")
          }
-         return items[items.length - 1].replace(".git", "")
+         
+         def repoName = items[items.length - 1].replace(".git", "")
+         
+         context.println "repoName: ${repoName}"
+         return repoName
     }
 
 }

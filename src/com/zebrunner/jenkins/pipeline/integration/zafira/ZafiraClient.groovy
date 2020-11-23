@@ -58,7 +58,7 @@ class ZafiraClient extends HttpClient {
                 cause: Configuration.get("cause"),
                 upstreamJobId: Configuration.get("upstreamJobId"),
                 upstreamJobBuildNumber: Configuration.get("upstreamJobBuildNumber"),
-                scmURL: Configuration.get("scmURL"),
+                repoUrl: Configuration.get("repoUrl"),
                 hashcode: Configuration.get("hashcode")
 
         logger.info("REQUEST: " + jsonBuilder.toPrettyString())

@@ -17,14 +17,14 @@ class Gitlab extends Scm {
         HTTP_URL("httpUrl", "\$.project.http_url"),
         HEADER_EVENT_NAME("eventName", "x-gitlab-event"),
 
-        PR_ACTION("prAction", "\$.object_attributes.state"),
+        PR_ACTION("prAction", "\$.object_attributes.action"),
         PR_SHA("prSha", "\$.object_attributes.last_commit.id"),
         PR_NUMBER("prNumber", "\$.object_attributes.iid"),
         PR_REPO("prRepo", "\$.project.id"),
         PR_SOURCE_BRANCH("prSourceBranch", "\$.object_attributes.source_branch"),
         PR_TARGET_BRANCH("prTargetBranch", "\$.object_attributes.target_branch"),
         PR_FILTER_TEXT("prFilterText", "\$pr_action \$x_gitlab_event %s"),
-        PR_FILTER_REGEX("prFilterExpression", "^((opened|reopened)\\sMerge\\sRequest\\sHook\\s%s)*?\$"),
+        PR_FILTER_REGEX("prFilterExpression", "^((open|reopen|update)\\sMerge\\sRequest\\sHook\\s%s)*?\$"),
 
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_gitlab_event %s"),
         PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\sPush\\sHook\\s%s)*?\$"),

@@ -486,11 +486,6 @@ public class TestNG extends Runner {
         setReportingCreds()
         setSeleniumUrl()
         
-        //TODO: test if we should support scmURL
-        if (!isParamEmpty(Configuration.get("scmURL"))){
-            scmClient.setUrl(Configuration.get("scmURL"))
-        }
-        
         logger.info("TestNG->runJob")
         uuid = getUUID()
         logger.info("UUID: " + uuid)
@@ -701,7 +696,10 @@ public class TestNG extends Runner {
         }
 
         //general mobile capabilities
-        Configuration.set("capabilities.provider", "mcloud")
+        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
+            // set for mobile tests mcloud as default provider if nothing is specified by end-user
+            Configuration.set("capabilities.provider", "mcloud")
+        }
 
 
         // ATTENTION! Obligatory remove device from the params otherwise
@@ -733,7 +731,7 @@ public class TestNG extends Runner {
         context.stage('Run Test Suite') {
             def goals = getMavenGoals()
             def pomFile = getMavenPomFile()
-            context.mavenBuild("-U ${goals} -f ${pomFile}")
+            context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
         }
     }
 
@@ -1077,11 +1075,6 @@ public class TestNG extends Runner {
     public void runCron() {
         logger.info("TestNG->runCron")
         context.node("master") {
-            //TODO: test if we should support scmURL
-            if (!isParamEmpty(Configuration.get("scmURL"))){
-                scmClient.setUrl(Configuration.get("scmURL"))
-            }
-
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
@@ -1419,7 +1412,8 @@ public class TestNG extends Runner {
     public void rerunJobs(){
         context.stage('Rerun Tests'){
             //updates zafira credentials with values from Jenkins Credentials (if present)
-			setReportingCreds()
+            this.organization = Configuration.get("folderName")
+            setReportingCreds()
             zafiraUpdater.smartRerun()
         }
     }

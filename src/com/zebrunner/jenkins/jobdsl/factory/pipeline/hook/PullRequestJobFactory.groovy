@@ -91,7 +91,12 @@ public class PullRequestJobFactory extends PipelineFactory {
                                 }
                             }
 
-                            tokenCredentialId("${this.organization}-${this.webHookArgs.scmType}-webhook-token")
+                            def webhookTokenCreds = "${this.webHookArgs.scmType}-webhook-token"
+                            if (this.organization != null && !this.organization.isEmpty()) {
+                                webhookTokenCreds = "${this.organization}-${this.webHookArgs.scmType}-webhook-token"
+                            }
+                            tokenCredentialId(webhookTokenCreds)
+                            
                             printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                             printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                             silentResponse(false)
