@@ -103,6 +103,32 @@ public abstract class AbstractRunner extends BaseObject {
         logger.debug("tokenName: ${tokenName}; name: ${name}; password: ${password}")
         return [name, password]
     }
+    
+    /*
+     * Get custom maven settings xml IDbased on organization
+     *
+     * @return maven settings ID
+     */
+    protected def getMavenSettings() {
+        // https://github.com/zebrunner/pipeline-ce/issues/54
+        // be able to override mavenSettingsConfig without private custom pipeline usage
+        def tokenName = "maven"
+        def name = ""
+        def id = ""
+        
+        if (!isParamEmpty(this.organization)) {
+            tokenName = "${this.organization}" + "-" + tokenName
+        }
+
+        if (getCredentials(tokenName)) {
+            context.withCredentials([context.usernamePassword(credentialsId: tokenName, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                name = context.env.USERNAME
+                id = context.env.PASSWORD
+            }
+        }
+        logger.debug("MavenSettings: ${tokenName}; name: ${name}; id: ${id}")
+        return id
+    }
 
     /*
      * set DslClasspath to support custom JobDSL logic

@@ -329,7 +329,6 @@ class Organization extends BaseObject {
         }
     }
     
-    
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
             Organization.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)

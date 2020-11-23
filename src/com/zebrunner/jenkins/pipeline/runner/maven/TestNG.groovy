@@ -731,7 +731,7 @@ public class TestNG extends Runner {
         context.stage('Run Test Suite') {
             def goals = getMavenGoals()
             def pomFile = getMavenPomFile()
-            context.mavenBuild("-U ${goals} -f ${pomFile}")
+            context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
         }
     }
 
