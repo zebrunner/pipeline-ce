@@ -112,7 +112,7 @@ public abstract class AbstractRunner extends BaseObject {
     protected def getMavenSettings() {
         // https://github.com/zebrunner/pipeline-ce/issues/54
         // be able to override mavenSettingsConfig without private custom pipeline usage
-        def tokenName = "maven"
+        def tokenName = Configuration.CREDS_MAVEN_SETTINGS
         def name = ""
         def id = ""
         

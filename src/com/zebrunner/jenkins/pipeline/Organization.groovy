@@ -316,7 +316,7 @@ class Organization extends BaseObject {
             def name = Configuration.get("Name")
             def id = Configuration.get("ID")
             
-            def mavenCreds = "maven"
+            def mavenCreds = Configuration.CREDS_MAVEN_SETTINGS
             if (!isParamEmpty(this.folderName)) {
                 mavenCreds = "${this.folderName}-maven"
             }

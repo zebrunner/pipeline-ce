@@ -8,6 +8,8 @@ public class Configuration {
 
     public final static def mustOverride = "{must_override}"
 
+    public final static def CREDS_MAVEN_SETTINGS = "maven"
+    
     public final static def CREDS_REPORTING_SERVICE_URL = "reporting_service_url"
     public final static def CREDS_REPORTING_ACCESS_TOKEN = "reporting_access_token"
     
