@@ -310,8 +310,26 @@ class Organization extends BaseObject {
             }
         }
     }
-
-
+    
+    public def registerMavenSettings() {
+        context.stage("Register Maven Settings") {
+            def name = Configuration.get("Name")
+            def id = Configuration.get("ID")
+            
+            def mavenCreds = "maven"
+            if (!isParamEmpty(this.folderName)) {
+                mavenCreds = "${this.folderName}-maven"
+            }
+            
+            if (updateJenkinsCredentials(mavenCreds, "Maven settings file", name, id)) {
+                logger.info(mavenCreds + " settings were successfully registered.")
+            } else {
+                throw new RuntimeException("Maven settings were not registered successfully!")
+            }
+        }
+    }
+    
+    
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
             Organization.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
