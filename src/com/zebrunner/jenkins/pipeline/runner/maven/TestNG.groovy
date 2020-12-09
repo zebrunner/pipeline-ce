@@ -130,11 +130,10 @@ public class TestNG extends Runner {
 
         context.stage("Scan Repository") {
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-            def repo = Configuration.get("repo")
             def repoFolder = parseFolderName(getWorkspace())
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${repo}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             def workspace = getWorkspace()
@@ -393,7 +392,7 @@ public class TestNG extends Runner {
     protected def getJenkinsJobsScanResult(build) {
         Map jenkinsJobsScanResult = [:]
         jenkinsJobsScanResult.success = false
-        jenkinsJobsScanResult.repo = Configuration.get("repo")
+        jenkinsJobsScanResult.repo = Configuration.get("repoUrl")
         jenkinsJobsScanResult.userId = !isParamEmpty(Configuration.get("userId")) ? Long.valueOf(Configuration.get("userId")) : 2
         jenkinsJobsScanResult.jenkinsJobs = []
         try {
@@ -1082,10 +1081,9 @@ public class TestNG extends Runner {
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-            def repo = Configuration.get("repo")
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${repo}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             for(pomFile in context.getPomFiles()){
