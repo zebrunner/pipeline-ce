@@ -133,7 +133,7 @@ public class TestNG extends Runner {
             def repoFolder = parseFolderName(getWorkspace())
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${this.repo}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             def workspace = getWorkspace()
@@ -877,7 +877,7 @@ public class TestNG extends Runner {
                 "QTEST_ACCESS_TOKEN",
                 "qtest_enabled",
                 "job_type",
-                "repo",
+                "repoUrl",
                 "sub_project",
                 "slack_channels",
                 "BuildPriority",
@@ -945,7 +945,7 @@ public class TestNG extends Runner {
                     getBrowser() + "-" + Configuration.get("env") + "\""
             uniqueBrowserInstance = uniqueBrowserInstance.replace("/", "-").replace("#", "")
             startBrowserStackLocal(uniqueBrowserInstance)
-            Configuration.set("capabilities.project", Configuration.get("repo"))
+            Configuration.set("capabilities.project", this.repo)
             Configuration.set("capabilities.build", uniqueBrowserInstance)
             Configuration.set("capabilities.browserstack.localIdentifier", uniqueBrowserInstance)
             Configuration.set("app_version", "browserStack")
@@ -1083,7 +1083,7 @@ public class TestNG extends Runner {
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${this.repo}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             for(pomFile in context.getPomFiles()){
