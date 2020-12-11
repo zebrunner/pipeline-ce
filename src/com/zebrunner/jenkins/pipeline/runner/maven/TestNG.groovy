@@ -130,11 +130,10 @@ public class TestNG extends Runner {
 
         context.stage("Scan Repository") {
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-            def repo = Configuration.get("repo")
             def repoFolder = parseFolderName(getWorkspace())
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${repo}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${this.repo}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             def workspace = getWorkspace()
@@ -393,7 +392,7 @@ public class TestNG extends Runner {
     protected def getJenkinsJobsScanResult(build) {
         Map jenkinsJobsScanResult = [:]
         jenkinsJobsScanResult.success = false
-        jenkinsJobsScanResult.repo = Configuration.get("repo")
+        jenkinsJobsScanResult.repo = Configuration.get("repoUrl")
         jenkinsJobsScanResult.userId = !isParamEmpty(Configuration.get("userId")) ? Long.valueOf(Configuration.get("userId")) : 2
         jenkinsJobsScanResult.jenkinsJobs = []
         try {
@@ -628,6 +627,16 @@ public class TestNG extends Runner {
     }
 
     protected String chooseNode() {
+        
+        // reuse overriden node label assignment and return 
+        def nodeLabel = Configuration.get("node_label")
+        if (!isParamEmpty(nodeLabel)) {
+            logger.info("overriding default node to: " + nodeLabel)
+            Configuration.set("node", nodeLabel)
+            return Configuration.get("node")
+        }
+        
+        
         def jobType = !isParamEmpty(Configuration.get(JOB_TYPE)) ? Configuration.get(JOB_TYPE) : ""
         switch (jobType.toLowerCase()) {
             case "api":
@@ -660,12 +669,6 @@ public class TestNG extends Runner {
                 Configuration.set("node", "default")
         }
 
-        def nodeLabel = Configuration.get("node_label")
-        logger.info("nodeLabel: " + nodeLabel)
-        if (!isParamEmpty(nodeLabel)) {
-            logger.info("overriding default node to: " + nodeLabel)
-            Configuration.set("node", nodeLabel)
-        }
         logger.info("node: " + Configuration.get("node"))
         return Configuration.get("node")
     }
@@ -874,7 +877,7 @@ public class TestNG extends Runner {
                 "QTEST_ACCESS_TOKEN",
                 "qtest_enabled",
                 "job_type",
-                "repo",
+                "repoUrl",
                 "sub_project",
                 "slack_channels",
                 "BuildPriority",
@@ -942,7 +945,7 @@ public class TestNG extends Runner {
                     getBrowser() + "-" + Configuration.get("env") + "\""
             uniqueBrowserInstance = uniqueBrowserInstance.replace("/", "-").replace("#", "")
             startBrowserStackLocal(uniqueBrowserInstance)
-            Configuration.set("capabilities.project", Configuration.get("repo"))
+            Configuration.set("capabilities.project", this.repo)
             Configuration.set("capabilities.build", uniqueBrowserInstance)
             Configuration.set("capabilities.browserstack.localIdentifier", uniqueBrowserInstance)
             Configuration.set("app_version", "browserStack")
@@ -1078,10 +1081,9 @@ public class TestNG extends Runner {
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-            def repo = Configuration.get("repo")
             def branch = Configuration.get("branch")
 
-            setDisplayNameTemplate("#${buildNumber}|${repo}|${branch}")
+            setDisplayNameTemplate("#${buildNumber}|${this.repo}|${branch}")
             currentBuild.displayName = getDisplayName()
 
             for(pomFile in context.getPomFiles()){
