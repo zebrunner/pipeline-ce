@@ -12,6 +12,7 @@ class Runner extends AbstractRunner {
 	protected def registry
 	protected def registryCreds
 	protected def releaseName
+	protected def releaseType
 	protected def dockerFile
   	protected def buildTool
 	
@@ -20,7 +21,15 @@ class Runner extends AbstractRunner {
 		runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
 		registry = "${this.organization}/${this.repo}"
 		registryCreds = "${this.organization}-docker"
-		releaseName = "1.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
+
+		releaseType = Configuration.get("RELEASE_TYPE")
+		// SNAPSHOT - RELEASE_VERSION.BUILD_NUMBER-SNAPSHOT
+		// RELEASE and RELEASE_CANDIDATE - just RELEASE_VERSION
+		releaseName = ${Configuration.get("RELEASE_VERSION")}
+		if ("SNAPSHOT".equals(releaseType)) {
+			releaseName = "${Configuration.get("RELEASE_VERSION")}.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
+		}
+
 		buildTool = Configuration.get("build_tool")
 		dockerFile = Configuration.get("DOCKERFILE")
 		context.currentBuild.setDisplayName(releaseName)
