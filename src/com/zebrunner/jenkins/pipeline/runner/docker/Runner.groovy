@@ -25,7 +25,7 @@ class Runner extends AbstractRunner {
 		releaseType = Configuration.get("RELEASE_TYPE")
 		// SNAPSHOT - RELEASE_VERSION.BUILD_NUMBER-SNAPSHOT
 		// RELEASE and RELEASE_CANDIDATE - just RELEASE_VERSION
-		releaseName = ${Configuration.get("RELEASE_VERSION")}
+		releaseName = Configuration.get("RELEASE_VERSION")
 		if ("SNAPSHOT".equals(releaseType)) {
 			releaseName = "${Configuration.get("RELEASE_VERSION")}.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
 		}
