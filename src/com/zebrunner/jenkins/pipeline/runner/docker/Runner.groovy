@@ -114,9 +114,7 @@ class Runner extends AbstractRunner {
         logger.info("releaseTagFull: " + releaseTagFull)
         logger.info("releaseTagMM: " + releaseTagMM)
         
-
-        
-        context.currentBuild.setDisplayName(this.releaseTagFull)
+        context.currentBuild.setDisplayName(releaseTagFull)
         
 		context.node('docker') {
 			context.timestamps {
