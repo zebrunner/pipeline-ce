@@ -37,7 +37,7 @@ class Runner extends AbstractRunner {
         this.branch = Configuration.get("branch")
         
         if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-            error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
+            context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
 
         
@@ -52,13 +52,13 @@ class Runner extends AbstractRunner {
             this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
         } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
             if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
+                context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
             }
             this.releaseTagFull = this.releaseVersion
             this.releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
         } else if ("RELEASE".equals(this.releaseType)) {
             if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
+                context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
             }
             this.releaseTagFull = this.releaseVersion
             this.releaseTagMM = releaseVersionMM
