@@ -87,6 +87,8 @@ class Runner extends AbstractRunner {
         def releaseTagMM
 
         def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        logger.info("releaseVersionMM: " + releaseVersionMM)
+        
         def buildNumber = Configuration.get("BUILD_NUMBER")
         
         // following block is used to construct release tags
@@ -94,7 +96,7 @@ class Runner extends AbstractRunner {
         // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
         if ("SNAPSHOT".equals(this.releaseType)) {
             releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
-            releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
+            releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
         } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
             if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
                 context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
@@ -109,8 +111,6 @@ class Runner extends AbstractRunner {
             releaseTagMM = releaseVersionMM
         }
 
-        logger.info("releaseVersionMM: " + releaseVersionMM)
-        
         logger.info("releaseTagFull: " + releaseTagFull)
         logger.info("releaseTagMM: " + releaseTagMM)
         
