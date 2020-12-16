@@ -18,25 +18,50 @@ class Runner extends AbstractRunner {
 	protected def releaseType
 	protected def dockerFile
   	protected def buildTool
+      
+    protected def releaseTagFull
+    protected def releaseTagMM
+    
+    protected def branch
 	
 	public Runner(context) {
 		super(context)
-		runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
-		registry = "${this.organization}/${this.repo}"
-		registryCreds = "${this.organization}-docker"
+		
+        this.runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
+		this.registry = "${this.organization}/${this.repo}"
+		this.registryCreds = "${this.organization}-docker"
 
-		releaseType = Configuration.get("RELEASE_TYPE")
-		// SNAPSHOT - RELEASE_VERSION.BUILD_NUMBER-SNAPSHOT
-		// RELEASE and RELEASE_CANDIDATE - just RELEASE_VERSION
-		releaseVersion = Configuration.get("RELEASE_VERSION")
+		this.releaseType = Configuration.get("RELEASE_TYPE")
+		this.releaseVersion = Configuration.get("RELEASE_VERSION")
         
-        if (!(releaseVersion ==~ "${SEMVER_REGEX}") && !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-            throw new RuntimeException("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
+        this.branch = Configuration.get("branch")
+        
+        if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+            error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
+
         
-		if ("SNAPSHOT".equals(releaseType)) {
-			releaseVersion = "${Configuration.get("RELEASE_VERSION")}.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
-		}
+        def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        
+        // following block is used to construct release tags
+        // RELEASE_TAG_FULL is used to fully identify this specific build
+        // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
+        if ("SNAPSHOT".equals(this.releaseType)) {
+            this.releaseTagFull = "${this.releaseVersion}.${BUILD_NUMBER}-SNAPSHOT"
+            this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
+        } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
+            if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
+            }
+            this.releaseTagFull = this.releaseVersion
+            this.releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
+        } else if ("RELEASE".equals(this.releaseType)) {
+            if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
+            }
+            this.releaseTagFull = this.releaseVersion
+            this.releaseTagMM = releaseVersionMM
+        }
 
 		buildTool = Configuration.get("build_tool")
 		dockerFile = Configuration.get("DOCKERFILE")
@@ -109,7 +134,8 @@ class Runner extends AbstractRunner {
 
 				try {
 					context.currentBuild.setDisplayName(releaseVersion)
-					context.dockerDeploy(releaseVersion, registry, registryCreds, dockerFile)
+					context.dockerDeploy(this.releaseTagFull, registry, registryCreds, dockerFile)
+                    context.dockerDeploy(this.releaseTagMM, registry, registryCreds, dockerFile)
 				} catch(Exception e) {
 					logger.error("Something went wrond while pushin the image. \n" + Utils.printStackTrace(e))
 					context.currentBuild.result = BuildResult.FAILURE
