@@ -31,7 +31,7 @@ class Runner extends AbstractRunner {
 		releaseVersion = Configuration.get("RELEASE_VERSION")
         
         if (!(releaseVersion ==~ "${SEMVER_REGEX}") && !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-            throw new RuntimeException "Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/"
+            throw new RuntimeException("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
         
 		if ("SNAPSHOT".equals(releaseType)) {
