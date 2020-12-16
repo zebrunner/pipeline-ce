@@ -42,12 +42,13 @@ class Runner extends AbstractRunner {
 
         
         def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        def buildNumber = Configuration.get("BUILD_NUMBER")
         
         // following block is used to construct release tags
         // RELEASE_TAG_FULL is used to fully identify this specific build
         // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
         if ("SNAPSHOT".equals(this.releaseType)) {
-            this.releaseTagFull = "${this.releaseVersion}.${BUILD_NUMBER}-SNAPSHOT"
+            this.releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
             this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
         } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
             if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
