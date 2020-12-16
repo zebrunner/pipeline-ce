@@ -47,6 +47,16 @@ class Runner extends AbstractRunner {
                     // hotfix to buildTool initialization
                     def buildTool = "gradle"
                     Configuration.set("gradle_tasks", "clean build " + sc.getGoals(true) + " sonarqube --scan --debug")
+                    context.stage("${this.buildTool} build") {
+                        switch (buildTool.toLowerCase()) {
+                            case 'maven':
+                                context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
+                                break
+                            case 'gradle':
+                                context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
+                                break
+                        }
+                    }
                     
 					context.dockerDeploy(version, registry, registryCreds)
 				} catch (Exception e) {
