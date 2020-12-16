@@ -87,6 +87,7 @@ class Runner extends AbstractRunner {
         }
 
         def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        logger.info("releaseVersionMM: " + releaseVersionMM)
         def buildNumber = Configuration.get("BUILD_NUMBER")
         
         // following block is used to construct release tags
@@ -136,7 +137,6 @@ class Runner extends AbstractRunner {
 				}
 
 				try {
-					context.currentBuild.setDisplayName(releaseVersion)
 					context.dockerDeploy(this.releaseTagFull, registry, registryCreds, dockerFile)
                     context.dockerDeploy(this.releaseTagMM, registry, registryCreds, dockerFile)
 				} catch(Exception e) {
