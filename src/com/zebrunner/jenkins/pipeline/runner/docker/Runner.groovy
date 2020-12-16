@@ -67,7 +67,7 @@ class Runner extends AbstractRunner {
                     
                     // hotfix to buildTool initialization 
                     def buildTool = "gradle"
-                    Configuration.set("gradle_tasks", "clean build " + sc.getGoals(true) + " sonarqube")
+                    Configuration.set("gradle_tasks", "clean build " + sc.getGoals(true) + " sonarqube --scan --debug")
                     
                     context.stage("${this.buildTool} build") {
                         switch (buildTool.toLowerCase()) {
