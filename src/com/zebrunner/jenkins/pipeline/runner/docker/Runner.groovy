@@ -57,7 +57,7 @@ class Runner extends AbstractRunner {
         def pr_number = configuration.get("pr_number")
         
         def version = "pr-${pr_number}-SNAPSHOT"
-        context.currentBuild.setDisplayName(version)
+        context.currentBuild.setDisplayName("${Configuration.get("BUILD_NUMBER")}|${version})
 		context.node('docker') {
 			context.timestamps {
 				logger.info('DockerRunner->onPullRequest')
