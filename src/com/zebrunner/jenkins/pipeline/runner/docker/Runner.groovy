@@ -19,9 +19,6 @@ class Runner extends AbstractRunner {
 	protected def dockerFile
   	protected def buildTool
       
-    protected def releaseTagFull
-    protected def releaseTagMM
-    
     protected def branch
 	
 	public Runner(context) {
@@ -85,30 +82,39 @@ class Runner extends AbstractRunner {
         if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
             context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
+        
+        def releaseTagFull
+        def releaseTagMM
 
         def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
-        logger.info("releaseVersionMM: " + releaseVersionMM)
         def buildNumber = Configuration.get("BUILD_NUMBER")
         
         // following block is used to construct release tags
         // RELEASE_TAG_FULL is used to fully identify this specific build
         // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
         if ("SNAPSHOT".equals(this.releaseType)) {
-            this.releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
-            this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
+            releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
+            releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
         } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
             if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
                 context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
             }
-            this.releaseTagFull = this.releaseVersion
-            this.releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
+            releaseTagFull = this.releaseVersion
+            releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
         } else if ("RELEASE".equals(this.releaseType)) {
             if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
                 context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
             }
-            this.releaseTagFull = this.releaseVersion
-            this.releaseTagMM = releaseVersionMM
+            releaseTagFull = this.releaseVersion
+            releaseTagMM = releaseVersionMM
         }
+
+        logger.info("releaseVersionMM: " + releaseVersionMM)
+        
+        logger.info("releaseTagFull: " + releaseTagFull)
+        logger.info("releaseTagMM: " + releaseTagMM)
+        
+
         
         context.currentBuild.setDisplayName(this.releaseTagFull)
         
