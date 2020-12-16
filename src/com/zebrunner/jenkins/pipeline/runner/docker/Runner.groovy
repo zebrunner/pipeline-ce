@@ -41,7 +41,14 @@ class Runner extends AbstractRunner {
 				logger.info('DockerRunner->onPush')
 				try {
 					getScm().clonePush()
-					context.dockerDeploy(releaseVersion, registry, registryCreds)
+                    
+                    def version = "push-" + Configuration.get("BUILD_NUMBER") + "-SNAPSHOT"
+                    
+                    // hotfix to buildTool initialization
+                    def buildTool = "gradle"
+                    Configuration.set("gradle_tasks", "clean build " + sc.getGoals(true) + " sonarqube --scan --debug")
+                    
+					context.dockerDeploy(version, registry, registryCreds)
 				} catch (Exception e) {
 					logger.error("Something went wrong while pushing the docker image. \n" + Utils.printStackTrace(e))
 					context.currentBuild.result = BuildResult.FAILURE
