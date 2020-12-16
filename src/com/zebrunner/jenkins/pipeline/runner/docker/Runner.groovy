@@ -36,37 +36,9 @@ class Runner extends AbstractRunner {
         
         this.branch = Configuration.get("branch")
         
-        if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-            context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
-        }
-
-        
-        def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
-        def buildNumber = Configuration.get("BUILD_NUMBER")
-        
-        // following block is used to construct release tags
-        // RELEASE_TAG_FULL is used to fully identify this specific build
-        // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
-        if ("SNAPSHOT".equals(this.releaseType)) {
-            this.releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
-            this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
-        } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
-            if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
-            }
-            this.releaseTagFull = this.releaseVersion
-            this.releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
-        } else if ("RELEASE".equals(this.releaseType)) {
-            if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
-            }
-            this.releaseTagFull = this.releaseVersion
-            this.releaseTagMM = releaseVersionMM
-        }
-
 		buildTool = Configuration.get("build_tool")
 		dockerFile = Configuration.get("DOCKERFILE")
-		context.currentBuild.setDisplayName(releaseVersion)
+		
 	}
 
 	@Override
@@ -109,6 +81,36 @@ class Runner extends AbstractRunner {
 
 	@Override
 	public void build() {
+        // do semantic versioning verifications
+        if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+            context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
+        }
+
+        def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        def buildNumber = Configuration.get("BUILD_NUMBER")
+        
+        // following block is used to construct release tags
+        // RELEASE_TAG_FULL is used to fully identify this specific build
+        // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
+        if ("SNAPSHOT".equals(this.releaseType)) {
+            this.releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
+            this.releaseTagMM = "${this.releaseVersion}-SNAPSHOT"
+        } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
+            if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
+            }
+            this.releaseTagFull = this.releaseVersion
+            this.releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
+        } else if ("RELEASE".equals(this.releaseType)) {
+            if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
+            }
+            this.releaseTagFull = this.releaseVersion
+            this.releaseTagMM = releaseVersionMM
+        }
+        
+        context.currentBuild.setDisplayName(this.releaseTagFull)
+        
 		context.node('docker') {
 			context.timestamps {
 				logger.info('DockerRunner->build')
