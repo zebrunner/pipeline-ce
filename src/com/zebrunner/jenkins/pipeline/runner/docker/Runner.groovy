@@ -8,8 +8,8 @@ import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Runner extends AbstractRunner {
     
-    private static String SEMVER_REGEX = "/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/"
-    private static String SEMVER_REGEX_RC = "/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\.RC([1-9]\d*)/"
+    private static def SEMVER_REGEX = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/
+    private static def SEMVER_REGEX_RC = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\.RC([1-9]\d*)/
 	
 	protected def runnerClass
 	protected def registry
