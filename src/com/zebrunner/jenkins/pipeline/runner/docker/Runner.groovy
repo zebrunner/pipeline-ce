@@ -7,11 +7,14 @@ import com.zebrunner.jenkins.Utils
 import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Runner extends AbstractRunner {
+    
+    private static String SEMVER_REGEX = "/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/"
+    private static String SEMVER_REGEX_RC = "/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\.RC([1-9]\d*)/"
 	
 	protected def runnerClass
 	protected def registry
 	protected def registryCreds
-	protected def releaseName
+	protected def releaseVersion
 	protected def releaseType
 	protected def dockerFile
   	protected def buildTool
@@ -25,14 +28,19 @@ class Runner extends AbstractRunner {
 		releaseType = Configuration.get("RELEASE_TYPE")
 		// SNAPSHOT - RELEASE_VERSION.BUILD_NUMBER-SNAPSHOT
 		// RELEASE and RELEASE_CANDIDATE - just RELEASE_VERSION
-		releaseName = Configuration.get("RELEASE_VERSION")
+		releaseVersion = Configuration.get("RELEASE_VERSION")
+        
+        if (!(releaseVersion ==~ "${SEMVER_REGEX}") && !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+            throw new Runtimeexception "Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/"
+        }
+        
 		if ("SNAPSHOT".equals(releaseType)) {
-			releaseName = "${Configuration.get("RELEASE_VERSION")}.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
+			releaseVersion = "${Configuration.get("RELEASE_VERSION")}.${Configuration.get("BUILD_NUMBER")}-SNAPSHOT"
 		}
 
 		buildTool = Configuration.get("build_tool")
 		dockerFile = Configuration.get("DOCKERFILE")
-		context.currentBuild.setDisplayName(releaseName)
+		context.currentBuild.setDisplayName(releaseVersion)
 	}
 
 	@Override
@@ -42,7 +50,7 @@ class Runner extends AbstractRunner {
 				logger.info('DockerRunner->onPush')
 				try {
 					getScm().clonePush()
-					context.dockerDeploy(releaseName, registry, registryCreds)
+					context.dockerDeploy(releaseVersion, registry, registryCreds)
 				} catch (Exception e) {
 					logger.error("Something went wrong while pushing the docker image. \n" + Utils.printStackTrace(e))
 					context.currentBuild.result = BuildResult.FAILURE
@@ -59,9 +67,9 @@ class Runner extends AbstractRunner {
 			context.timestamps {
 				logger.info('DockerRunner->onPullRequest')
 				try {
-					context.currentBuild.setDisplayName(releaseName)
+					context.currentBuild.setDisplayName(releaseVersion)
 					getScm().clonePR()
-					def image = context.dockerDeploy.build(releaseName, registry)
+					def image = context.dockerDeploy.build(releaseVersion, registry)
 					context.dockerDeploy.clean(image)
 				} catch (Exception e) {
 					logger.error("Something went wrong while building the docker image. \n" + Utils.printStackTrace(e))
@@ -79,7 +87,7 @@ class Runner extends AbstractRunner {
 			context.timestamps {
 				logger.info('DockerRunner->build')
 				try {
-					setDisplayNameTemplate("#${releaseName}|${Configuration.get('branch')}")
+					setDisplayNameTemplate("#${releaseVersion}|${Configuration.get('branch')}")
 					currentBuild.displayName = getDisplayName()
 					getScm().clone()
 
@@ -100,8 +108,8 @@ class Runner extends AbstractRunner {
 				}
 
 				try {
-					context.currentBuild.setDisplayName(releaseName)
-					context.dockerDeploy(releaseName, registry, registryCreds, dockerFile)
+					context.currentBuild.setDisplayName(releaseVersion)
+					context.dockerDeploy(releaseVersion, registry, registryCreds, dockerFile)
 				} catch(Exception e) {
 					logger.error("Something went wrond while pushin the image. \n" + Utils.printStackTrace(e))
 					context.currentBuild.result = BuildResult.FAILURE
