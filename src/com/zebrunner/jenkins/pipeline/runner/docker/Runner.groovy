@@ -65,6 +65,9 @@ class Runner extends AbstractRunner {
 					
 					getScm().clonePR()
                     
+                    // hotfix to buildTool initialization 
+                    def buildTool = "gradle"
+                    
                     context.stage("${this.buildTool} build") {
                         switch (buildTool.toLowerCase()) {
                             case 'maven':
