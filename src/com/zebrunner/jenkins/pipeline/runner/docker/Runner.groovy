@@ -15,7 +15,6 @@ class Runner extends AbstractRunner {
 	protected def registry
 	protected def registryCreds
 	protected def releaseVersion
-	protected def releaseType
 	protected def dockerFile
   	protected def buildTool
       
@@ -28,9 +27,6 @@ class Runner extends AbstractRunner {
 		this.registry = "${this.organization}/${this.repo}"
 		this.registryCreds = "${this.organization}-docker"
 
-		this.releaseType = Configuration.get("RELEASE_TYPE")
-		this.releaseVersion = Configuration.get("RELEASE_VERSION")
-        
         this.branch = Configuration.get("branch")
         
 		buildTool = Configuration.get("build_tool")
@@ -58,13 +54,29 @@ class Runner extends AbstractRunner {
 
 	@Override
 	public void onPullRequest() {
+        def pr_number = configuration.get("pr_number")
+        
+        def version = "pr-${pr_number}-SNAPSHOT"
+        context.currentBuild.setDisplayName(version)
 		context.node('docker') {
 			context.timestamps {
 				logger.info('DockerRunner->onPullRequest')
 				try {
-					context.currentBuild.setDisplayName(releaseVersion)
+					
 					getScm().clonePR()
-					def image = context.dockerDeploy.build(releaseVersion, registry)
+                    
+                    context.stage("${this.buildTool} build") {
+                        switch (buildTool.toLowerCase()) {
+                            case 'maven':
+                                context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
+                                break
+                            case 'gradle':
+                                context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
+                                break
+                        }
+                    }
+                    
+					def image = context.dockerDeploy.build(version, registry)
 					context.dockerDeploy.clean(image)
 				} catch (Exception e) {
 					logger.error("Something went wrong while building the docker image. \n" + Utils.printStackTrace(e))
@@ -78,36 +90,39 @@ class Runner extends AbstractRunner {
 
 	@Override
 	public void build() {
+        def releaseType = Configuration.get("RELEASE_TYPE")
+        def releaseVersion = Configuration.get("RELEASE_VERSION")
+        
+        def buildNumber = Configuration.get("BUILD_NUMBER")
+        
         // do semantic versioning verifications
-        if (!(this.releaseVersion ==~ "${SEMVER_REGEX}") && !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+        if (!(releaseVersion ==~ "${SEMVER_REGEX}") && !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
             context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
         
         def releaseTagFull
         def releaseTagMM
 
-        def releaseVersionMM = this.releaseVersion.split('\\.')[0] + '.' + this.releaseVersion.split('\\.')[1]
+        def releaseVersionMM = releaseVersion.split('\\.')[0] + '.' + releaseVersion.split('\\.')[1]
         logger.info("releaseVersionMM: " + releaseVersionMM)
-        
-        def buildNumber = Configuration.get("BUILD_NUMBER")
         
         // following block is used to construct release tags
         // RELEASE_TAG_FULL is used to fully identify this specific build
         // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
-        if ("SNAPSHOT".equals(this.releaseType)) {
-            releaseTagFull = "${this.releaseVersion}.${buildNumber}-SNAPSHOT"
+        if ("SNAPSHOT".equals(releaseType)) {
+            releaseTagFull = "${releaseVersion}.${buildNumber}-SNAPSHOT"
             releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
-        } else if ("RELEASE_CANDIDATE".equals(this.releaseType)) {
-            if (!"develop".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${this.releaseVersion})")
+        } else if ("RELEASE_CANDIDATE".equals(releaseType)) {
+            if (!"develop".equals(this.branch) || !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                context.error("Release Candidate can only be built from develop branch (actual: ${this.branch}) and should be labeled with valid RC version, e.g. 1.13.1.RC1 (actual: ${releaseVersion})")
             }
-            releaseTagFull = this.releaseVersion
+            releaseTagFull = releaseVersion
             releaseTagMM = "${releaseVersionMM}-SNAPSHOT"
-        } else if ("RELEASE".equals(this.releaseType)) {
-            if (!"master".equals(this.branch) || !(this.releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
-                context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${this.releaseVersion})")
+        } else if ("RELEASE".equals(releaseType)) {
+            if (!"master".equals(this.branch) || !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
+                context.error("Release can only be built from master branch (actual: ${this.branch}) and should be labeled with valid release version, e.g. 1.13.1 (actual: ${releaseVersion})")
             }
-            releaseTagFull = this.releaseVersion
+            releaseTagFull = releaseVersion
             releaseTagMM = releaseVersionMM
         }
 
