@@ -141,8 +141,8 @@ class Runner extends AbstractRunner {
 				}
 
 				try {
-					context.dockerDeploy(this.releaseTagFull, registry, registryCreds, dockerFile)
-                    context.dockerDeploy(this.releaseTagMM, registry, registryCreds, dockerFile)
+					context.dockerDeploy(releaseTagFull, registry, registryCreds, dockerFile)
+                    context.dockerDeploy(releaseTagMM, registry, registryCreds, dockerFile)
 				} catch(Exception e) {
 					logger.error("Something went wrond while pushin the image. \n" + Utils.printStackTrace(e))
 					context.currentBuild.result = BuildResult.FAILURE
