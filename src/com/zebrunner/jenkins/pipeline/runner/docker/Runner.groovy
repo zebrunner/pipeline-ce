@@ -42,7 +42,7 @@ class Runner extends AbstractRunner {
 				try {
 					getScm().clonePush()
                     
-                    def version = "push-" + Configuration.get("BUILD_NUMBER") + "-SNAPSHOT"
+                    def version = "merge-" + Configuration.get("BUILD_NUMBER") + "-SNAPSHOT"
                     
                     // hotfix to buildTool initialization
                     def buildTool = "gradle"
@@ -74,7 +74,7 @@ class Runner extends AbstractRunner {
 	public void onPullRequest() {
         def pr_number = configuration.get("pr_number")
         
-        def version = "pr-${pr_number}-SNAPSHOT"
+        def version = "${pr_number}"
         context.currentBuild.setDisplayName(Configuration.get("BUILD_NUMBER") + "|" + version)
 		context.node('docker') {
 			context.timestamps {
@@ -159,7 +159,6 @@ class Runner extends AbstractRunner {
 				logger.info('DockerRunner->build')
 				try {
 					setDisplayNameTemplate("#${releaseVersion}|${Configuration.get('branch')}")
-					currentBuild.displayName = getDisplayName()
 					getScm().clone()
 
 					context.stage("${this.buildTool} build") {
