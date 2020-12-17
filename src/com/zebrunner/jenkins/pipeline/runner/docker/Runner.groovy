@@ -2,133 +2,103 @@ package com.zebrunner.jenkins.pipeline.runner.docker
 
 import com.zebrunner.jenkins.pipeline.runner.AbstractRunner
 import com.zebrunner.jenkins.pipeline.Configuration
-import com.zebrunner.jenkins.Utils
 
+import static com.zebrunner.jenkins.Utils.*
 import static com.zebrunner.jenkins.pipeline.Executor.*
 
 class Runner extends AbstractRunner {
-    
+
     private static def SEMVER_REGEX = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/
     private static def SEMVER_REGEX_RC = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\.RC([1-9]\d*)/
-	
-	protected def runnerClass
-	protected def registry
-	protected def registryCreds
-	protected def releaseVersion
-	protected def dockerFile
-  	protected def buildTool
-      
+
+    // protected def runnerClass
+    protected def registry
+    protected def registryCreds
+    protected def releaseVersion
     protected def branch
-	
-	public Runner(context) {
-		super(context)
-		
-        this.runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
-		this.registry = "${this.organization}/${this.repo}"
-		this.registryCreds = "${this.organization}-docker"
+    protected def dockerFile
+
+    protected def goals
+
+    public Runner(context) {
+        super(context)
+
+        // this.runnerClass = "com.zebrunner.jenkins.pipeline.runner.docker.Runner"
+        this.registry = "${this.organization}/${this.repo}"
+        this.registryCreds = "${this.organization}-docker"
 
         this.branch = Configuration.get("branch")
+
+        this.dockerFile = Configuration.get("DOCKERFILE")
+
+        this.goals = Configuration.get("goals")
+    }
+
+    @Override
+    public void onPush() {
+        def version = Configuration.get("branch") + "-latest"
         
-		buildTool = Configuration.get("build_tool")
-		dockerFile = Configuration.get("DOCKERFILE")
-		
-	}
+        context.node('docker') {
+            context.timestamps {
+                logger.info('DockerRunner->onPush')
+                try {
+                    getScm().clonePush()
+                    buildSources(false)
+                    
+                    def image = context.dockerDeploy.build(version, registry)
+                    context.dockerDeploy.push(image, registryCreds)
+                    context.dockerDeploy.clean(image)
+                } catch (Exception e) {
+                    context.error("Something went wrong while building and pushing the docker image. \n" + printStackTrace(e))
+                } finally {
+                    clean()
+                }
+            }
+        }
+    }
 
-	@Override
-	public void onPush() {
-		context.node('docker') {
-			context.timestamps {
-				logger.info('DockerRunner->onPush')
-				try {
-					getScm().clonePush()
-                    
-                    def version = "merge-" + Configuration.get("BUILD_NUMBER") + "-SNAPSHOT"
-                    
-                    // hotfix to buildTool initialization
-                    def buildTool = "gradle"
-                    Configuration.set("gradle_tasks", "clean build " + sc.getGoals(false) + " sonarqube")
-                    // Configuration.set("gradle_tasks", "clean build")
-                    context.stage("${this.buildTool} build") {
-                        switch (buildTool.toLowerCase()) {
-                            case 'maven':
-                                context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
-                                break
-                            case 'gradle':
-                                context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
-                                break
-                        }
-                    }
-                    
-					context.dockerDeploy(version, registry, registryCreds)
-				} catch (Exception e) {
-					logger.error("Something went wrong while pushing the docker image. \n" + Utils.printStackTrace(e))
-					context.currentBuild.result = BuildResult.FAILURE
-				} finally {
-					clean()
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onPullRequest() {
+    @Override
+    public void onPullRequest() {
         def pr_number = configuration.get("pr_number")
-        
+
         def version = "${pr_number}"
         context.currentBuild.setDisplayName(Configuration.get("BUILD_NUMBER") + "|" + version)
-		context.node('docker') {
-			context.timestamps {
-				logger.info('DockerRunner->onPullRequest')
-				try {
-					
-					getScm().clonePR()
+        context.node('docker') {
+            context.timestamps {
+                logger.info('DockerRunner->onPullRequest')
+                try {
+                    getScm().clonePR()
+                    buildSources(true)
                     
-                    // hotfix to buildTool initialization 
-                    def buildTool = "gradle"
-                    Configuration.set("gradle_tasks", "clean build " + sc.getGoals(true) + " sonarqube")
-                    //Configuration.set("gradle_tasks", "clean build")
-                    
-                    context.stage("${this.buildTool} build") {
-                        switch (buildTool.toLowerCase()) {
-                            case 'maven':
-                                context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
-                                break
-                            case 'gradle':
-                                context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
-                                break
-                        }
-                    }
-                    
-					def image = context.dockerDeploy.build(version, registry)
-					context.dockerDeploy.clean(image)
-				} catch (Exception e) {
-					logger.error("Something went wrong while building the docker image. \n" + Utils.printStackTrace(e))
-					context.currentBuild.result = BuildResult.FAILURE
-				} finally {
-					clean()
-				}
-			}
-		}
-	}
+                    def image = context.dockerDeploy.build(version, registry)
+                    context.dockerDeploy.clean(image)
+                } catch (Exception e) {
+                    context.error("Something went wrong while building the docker image. \n" + printStackTrace(e))
+                } finally {
+                    clean()
+                }
+            }
+        }
+    }
 
-	@Override
-	public void build() {
+    @Override
+    public void build() {
         def releaseType = Configuration.get("RELEASE_TYPE")
         def releaseVersion = Configuration.get("RELEASE_VERSION")
-        
+
         def buildNumber = Configuration.get("BUILD_NUMBER")
-        
+
         // do semantic versioning verifications
         if (!(releaseVersion ==~ "${SEMVER_REGEX}") && !(releaseVersion ==~ "${SEMVER_REGEX_RC}")) {
             context.error("Upcoming release version should be a valid SemVer-compliant release or RC version! Visit for details: https://semver.org/")
         }
-        
+
         def releaseTagFull
         def releaseTagMM
 
         def releaseVersionMM = releaseVersion.split('\\.')[0] + '.' + releaseVersion.split('\\.')[1]
         logger.info("releaseVersionMM: " + releaseVersionMM)
-        
+
         // following block is used to construct release tags
         // RELEASE_TAG_FULL is used to fully identify this specific build
         // RELEASE_TAG_MM is used to tag this specific build as latest MAJOR.MINOR version
@@ -149,45 +119,63 @@ class Runner extends AbstractRunner {
             releaseTagMM = releaseVersionMM
         }
 
-        logger.info("releaseTagFull: " + releaseTagFull)
-        logger.info("releaseTagMM: " + releaseTagMM)
-        
+        logger.debug("releaseTagFull: " + releaseTagFull)
+        logger.debug("releaseTagMM: " + releaseTagMM)
+
         context.currentBuild.setDisplayName(releaseTagFull)
+
+        context.node('docker') {
+            context.timestamps {
+                logger.info('DockerRunner->build')
+                try {
+                    getScm().clone()
+                    buildSources(false)
+
+                    def image = context.dockerDeploy.build(releaseTagFull, registry, dockerFile)
+                    context.dockerDeploy.push(image, registryCreds)
+                    // push the same image using different tag
+                    context.dockerDeploy.push(image, registryCreds, releaseTagMM)
+                    context.dockerDeploy.clean(image)
+                } catch(Exception e) {
+                    context.error("Something went wrond while building and pushing the image. \n" + printStackTrace(e))
+                } finally {
+                    clean()
+                }
+            }
+        }
+    }
+    
+    protected void buildSources(isPullRequest = false) {
+        // redefine default maven/gradle goals if nothing provided as goals
+        if (isParamEmpty(this.goals)) {
+            
+            if (isMaven()) {
+                this.goals = "-U clean install"
+            }
+            
+            if (isGradle()) {
+                this.goals = "clean build"
+            }
+        }
         
-		context.node('docker') {
-			context.timestamps {
-				logger.info('DockerRunner->build')
-				try {
-					setDisplayNameTemplate("#${releaseVersion}|${Configuration.get('branch')}")
-					getScm().clone()
-
-					context.stage("${this.buildTool} build") {
-						switch (buildTool.toLowerCase()) {
-							case 'maven':
-								context.mavenBuild(Configuration.get('maven_goals'), getMavenSettings())
-								break
-							case 'gradle':
-								context.gradleBuild('./gradlew ' + Configuration.get('gradle_tasks'))
-								break
-						}
-					}
-
-				} catch (Exception e) {
-					logger.error("Something went wrond while building the project. \n" + Utils.printStackTrace(e))
-					context.currentBuild.result = BuildResult.FAILURE
-				}
-
-				try {
-					context.dockerDeploy(releaseTagFull, registry, registryCreds, dockerFile)
-                    context.dockerDeploy(releaseTagMM, registry, registryCreds, dockerFile)
-				} catch(Exception e) {
-					logger.error("Something went wrond while pushin the image. \n" + Utils.printStackTrace(e))
-					context.currentBuild.result = BuildResult.FAILURE
-				} finally {
-					clean()
-				}
-			}
-		}
-	}
+        // append sonar related goals if needed
+        goals += sc.getGoals(isPullRequest)
+        logger.debug("goals: " + this.goals)
+        
+        if (isGradle()) {
+            context.gradleBuild(this.goals)
+        } else if (isMaven()) {
+            context.mavenBuild(this.goals, getMavenSettings())
+        }
+        
+    }
+ 
+    private def isMaven() {
+        return context.fileExists("pom.xml")
+    }
+    
+    private def isGradle() {
+        return context.fileExists("build.gradle")
+    }
 
 }

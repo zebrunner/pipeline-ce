@@ -145,9 +145,7 @@ class Repository extends BaseObject {
             registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs()))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
-
             if (isBuildToolDependent) {
-                def buildTool = determineBuildTool()
                 def isDockerRunner = false
 
                 if (extendsClass([com.zebrunner.jenkins.pipeline.runner.docker.Runner])) {
@@ -160,7 +158,7 @@ class Repository extends BaseObject {
                     registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.repoUrl, this.branch))
                 }
 
-                registerObject("build_job", new BuildJobFactory(repoFolder, getPipelineScript(), "build", this.repoUrl, this.branch, buildTool, isDockerRunner))
+                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", this.repoUrl, this.branch, isDockerRunner))
             }
 
             logger.debug("before - factoryRunner.run(dslObjects)")
@@ -178,7 +176,7 @@ class Repository extends BaseObject {
         return "${getPipelineLibrary(this.library)}\nimport ${runnerClass}\nnew ${runnerClass}(this).onPush()"
     }
 
-    protected String getPipelineScript() {
+    protected String getBuildScript() {
         return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).build()"
     }
 
@@ -192,22 +190,6 @@ class Repository extends BaseObject {
 
     protected boolean extendsClass(classes) {
         return classes.any { Class.forName(this.runnerClass, false, Thread.currentThread().getContextClassLoader()) in it } 
-    }
-
-    protected String determineBuildTool() {
-        def buildTool = "undefined"
-
-        def mavenRepo = context.fileExists 'pom.xml'
-        def gradleRepo = context.fileExists 'build.gradle'
-
-        if (!(mavenRepo && gradleRepo)) {
-            if (mavenRepo) buildTool = "maven"
-            else if (gradleRepo) buildTool = "gradle"
-        }
-
-        logger.debug("buildTool: " + buildTool)
-
-        return buildTool
     }
 
 }
