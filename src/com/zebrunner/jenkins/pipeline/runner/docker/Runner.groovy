@@ -32,6 +32,11 @@ class Runner extends AbstractRunner {
         this.dockerFile = Configuration.get("DOCKERFILE")
 
         this.goals = Configuration.get("goals")
+        
+        if (Configuration.get("pro")?.toBoolean()) {
+            Configuration.set(REPO_URL, Configuration.get(REPO_URL).replace("zebrunner/ce", "zebrunner/pro"))
+        }
+        Configuration.get(REPO_URL)
     }
 
     @Override

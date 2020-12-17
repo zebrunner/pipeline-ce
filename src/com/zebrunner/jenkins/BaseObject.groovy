@@ -41,7 +41,7 @@ public abstract class BaseObject {
     //this is very important line which should be declared only as a class member!
     protected Configuration configuration = new Configuration(context)
     
-    private static final String REPO_URL = "repoUrl"
+    protected static final String REPO_URL = "repoUrl"
     private static final String SCM_USER = "scmUser"
     private static final String SCM_TOKEN = "scmToken"
 
