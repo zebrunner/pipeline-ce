@@ -899,6 +899,7 @@ public class TestNG extends Runner {
     }
 
     protected def addVideoStreamingCapability(message, capabilityName, capabilityValue) {
+        //TODO: made enableVnc detection related to provider instead of node name 
         def node = Configuration.get("node").toLowerCase()
         if ("web".equalsIgnoreCase(node) || node.contains("android")) {
             logger.info(message)
@@ -1030,14 +1031,14 @@ public class TestNG extends Runner {
 
     protected void publishJenkinsReports() {
         context.stage('Results') {
-            publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
+            //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
             publishReport('**/zafira/report.html', "ZafiraReport")
+            publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             //publishReport('**/artifacts/**', 'Artifacts')
             publishReport('**/*.dump', 'DumpReports')
             publishReport('**/*.har', 'HarReports')
-            publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
-            publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
-            publishReport('**/artifacts/**/feature-overview.html', 'CucumberReport')
+            //publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
+            //publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
         }
     }
 
