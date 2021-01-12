@@ -839,6 +839,8 @@ public class TestNG extends Runner {
         //TODO: move 8000 port into the global var
         addOptionalCapability("debug", "Enabling remote debug on ${getDebugHost()}:${getDebugPort()}", "maven.surefire.debug",
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
+        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVnc", "true")
+        //TODO: remove after migrating to 7.0 core
         addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVNC", "true")
         addBrowserStackGoals()
 
