@@ -812,16 +812,9 @@ public class TestNG extends Runner {
                             -Dreporting.server.access-token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
         }
         
-        def mobileRecorder=""
-        def provider = getProvider()
-        if ("zebrunner".equals(provider) || "mcloud".equals(provider)) {
-            // https://github.com/zebrunner/pipeline-ce/issues/90
-            mobileRecorder="-Dmobile_recorder=false"
-        }
-
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-        ${zafiraGoals} ${mobileRecorder} \
+        ${zafiraGoals} \
         -Ds3_save_screenshots=${Configuration.get(Configuration.Parameter.S3_SAVE_SCREENSHOTS)} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
@@ -1460,16 +1453,11 @@ public class TestNG extends Runner {
     }
     
     protected def getProvider() {
-        return getProvider("selenium")
-    }
-
-    protected def getProvider(defaultProvider) {
         if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            // set for mobile tests mcloud as default provider if nothing is specified by end-user
-            Configuration.set("capabilities.provider", defaultProvider)
+            return "selenium"
+        } else {        
+            Configuration.get("capabilities.provider")
         }
-        
-        return Configuration.get("capabilities.provider")
     }
 
 }
