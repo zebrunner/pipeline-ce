@@ -34,10 +34,6 @@ class BuildJobFactory extends PipelineFactory {
                     configure stringParam('DOCKERFILE', 'Dockerfile', 'Relative path to your dockerfile')
                 }
                 
-                if (this.repoUrl.contains("https://gitlab.com/zebrunner")) {
-                    booleanParam('pro', false, "Reuse pro version of repository.")
-                }
-
                 configure stringParam('branch', branch, "SCM repository branch containing sources for component build")
                 configure stringParam('goals', '', 'Extra build tool goals to build the project')
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
