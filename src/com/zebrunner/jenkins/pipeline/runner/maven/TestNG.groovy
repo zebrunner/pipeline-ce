@@ -699,11 +699,6 @@ public class TestNG extends Runner {
         }
 
         //general mobile capabilities
-        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            // set for mobile tests mcloud as default provider if nothing is specified by end-user
-            Configuration.set("capabilities.provider", "mcloud")
-        }
-
 
         // ATTENTION! Obligatory remove device from the params otherwise
         // hudson.remoting.Channel$CallSiteStackTrace: Remote call to JNLP4-connect connection from qpsinfra_jenkins-slave_1.qpsinfra_default/172.19.0.9:39487
@@ -746,10 +741,8 @@ public class TestNG extends Runner {
             return
         }
 
-        // update SELENIUM_URL parameter based on capabilities.provider. Local "selenium" is default provider
-        def provider = !isParamEmpty(Configuration.get("capabilities.provider")) ? Configuration.get("capabilities.provider") : "selenium"
-        def hubUrl = "${provider}_hub"
-        
+        // update SELENIUM_URL parameter based on capabilities.provider.
+        def hubUrl = getProvider() + "_hub"
 
         if (!isParamEmpty(getToken(hubUrl))) {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
@@ -811,18 +804,21 @@ public class TestNG extends Runner {
             && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
             // Ignore maven build result if Zafira integration is enabled
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
-							-Dzafira_enabled=true \
-							-Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-							-Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
+                            -Dzafira_enabled=true \
+                            -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
+                            -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
+                            -Dreporting.enabled=true \
+                            -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
+                            -Dreporting.server.access-token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
         }
-
+        
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
         ${zafiraGoals} \
         -Ds3_save_screenshots=${Configuration.get(Configuration.Parameter.S3_SAVE_SCREENSHOTS)} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
-        -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/CarinaReport\" \
+        -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
         -Dgit_branch=${Configuration.get("branch")} \
         -Dgit_commit=${Configuration.get("scm_commit")} \
         -Dgit_url=${Configuration.get("scm_url")} \
@@ -839,6 +835,9 @@ public class TestNG extends Runner {
         //TODO: move 8000 port into the global var
         addOptionalCapability("debug", "Enabling remote debug on ${getDebugHost()}:${getDebugPort()}", "maven.surefire.debug",
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
+        
+        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVnc", "true")
+        //TODO: remove after migrating to 7.0 core
         addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVNC", "true")
         addBrowserStackGoals()
 
@@ -897,6 +896,7 @@ public class TestNG extends Runner {
     }
 
     protected def addVideoStreamingCapability(message, capabilityName, capabilityValue) {
+        //TODO: made enableVnc detection related to provider instead of node name 
         def node = Configuration.get("node").toLowerCase()
         if ("web".equalsIgnoreCase(node) || node.contains("android")) {
             logger.info(message)
@@ -1028,14 +1028,14 @@ public class TestNG extends Runner {
 
     protected void publishJenkinsReports() {
         context.stage('Results') {
-            publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
+            //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
             publishReport('**/zafira/report.html', "ZafiraReport")
+            publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             //publishReport('**/artifacts/**', 'Artifacts')
             publishReport('**/*.dump', 'DumpReports')
             publishReport('**/*.har', 'HarReports')
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
-            publishReport('**/artifacts/**/feature-overview.html', 'CucumberReport')
         }
     }
 
@@ -1450,6 +1450,14 @@ public class TestNG extends Runner {
     protected def getDebugPort() {
         def port = "8000"
         return port
+    }
+    
+    protected def getProvider() {
+        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
+            return "selenium"
+        } else {        
+            Configuration.get("capabilities.provider")
+        }
     }
 
 }

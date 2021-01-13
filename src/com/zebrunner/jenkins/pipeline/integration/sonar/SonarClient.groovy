@@ -57,6 +57,17 @@ class SonarClient extends HttpClient {
         } else {
             goals += " -Dsonar.projectVersion=${Configuration.get("BUILD_NUMBER")} -Dsonar.branch.name=${Configuration.get("branch")}"
         }
+        
+        // Determine at run-time if we use maven or gradle.
+        def extraGoals = ""
+        if (isMaven()) {
+            extraGoals = " sonar:sonar"
+        }
+        // Gradle has higher priority!
+        if (isGradle()) {
+            extraGoals = " sonarqube"
+        }
+        goals += extraGoals
 
         // jacoco goals are valuable only when sonar is intergated as of now!
         goals += getJacocoGoals()
@@ -107,6 +118,14 @@ class SonarClient extends HttpClient {
         logger.debug("jacocoReportPaths: " + jacocoReportPaths)
 
         return [jacocoReportPath, jacocoReportPaths]
+    }
+    
+    private def isMaven() {
+        return context.fileExists("pom.xml")
+    }
+    
+    private def isGradle() {
+        return context.fileExists("build.gradle")
     }
 
 }
