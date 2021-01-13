@@ -1033,6 +1033,7 @@ public class TestNG extends Runner {
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             //publishReport('**/artifacts/**', 'Artifacts')
             publishReport('**/*.dump', 'DumpReports')
+            publishReport('**/*.dumpstream', 'DumpReports')
             publishReport('**/*.har', 'HarReports')
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
