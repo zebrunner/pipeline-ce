@@ -78,7 +78,7 @@ class Repository extends BaseObject {
         }
         
         if (!getCredentials(webhookTokenCreds)) {
-            updateJenkinsCredentials(webhookTokenCreds, "Token used to configure generic webhook triggers", "CHANGE_ME")
+            updateJenkinsCredentials(webhookTokenCreds, webhookTokenCreds, "CHANGE_ME")
         }
         
         
