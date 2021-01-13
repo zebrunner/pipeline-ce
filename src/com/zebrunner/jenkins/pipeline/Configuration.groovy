@@ -65,7 +65,6 @@ public class Configuration {
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 
         SELENIUM_URL("SELENIUM_URL", mustOverride, true),
-        PROVIDER("capabilities.provider", "selenium"),
 
         REPORTING_ACCESS_TOKEN("REPORTING_ACCESS_TOKEN", mustOverride, true),
         REPORTING_SERVICE_URL("REPORTING_SERVICE_URL", mustOverride),

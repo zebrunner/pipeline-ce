@@ -699,11 +699,6 @@ public class TestNG extends Runner {
         }
 
         //general mobile capabilities
-        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            // set for mobile tests mcloud as default provider if nothing is specified by end-user
-            Configuration.set("capabilities.provider", "mcloud")
-        }
-
 
         // ATTENTION! Obligatory remove device from the params otherwise
         // hudson.remoting.Channel$CallSiteStackTrace: Remote call to JNLP4-connect connection from qpsinfra_jenkins-slave_1.qpsinfra_default/172.19.0.9:39487
@@ -746,10 +741,8 @@ public class TestNG extends Runner {
             return
         }
 
-        // update SELENIUM_URL parameter based on capabilities.provider. Local "selenium" is default provider
-        def provider = !isParamEmpty(Configuration.get("capabilities.provider")) ? Configuration.get("capabilities.provider") : "selenium"
-        def hubUrl = "${provider}_hub"
-        
+        // update SELENIUM_URL parameter based on capabilities.provider.
+        def hubUrl = getProvider() + "_hub"
 
         if (!isParamEmpty(getToken(hubUrl))) {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
@@ -818,10 +811,17 @@ public class TestNG extends Runner {
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.access-token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
         }
+        
+        def mobileRecorder=""
+        def provider = getProvider()
+        if ("zebrunner".equals(provider) || "mcloud".equals(provider)) {
+            // https://github.com/zebrunner/pipeline-ce/issues/90
+            mobileRecorder="-Dmobile_recorder=false"
+        }
 
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-        ${zafiraGoals} \
+        ${zafiraGoals} ${mobileRecorder} \
         -Ds3_save_screenshots=${Configuration.get(Configuration.Parameter.S3_SAVE_SCREENSHOTS)} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
@@ -1457,6 +1457,19 @@ public class TestNG extends Runner {
     protected def getDebugPort() {
         def port = "8000"
         return port
+    }
+    
+    protected def getProvider() {
+        return getProvider("selenium")
+    }
+
+    protected def getProvider(defaultProvider) {
+        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
+            // set for mobile tests mcloud as default provider if nothing is specified by end-user
+            Configuration.set("capabilities.provider", defaultProvider)
+        }
+        
+        return Configuration.get("capabilities.provider")
     }
 
 }
