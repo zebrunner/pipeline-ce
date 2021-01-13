@@ -33,11 +33,6 @@ class Runner extends AbstractRunner {
 
         this.goals = Configuration.get("goals")
         
-        if (Configuration.get("pro")?.toBoolean()) {
-            //TODO: find a way to override repoUrl value
-            // Configuration.set(REPO_URL, Configuration.get(REPO_URL).replace("zebrunner/ce", "zebrunner/pro"))
-        }
-
     }
 
     @Override
