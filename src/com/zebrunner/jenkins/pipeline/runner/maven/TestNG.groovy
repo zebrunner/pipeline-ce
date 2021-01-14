@@ -525,6 +525,9 @@ public class TestNG extends Runner {
                 } catch (Exception e) {
                     //TODO: [VD] think about making currentBuild.result as FAILURE
                     logger.error(printStackTrace(e))
+                    
+                    printDumpReports()
+                    
                     testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                     if (!isParamEmpty(testRun)) {
                         def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
@@ -543,8 +546,6 @@ public class TestNG extends Runner {
                     }
                     throw e
                 } finally {
-                    printDumpReports()
-                    
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
                     if(!isParamEmpty(testRun)) {
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
