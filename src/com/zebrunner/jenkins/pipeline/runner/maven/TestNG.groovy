@@ -553,6 +553,12 @@ public class TestNG extends Runner {
                     }
                     publishJenkinsReports()
                     sendCustomizedEmail()
+                    
+                    def files = context.findFiles(glob: '**/Zebrunner-CE')
+                    for (int i = 0; i < files.length; i++) {
+                        logger.info("Detected:  " + files[i].path)
+                    }
+                    
                     clean()
                     customNotify()
 
@@ -598,10 +604,6 @@ public class TestNG extends Runner {
                         }
                     }
                     
-                    def files = context.findFiles(glob: '**/Zebrunner-CE')
-                    for (int i = 0; i < files.length; i++) {
-                        logger.info("Detected:  " + files[i].path)
-                    }
                 }
             }
         }
