@@ -1004,6 +1004,7 @@ public class TestNG extends Runner {
         // print "**/*.dump" file content into the log 
         def files = context.findFiles(glob: '**/*.dump')
         for (int i = 0; i < files.length; i++) {
+            currentBuild.result = BuildResult.FAILURE //explicitly mark build as fail
             logger.error("Detected dump: " + files[i].path)
             logger.info(context.readFile(file: files[i].path))
         }
