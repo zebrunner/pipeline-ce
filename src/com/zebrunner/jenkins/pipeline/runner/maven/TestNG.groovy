@@ -505,6 +505,7 @@ public class TestNG extends Runner {
                         context.timeout(time: Integer.valueOf(Configuration.get(Configuration.Parameter.JOB_MAX_RUN_TIME)), unit: 'MINUTES') {
                             buildJob()
                         }
+                        
                         testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                         if(!isParamEmpty(testRun)){
                             zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
@@ -523,10 +524,8 @@ public class TestNG extends Runner {
                         publishJacocoReport()
                     }
                 } catch (Exception e) {
-                    //TODO: [VD] think about making currentBuild.result as FAILURE
+                    currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
                     logger.error(printStackTrace(e))
-                    
-                    printDumpReports()
                     
                     testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                     if (!isParamEmpty(testRun)) {
@@ -546,6 +545,8 @@ public class TestNG extends Runner {
                     }
                     throw e
                 } finally {
+                    printDumpReports()
+                    
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
                     if(!isParamEmpty(testRun)) {
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
