@@ -939,8 +939,11 @@ public class TestNG extends Runner {
             if (platform.equalsIgnoreCase("ios")) {
                 //TODO: remove platform if condition when we could organize vnc session
                 Configuration.set("capabilities.enableVNC", "false")
+                Configuration.set("capabilities.enableVnc", "false")
+                
             } else {
                 Configuration.set("capabilities.enableVNC", "true")
+                Configuration.set("capabilities.enableVnc", "true")
             }
         }
     }
