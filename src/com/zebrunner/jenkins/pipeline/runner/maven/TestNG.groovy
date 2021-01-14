@@ -550,6 +550,7 @@ public class TestNG extends Runner {
                     } else {
                         //try to find build result from CarinaReport if any
                     }
+                    printDumpReports()
                     publishJenkinsReports()
                     sendCustomizedEmail()
                     clean()
@@ -1026,6 +1027,14 @@ public class TestNG extends Runner {
         return emailList
     }
 
+    protected void printDumpReports() {
+        // analyze if "**/*.dump" or "**/*.dumpstream" 
+        def files = context.findFiles(glob: '**/*.dump**')
+        for (int i = 0; i < files.length; i++) {
+            logger.info("detected dump: " + files[i].path)
+        }
+    }
+    
     protected void publishJenkinsReports() {
         context.stage('Results') {
             //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
