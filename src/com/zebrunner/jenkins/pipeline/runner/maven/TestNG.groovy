@@ -1033,8 +1033,7 @@ public class TestNG extends Runner {
         def files = context.findFiles(glob: '**/*.dump**')
         for (int i = 0; i < files.length; i++) {
             logger.info("detected dump: " + files[i].path)
-            File file = new File(getWorkspace() + "/" + files[i].path) 
-            logger.info("${files[i].name.toString()}: ${file.text}")
+            logger.info(files[i].name.toString() + ": " + context.readFile(file: files[i].path))
         }
     }
     
