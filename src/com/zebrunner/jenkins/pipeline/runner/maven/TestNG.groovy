@@ -519,9 +519,6 @@ public class TestNG extends Runner {
                             }
                             zafiraUpdater.sendSlackNotification(uuid, channel)
                         }
-                        
-                        //TODO: think about seperate stage for uploading jacoco reports
-                        publishJacocoReport()
                     }
                 } catch (Exception e) {
                     currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
@@ -850,7 +847,6 @@ public class TestNG extends Runner {
         goals += addMVNParams(Configuration.getVars())
         goals += addMVNParams(Configuration.getParams())
 
-        goals += getOptionalCapability(Configuration.Parameter.JACOCO_ENABLE, " jacoco:instrument ")
         goals += getOptionalCapability("deploy_to_local_repo", " install")
 
         logger.debug("goals: ${goals}")
@@ -864,9 +860,6 @@ public class TestNG extends Runner {
                 "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
                 "CORE_LOG_LEVEL",
-                "JACOCO_BUCKET",
-                "JACOCO_REGION",
-                "JACOCO_ENABLE",
                 "JOB_MAX_RUN_TIME",
                 "ZEBRUNNER_PIPELINE",
                 "ZEBRUNNER_VERSION",
@@ -1000,29 +993,6 @@ public class TestNG extends Runner {
 
     protected String getMavenPomFile() {
         return getSubProjectFolder() + "/pom.xml"
-    }
-
-    //TODO: move into valid jacoco related package
-    protected void publishJacocoReport() {
-        def jacocoEnable = Configuration.get(Configuration.Parameter.JACOCO_ENABLE).toBoolean()
-        if (!jacocoEnable) {
-            logger.warn("do not publish any content to AWS S3 if integration is disabled")
-            return
-        }
-
-        def jacocoBucket = Configuration.get(Configuration.Parameter.JACOCO_BUCKET)
-        def jacocoRegion = Configuration.get(Configuration.Parameter.JACOCO_REGION)
-        def jobName = Configuration.get(Configuration.Parameter.JOB_NAME)
-        def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-
-        def files = context.findFiles(glob: '**/jacoco.exec')
-        if (files.length == 1) {
-            context.archiveArtifacts artifacts: '**/jacoco.exec', fingerprint: true, allowEmptyArchive: true
-            // https://github.com/jenkinsci/pipeline-aws-plugin#s3upload
-            context.withAWS(region: "$jacocoRegion", credentials: 'aws-jacoco-token') {
-                context.s3Upload(bucket: "$jacocoBucket", path: "$jobName/$buildNumber/jacoco-it.exec", includePathPattern: '**/jacoco.exec')
-            }
-        }
     }
 
     //Overriden in private pipeline
