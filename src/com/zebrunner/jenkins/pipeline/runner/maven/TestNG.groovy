@@ -810,7 +810,7 @@ public class TestNG extends Runner {
                             -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.enabled=true \
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.access-token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
+                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
