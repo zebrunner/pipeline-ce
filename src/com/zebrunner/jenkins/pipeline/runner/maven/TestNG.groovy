@@ -931,10 +931,6 @@ public class TestNG extends Runner {
     protected addProviderCapabilities() {
         def provider = getProvider()
         def platform = Configuration.get("job_type").toLowerCase()
-        if ("selenium".equals(provider)) {
-            Configuration.set("capabilities.logName", "session.log")
-        }
-
         if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
             if (platform.equalsIgnoreCase("ios")) {
                 //TODO: remove platform if condition when we could organize vnc session
