@@ -1029,11 +1029,11 @@ public class TestNG extends Runner {
     }
 
     protected void printDumpReports() {
-        // analyze if "**/*.dump" or "**/*.dumpstream" 
-        def files = context.findFiles(glob: '**/*.dump**')
+        // prinf "**/*.dump" file content into the log 
+        def files = context.findFiles(glob: '**/*.dump')
         for (int i = 0; i < files.length; i++) {
-            logger.info("detected dump: " + files[i].path)
-            logger.info(files[i].name.toString() + ": " + context.readFile(file: files[i].path))
+            logger.error("detected dump: " + files[i].path)
+            logger.info("[[[" + context.readFile(file: files[i].path + "]]]"))
         }
     }
     
@@ -1043,8 +1043,6 @@ public class TestNG extends Runner {
             publishReport('**/zafira/report.html', "ZafiraReport")
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             //publishReport('**/artifacts/**', 'Artifacts')
-            publishReport('**/*.dump', 'Dump')
-            publishReport('**/*.dumpstream', 'Dumpstream')
             publishReport('**/*.har', 'HarReports')
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
