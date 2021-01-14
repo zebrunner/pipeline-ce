@@ -543,6 +543,8 @@ public class TestNG extends Runner {
                     }
                     throw e
                 } finally {
+                    printDumpReports()
+                    
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
                     if(!isParamEmpty(testRun)) {
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
@@ -550,7 +552,6 @@ public class TestNG extends Runner {
                     } else {
                         //try to find build result from CarinaReport if any
                     }
-                    printDumpReports()
                     publishJenkinsReports()
                     sendCustomizedEmail()
                     clean()
@@ -1430,21 +1431,6 @@ public class TestNG extends Runner {
             setReportingCreds()
             zafiraUpdater.smartRerun()
         }
-    }
-
-    public void publishUnitTestResults() {
-        //publish junit/cobertura reports
-        context.junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-        context.step([$class: 'CoberturaPublisher',
-                      autoUpdateHealth: false,
-                      autoUpdateStability: false,
-                      coberturaReportFile: '**/target/site/cobertura/coverage.xml',
-                      failUnhealthy: false,
-                      failUnstable: false,
-                      maxNumberOfBuilds: 0,
-                      onlyStable: false,
-                      sourceEncoding: 'ASCII',
-                      zoomCoverageChart: false])
     }
 
     def getSettingsFileProviderContent(fileId){
