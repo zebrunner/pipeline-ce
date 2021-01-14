@@ -840,15 +840,14 @@ public class TestNG extends Runner {
         addOptionalCapability("debug", "Enabling remote debug on ${getDebugHost()}:${getDebugPort()}", "maven.surefire.debug",
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
         
-        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVnc", "true")
-        //TODO: remove after migrating to 7.0 core
-        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVNC", "true")
-        addBrowserStackGoals()
+        addBrowserStackCapabilities()
+        addProviderCapabilities()
 
         def goals = Configuration.resolveVars(defaultBaseMavenGoals)
 
         goals += addMVNParams(Configuration.getVars())
         goals += addMVNParams(Configuration.getParams())
+
 
         goals += getOptionalCapability("deploy_to_local_repo", " install")
 
@@ -895,15 +894,6 @@ public class TestNG extends Runner {
         return goals
     }
 
-    protected def addVideoStreamingCapability(message, capabilityName, capabilityValue) {
-        //TODO: made enableVnc detection related to provider instead of node name 
-        def node = Configuration.get("node").toLowerCase()
-        if ("web".equalsIgnoreCase(node) || node.contains("android")) {
-            logger.info(message)
-            Configuration.set(capabilityName, capabilityValue)
-        }
-    }
-
     /**
      * Enables capability
      */
@@ -937,9 +927,25 @@ public class TestNG extends Runner {
     protected def getOptionalCapability(parameterName, capabilityName) {
         return Configuration.get(parameterName)?.toBoolean() ? capabilityName : ""
     }
+    
+    protected addProviderCapabilities() {
+        def provider = getProvider()
+        def platform = Configuration.get("job_type").toLowerCase()
+        if ("selenium".equals(provider)) {
+            Configuration.set("capabilities.logName", "session.log")
+        }
 
-    protected def addBrowserStackGoals() {
-        //browserstack goals
+        if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
+            if (platform.equalsIgnoreCase("ios")) {
+                //TODO: remove platform if condition when we could organize vnc session
+                Configuration.set("capabilities.enableVnc", "false")
+            } else {
+                Configuration.set("capabilities.enableVnc", "true")
+            }
+        }
+    }
+
+    protected def addBrowserStackCapabilities() {
         if (isBrowserStackRunning()) {
             def uniqueBrowserInstance = "\"#${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}-" + Configuration.get("suite") + "-" +
                     getBrowser() + "-" + Configuration.get("env") + "\""
