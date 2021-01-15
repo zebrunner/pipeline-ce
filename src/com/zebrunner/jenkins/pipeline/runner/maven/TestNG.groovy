@@ -934,11 +934,11 @@ public class TestNG extends Runner {
         if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
             if (platform.equalsIgnoreCase("ios")) {
                 //TODO: remove platform if condition when we could organize vnc session
-                Configuration.set("capabilities.enableVNC", "false")
+                //Configuration.set("capabilities.enableVNC", "false")
                 Configuration.set("capabilities.enableVnc", "false")
                 
             } else {
-                Configuration.set("capabilities.enableVNC", "true")
+                //Configuration.set("capabilities.enableVNC", "true")
                 Configuration.set("capabilities.enableVnc", "true")
             }
         }
