@@ -505,6 +505,7 @@ public class TestNG extends Runner {
                         context.timeout(time: Integer.valueOf(Configuration.get(Configuration.Parameter.JOB_MAX_RUN_TIME)), unit: 'MINUTES') {
                             buildJob()
                         }
+                        
                         testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                         if(!isParamEmpty(testRun)){
                             zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
@@ -518,13 +519,11 @@ public class TestNG extends Runner {
                             }
                             zafiraUpdater.sendSlackNotification(uuid, channel)
                         }
-                        
-                        //TODO: think about seperate stage for uploading jacoco reports
-                        publishJacocoReport()
                     }
                 } catch (Exception e) {
-                    //TODO: [VD] think about making currentBuild.result as FAILURE
+                    currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
                     logger.error(printStackTrace(e))
+                    
                     testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                     if (!isParamEmpty(testRun)) {
                         def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
@@ -543,6 +542,8 @@ public class TestNG extends Runner {
                     }
                     throw e
                 } finally {
+                    printDumpReports()
+                    
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
                     if(!isParamEmpty(testRun)) {
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
@@ -552,6 +553,7 @@ public class TestNG extends Runner {
                     }
                     publishJenkinsReports()
                     sendCustomizedEmail()
+                    
                     clean()
                     customNotify()
 
@@ -596,6 +598,7 @@ public class TestNG extends Runner {
                                     ]
                         }
                     }
+                    
                 }
             }
         }
@@ -809,7 +812,8 @@ public class TestNG extends Runner {
                             -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.enabled=true \
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.access-token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)}"
+                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
+                            -Dreporting.run.environment=${Configuration.get('env')}"
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
@@ -836,17 +840,15 @@ public class TestNG extends Runner {
         addOptionalCapability("debug", "Enabling remote debug on ${getDebugHost()}:${getDebugPort()}", "maven.surefire.debug",
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
         
-        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVnc", "true")
-        //TODO: remove after migrating to 7.0 core
-        addVideoStreamingCapability("Video streaming was enabled.", "capabilities.enableVNC", "true")
-        addBrowserStackGoals()
+        addBrowserStackCapabilities()
+        addProviderCapabilities()
 
         def goals = Configuration.resolveVars(defaultBaseMavenGoals)
 
         goals += addMVNParams(Configuration.getVars())
         goals += addMVNParams(Configuration.getParams())
 
-        goals += getOptionalCapability(Configuration.Parameter.JACOCO_ENABLE, " jacoco:instrument ")
+
         goals += getOptionalCapability("deploy_to_local_repo", " install")
 
         logger.debug("goals: ${goals}")
@@ -860,9 +862,6 @@ public class TestNG extends Runner {
                 "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
                 "CORE_LOG_LEVEL",
-                "JACOCO_BUCKET",
-                "JACOCO_REGION",
-                "JACOCO_ENABLE",
                 "JOB_MAX_RUN_TIME",
                 "ZEBRUNNER_PIPELINE",
                 "ZEBRUNNER_VERSION",
@@ -893,15 +892,6 @@ public class TestNG extends Runner {
             }
         }
         return goals
-    }
-
-    protected def addVideoStreamingCapability(message, capabilityName, capabilityValue) {
-        //TODO: made enableVnc detection related to provider instead of node name 
-        def node = Configuration.get("node").toLowerCase()
-        if ("web".equalsIgnoreCase(node) || node.contains("android")) {
-            logger.info(message)
-            Configuration.set(capabilityName, capabilityValue)
-        }
     }
 
     /**
@@ -937,9 +927,23 @@ public class TestNG extends Runner {
     protected def getOptionalCapability(parameterName, capabilityName) {
         return Configuration.get(parameterName)?.toBoolean() ? capabilityName : ""
     }
+    
+    protected addProviderCapabilities() {
+        def provider = getProvider()
+        def platform = Configuration.get("job_type").toLowerCase()
+        if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
+            //TODO: remove enableVnc when zebrunnre agent adjusted accordingly
+            if (platform.equalsIgnoreCase("ios")) {
+                Configuration.set("capabilities.enableVNC", "false")
+                Configuration.set("capabilities.enableVnc", "false")
+            } else {
+                Configuration.set("capabilities.enableVNC", "true")
+                Configuration.set("capabilities.enableVnc", "true")
+            }
+        }
+    }
 
-    protected def addBrowserStackGoals() {
-        //browserstack goals
+    protected def addBrowserStackCapabilities() {
         if (isBrowserStackRunning()) {
             def uniqueBrowserInstance = "\"#${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}-" + Configuration.get("suite") + "-" +
                     getBrowser() + "-" + Configuration.get("env") + "\""
@@ -998,42 +1002,27 @@ public class TestNG extends Runner {
         return getSubProjectFolder() + "/pom.xml"
     }
 
-    //TODO: move into valid jacoco related package
-    protected void publishJacocoReport() {
-        def jacocoEnable = Configuration.get(Configuration.Parameter.JACOCO_ENABLE).toBoolean()
-        if (!jacocoEnable) {
-            logger.warn("do not publish any content to AWS S3 if integration is disabled")
-            return
-        }
-
-        def jacocoBucket = Configuration.get(Configuration.Parameter.JACOCO_BUCKET)
-        def jacocoRegion = Configuration.get(Configuration.Parameter.JACOCO_REGION)
-        def jobName = Configuration.get(Configuration.Parameter.JOB_NAME)
-        def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
-
-        def files = context.findFiles(glob: '**/jacoco.exec')
-        if (files.length == 1) {
-            context.archiveArtifacts artifacts: '**/jacoco.exec', fingerprint: true, allowEmptyArchive: true
-            // https://github.com/jenkinsci/pipeline-aws-plugin#s3upload
-            context.withAWS(region: "$jacocoRegion", credentials: 'aws-jacoco-token') {
-                context.s3Upload(bucket: "$jacocoBucket", path: "$jobName/$buildNumber/jacoco-it.exec", includePathPattern: '**/jacoco.exec')
-            }
-        }
-    }
-
     //Overriden in private pipeline
     protected def overrideRecipients(emailList) {
         return emailList
     }
 
+    protected void printDumpReports() {
+        // print "**/*.dump" file content into the log 
+        def files = context.findFiles(glob: '**/*.dump')
+        for (int i = 0; i < files.length; i++) {
+            currentBuild.result = BuildResult.FAILURE //explicitly mark build as fail
+            logger.error("Detected dump: " + files[i].path)
+            logger.info(context.readFile(file: files[i].path))
+        }
+    }
+    
     protected void publishJenkinsReports() {
         context.stage('Results') {
             //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
             publishReport('**/zafira/report.html', "ZafiraReport")
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             //publishReport('**/artifacts/**', 'Artifacts')
-            publishReport('**/*.dump', 'DumpReports')
-            publishReport('**/*.dumpstream', 'DumpReports')
             publishReport('**/*.har', 'HarReports')
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
@@ -1419,21 +1408,6 @@ public class TestNG extends Runner {
             setReportingCreds()
             zafiraUpdater.smartRerun()
         }
-    }
-
-    public void publishUnitTestResults() {
-        //publish junit/cobertura reports
-        context.junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-        context.step([$class: 'CoberturaPublisher',
-                      autoUpdateHealth: false,
-                      autoUpdateStability: false,
-                      coberturaReportFile: '**/target/site/cobertura/coverage.xml',
-                      failUnhealthy: false,
-                      failUnstable: false,
-                      maxNumberOfBuilds: 0,
-                      onlyStable: false,
-                      sourceEncoding: 'ASCII',
-                      zoomCoverageChart: false])
     }
 
     def getSettingsFileProviderContent(fileId){

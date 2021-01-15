@@ -22,7 +22,7 @@ class ZafiraUpdater {
     def getTestRunByCiRunId(uuid) {
         def testRun = zc.getTestRunByCiRunId(uuid)
         if (isParamEmpty(testRun)) {
-            logger.error("TestRun is not found in Zafira!")
+            logger.warn("TestRun is not found in Zebrunner Reporting!")
             return
         }
         return testRun
@@ -53,30 +53,41 @@ class ZafiraUpdater {
         String env = Configuration.get("env")
 
         def bodyHeader = "Unable to execute tests due to the unrecognized failure: ${jobBuildUrl}\n"
-        def subject = getFailureSubject(FailureCause.UNRECOGNIZED_FAILURE.value, jobName, env, buildNumber)
+        def cause = FailureCause.UNRECOGNIZED_FAILURE.value
         def failureLog = ""
 
         if (currentBuild.rawBuild.log.contains("COMPILATION ERROR : ")) {
             bodyHeader = "Unable to execute tests due to the compilation failure. ${jobBuildUrl}\n"
-            subject = getFailureSubject(FailureCause.COMPILATION_FAILURE.value, jobName, env, buildNumber)
+            cause = FailureCause.COMPILATION_FAILURE.value
             failureLog = getLogDetailsForEmail(currentBuild, "ERROR")
             failureReason = URLEncoder.encode("${FailureCause.COMPILATION_FAILURE.value}:\n" + failureLog, "UTF-8")
         } else if (currentBuild.rawBuild.log.contains("Cancelling nested steps due to timeout")) {
             currentBuild.result = BuildResult.ABORTED
             bodyHeader = "Unable to continue tests due to the abort by timeout ${jobBuildUrl}\n"
-            subject = getFailureSubject(FailureCause.TIMED_OUT.value, jobName, env, buildNumber)
+            cause = FailureCause.TIMED_OUT.value
             failureReason = "Aborted by timeout"
         } else if (currentBuild.rawBuild.log.contains("Aborted by ")) {
             currentBuild.result = BuildResult.ABORTED
             bodyHeader = "Unable to continue tests due to the abort by " + getAbortCause(currentBuild) + " ${jobBuildUrl}\n"
-            subject = getFailureSubject(FailureCause.ABORTED.value, jobName, env, buildNumber)
+            cause = FailureCause.ABORTED.value
             failureReason = "Aborted by " + getAbortCause(currentBuild)
         } else if (currentBuild.rawBuild.log.contains("BUILD FAILURE")) {
             bodyHeader = "Unable to execute tests due to the build failure. ${jobBuildUrl}\n"
-            subject = getFailureSubject(FailureCause.BUILD_FAILURE.value, jobName, env, buildNumber)
+            cause = FailureCause.BUILD_FAILURE.value
             failureLog = getLogDetailsForEmail(currentBuild, "ERROR")
             failureReason = URLEncoder.encode("${FailureCause.BUILD_FAILURE.value}:\n" + failureLog, "UTF-8")
         }
+        
+        // analyze if any "**/*.dump" file exists
+        def files = context.findFiles(glob: '**/*.dump')
+        for (int i = 0; i < files.length; i++) {
+            bodyHeader = "Unable to execute tests due to the maven-surefire failure. ${jobBuildUrl}\n"
+            cause = FailureCause.BUILD_FAILURE.value
+            failureReason = context.readFile(file: files[i].path)
+        }
+        
+        def subject = getFailureSubject(cause, jobName, env, buildNumber)
+        
         abortedTestRun = zc.abortTestRun(uuid, failureReason)
 
         //Checks if testRun is present in Zafira and sends Zafira-generated report

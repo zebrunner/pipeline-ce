@@ -51,11 +51,6 @@ public class Configuration {
 
         //vars
         CORE_LOG_LEVEL("CORE_LOG_LEVEL", "INFO"),
-        //to enable default jacoco code coverage instrumenting we have to find a way to init valid AWS aws-jacoco-token on Jenkins preliminary
-        //the biggest problem is that AWS key can't be located in public repositories
-        JACOCO_BUCKET("JACOCO_BUCKET", "jacoco.qaprosoft.com"),
-        JACOCO_REGION("JACOCO_REGION", "us-west-1"),
-        JACOCO_ENABLE("JACOCO_ENABLE", "false"),
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
 
         ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),
@@ -91,9 +86,7 @@ public class Configuration {
         VNC_HOST("vnc_host", "\${INFRA_HOST}"),
         VNC_PORT("vnc_port", "80"),
 
-        ENABLE_VNC("capabilities.enableVNC", "true"),
-        ENABLE_VIDEO("capabilities.enableVideo", "true"),
-        ENABLE_STF("capabilities.STF_ENABLED", "false"),
+        ENABLE_VIDEO("capabilities.enableVideo", "false"),
 
         TIMEZONE("user.timezone", "UTC"),
 
