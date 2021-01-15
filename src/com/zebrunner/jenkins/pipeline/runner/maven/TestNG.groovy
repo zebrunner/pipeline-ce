@@ -1429,10 +1429,11 @@ public class TestNG extends Runner {
     
     protected def getProvider() {
         if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            return "selenium"
-        } else {        
-            Configuration.get("capabilities.provider")
-        }
+            //we have to set default provider otherwise 6.5 carina can't register artifacts correctly 
+            Configuration.set("capabilities.provider", "selenium")
+        } 
+        
+        return Configuration.get("capabilities.provider")
     }
 
 }
