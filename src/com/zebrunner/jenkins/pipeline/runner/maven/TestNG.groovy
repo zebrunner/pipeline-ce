@@ -940,6 +940,9 @@ public class TestNG extends Runner {
                 Configuration.set("capabilities.enableVNC", "true")
                 Configuration.set("capabilities.enableVnc", "true")
             }
+            
+            // forcible disable mobile_recorder carina option
+            Configuration.set("mobile_recorder", "false")
         }
     }
 
