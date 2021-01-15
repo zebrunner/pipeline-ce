@@ -932,9 +932,12 @@ public class TestNG extends Runner {
         def provider = getProvider()
         def platform = Configuration.get("job_type").toLowerCase()
         if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
+            //TODO: remove enableVnc when zebrunnre agent adjusted accordingly
             if (platform.equalsIgnoreCase("ios")) {
+                Configuration.set("capabilities.enableVNC", "false")
                 Configuration.set("capabilities.enableVnc", "false")
             } else {
+                Configuration.set("capabilities.enableVNC", "true")
                 Configuration.set("capabilities.enableVnc", "true")
             }
         }
