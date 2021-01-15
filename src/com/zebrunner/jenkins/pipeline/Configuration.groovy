@@ -86,7 +86,6 @@ public class Configuration {
         VNC_HOST("vnc_host", "\${INFRA_HOST}"),
         VNC_PORT("vnc_port", "80"),
 
-        ENABLE_VNC("capabilities.enableVNC", "true"),
         ENABLE_VIDEO("capabilities.enableVideo", "true"),
         ENABLE_STF("capabilities.STF_ENABLED", "false"),
 
