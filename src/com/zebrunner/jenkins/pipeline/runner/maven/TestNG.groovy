@@ -932,17 +932,14 @@ public class TestNG extends Runner {
         def provider = getProvider()
         def platform = Configuration.get("job_type").toLowerCase()
         if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
-            //TODO: remove enableVnc when zebrunnre agent adjusted accordingly
             if (platform.equalsIgnoreCase("ios")) {
                 Configuration.set("capabilities.enableVNC", "false")
-                Configuration.set("capabilities.enableVnc", "false")
             } else {
                 Configuration.set("capabilities.enableVNC", "true")
-                Configuration.set("capabilities.enableVnc", "true")
             }
             
             // forcible disable mobile_recorder carina option
-            Configuration.set("mobile_recorder", "false")
+            Configuration.set("driver_recorder", "false")
         }
     }
 
@@ -1025,8 +1022,6 @@ public class TestNG extends Runner {
             //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
             publishReport('**/zafira/report.html', "ZafiraReport")
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
-            //publishReport('**/artifacts/**', 'Artifacts')
-            publishReport('**/*.har', 'HarReports')
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
         }
