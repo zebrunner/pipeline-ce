@@ -931,7 +931,7 @@ public class TestNG extends Runner {
     protected addProviderCapabilities() {
         def provider = getProvider()
         def platform = Configuration.get("job_type").toLowerCase()
-        if ("selenium".equals(provider) || "zebrunner".equals(provider) || "mcloud".equals(provider)) {
+        if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
             if (platform.equalsIgnoreCase("ios")) {
                 Configuration.set("capabilities.enableVNC", "false")
             } else {
