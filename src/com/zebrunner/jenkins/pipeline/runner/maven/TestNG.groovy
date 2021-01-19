@@ -392,7 +392,7 @@ public class TestNG extends Runner {
     protected def getJenkinsJobsScanResult(build) {
         Map jenkinsJobsScanResult = [:]
         jenkinsJobsScanResult.success = false
-        jenkinsJobsScanResult.repo = Configuration.get("repoUrl")
+        jenkinsJobsScanResult.repo = this.repo
         jenkinsJobsScanResult.userId = !isParamEmpty(Configuration.get("userId")) ? Long.valueOf(Configuration.get("userId")) : 2
         jenkinsJobsScanResult.jenkinsJobs = []
         try {
