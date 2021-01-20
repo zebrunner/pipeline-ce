@@ -492,7 +492,7 @@ public class TestNG extends Runner {
         def isRerun = isRerun()
         String nodeName = "master"
         context.node(nodeName) {
-            zafiraUpdater.queueZafiraTestRun(uuid)
+            //zafiraUpdater.queueZafiraTestRun(uuid)
             nodeName = chooseNode()
         }
         context.node(nodeName) {
