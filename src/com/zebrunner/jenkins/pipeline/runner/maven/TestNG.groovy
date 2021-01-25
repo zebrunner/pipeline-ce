@@ -814,7 +814,7 @@ public class TestNG extends Runner {
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
-                            -Dreporting.project-key=${Configuration.get('zafira_project')} \
+                            -Dreporting.projectKey=${Configuration.get('zafira_project')} \
                             -Dreporting.run.environment=${Configuration.get('env')}"
         }
         
