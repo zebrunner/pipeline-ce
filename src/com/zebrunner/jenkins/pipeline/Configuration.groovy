@@ -265,8 +265,11 @@ public class Configuration {
     public static String get(String paramName) {
         if (params.get(paramName) != null) {
             return params.get(paramName)
+        } else if (vars.get(paramName) != null) {
+            return vars.get(paramName)
+        } else {
+            return ""
         }
-        return vars.get(paramName)
     }
 
     public static void set(Parameter param, String value) {
