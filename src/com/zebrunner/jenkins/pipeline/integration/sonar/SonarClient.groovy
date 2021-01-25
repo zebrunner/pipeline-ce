@@ -81,7 +81,10 @@ class SonarClient extends HttpClient {
     }
 
     private def isMaven() {
-        return context.fileExists("pom.xml")
+        def files = context.findFiles glob: '**/pom.xml'
+        boolean res = files.length > 0
+        logger.debug("isMaven: " + res)
+        return res
     }
     
     private def isGradle() {
