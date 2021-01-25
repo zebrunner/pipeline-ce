@@ -81,7 +81,7 @@ class SonarClient extends HttpClient {
     }
 
     private def isMaven() {
-        return context.fileExists("pom.xml")
+        return context.fileExists("pom.xml") || context.fileExists("./**/pom.xml")
     }
     
     private def isGradle() {
