@@ -180,10 +180,6 @@ class ZafiraUpdater {
         return zc.createLaunchers(jenkinsJobsScanResult)
     }
 
-    public def createJob(jobUrl) {
-        return zc.createJob(jobUrl)
-    }
-
     protected boolean isFailure(testRunStatus) {
         return !"PASSED".equals(testRunStatus)
     }
