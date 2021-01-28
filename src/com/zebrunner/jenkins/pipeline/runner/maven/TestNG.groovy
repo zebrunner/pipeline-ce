@@ -815,7 +815,7 @@ public class TestNG extends Runner {
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.projectKey=${Configuration.get('zafira_project')} \
-                            -Dreporting.run.environment=\"${Configuration.get('env')\"}"
+                            -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
