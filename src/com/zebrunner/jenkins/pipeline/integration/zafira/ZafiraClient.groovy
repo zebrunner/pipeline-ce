@@ -208,26 +208,6 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
 
-    public def createJob(jobUrl) {
-        if (!isZafiraConnected()) {
-            return
-        }
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder jobUrlValue: jobUrl
-
-        logger.debug("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:401",
-                          url               : this.serviceURL + "/api/reporting/api/jobs/url"]
-        return sendRequestFormatted(parameters)
-    }
-
     protected boolean isTokenExpired() {
         return authToken == null || System.currentTimeMillis() > tokenExpTime
     }
