@@ -1126,6 +1126,7 @@ public class TestNG extends Runner {
         def executionMode = currentSuite.getParameter("jenkinsJobExecutionMode")
         def supportedEnvs = getSuiteParameter(currentSuite.getParameter("jenkinsEnvironments"), "jenkinsPipelineEnvironments", currentSuite)
         def currentEnvs = getCronEnv(currentSuite)
+        //TODO: remove completely in 1.5
         def queueRegistration = !isParamEmpty(currentSuite.getParameter("jenkinsQueueRegistration"))?currentSuite.getParameter("jenkinsQueueRegistration"):Configuration.get("queue_registration")
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
@@ -1193,6 +1194,7 @@ public class TestNG extends Runner {
 						putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
 						putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
 						putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
+						//TODO: remove completely in 1.5
 						putNotNull(pipelineMap, "queue_registration", queueRegistration)
 						// supported config matrix should be applied at the end to be able to override default args like retry_count etc
 						putMap(pipelineMap, supportedConfigurations)
