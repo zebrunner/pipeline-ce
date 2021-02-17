@@ -86,7 +86,7 @@ public class Configuration {
         VNC_HOST("vnc_host", "\${INFRA_HOST}"),
         VNC_PORT("vnc_port", "80"),
 
-        ENABLE_VIDEO("capabilities.enableVideo", "false"),
+        ENABLE_VIDEO("capabilities.enableVideo", "true"),
 
         TIMEZONE("user.timezone", "UTC"),
 
