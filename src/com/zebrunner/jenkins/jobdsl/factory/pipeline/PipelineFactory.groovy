@@ -34,8 +34,6 @@ public class PipelineFactory extends JobFactory {
             description "${description}"
             logRotator { numToKeep logRotator }
             
-            authenticationToken('ciStart')
-
             properties {
                 disableResume()
                 durabilityHint { hint("PERFORMANCE_OPTIMIZED") }
