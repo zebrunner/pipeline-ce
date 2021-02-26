@@ -50,6 +50,8 @@ public class TestJobFactory extends PipelineFactory {
             logRotator {
                 numToKeep maxNumberKeepBuilds
             }
+            
+            authenticationToken('ciStart')
 
             //** Triggers **//*
             def scheduling = currentSuite.getParameter("scheduling")
