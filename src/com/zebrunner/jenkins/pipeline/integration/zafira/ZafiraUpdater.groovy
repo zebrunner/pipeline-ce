@@ -28,15 +28,6 @@ class ZafiraUpdater {
         return testRun
     }
 
-    public def queueZafiraTestRun(uuid) {
-        if (isParamEmpty(Configuration.get("queue_registration")) || Configuration.get("queue_registration").toBoolean()) {
-            if (isParamEmpty(Configuration.get('test_run_rules'))) {
-                def response = zc.queueZafiraTestRun(uuid)
-                logger.info("Queued TestRun: " + formatJson(response))
-            }
-        }
-    }
-
     public def smartRerun() {
         def response = zc.smartRerun()
         logger.info("Results : " + response.size())
