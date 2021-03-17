@@ -652,6 +652,7 @@ public class TestNG extends Runner {
             case "android-web":
                 logger.info("Suite Type: ANDROID")
                 Configuration.set("node", "android")
+                Configuration.set("auto_screenshot", "true")
                 break;
             case "android-tv":
                 logger.info("Suite Type: ANDROID TV")
@@ -661,10 +662,12 @@ public class TestNG extends Runner {
             case "ios-web":
                 logger.info("Suite Type: iOS")
                 Configuration.set("node", "ios")
+                Configuration.set("auto_screenshot", "true")
                 break;
             case "web":
                 logger.info("Suite Type: Web")
                 Configuration.set("node", "web")
+                Configuration.set("auto_screenshot", "true")
                 break;
             default:
                 logger.info("Suite Type: Default")
