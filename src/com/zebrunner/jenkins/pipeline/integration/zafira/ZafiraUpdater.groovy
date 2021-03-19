@@ -136,7 +136,7 @@ class ZafiraUpdater {
             }
             logger.info("Overall tests count: " + overallCount)
             logger.info("Failed tests count: " + failedCount)
-            def successRate = (overallCount - failedCount / overallCount) * 100
+            def successRate = ((overallCount - failedCount) / overallCount) * 100
             logger.info("Success rate(%): " + successRate)
             if (successRate < thresholdEmailPercent) {
                 logger.info("Sending email as success rate is less then threshold: ")
