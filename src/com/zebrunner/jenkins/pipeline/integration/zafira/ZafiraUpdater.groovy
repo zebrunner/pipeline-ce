@@ -136,12 +136,12 @@ class ZafiraUpdater {
                 logger.info("Success rate(%): " + successRate)
                 if (successRate < thresholdEmailPercent) {
                     logger.info("Sending failure email as success rate is less then pass rate threshold")
-                    zc.sendEmail(uuid, failureEmailList, "all")
+                    zc.sendEmail(uuid, failureEmailList.minus(emailList), "all")
                 } else {
                     logger.info("Not sending failure email as success rate is greater then pass rate threshold")
                 }
             } else {
-                zc.sendEmail(uuid, failureEmailList, "all")
+                zc.sendEmail(uuid, failureEmailList.minus(emailList), "all")
             }
         }
     }
