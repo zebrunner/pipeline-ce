@@ -177,6 +177,8 @@ public class TestJobFactory extends PipelineFactory {
                 }
                 stringParam('email_list', getSuiteParameter("", "jenkinsEmail", currentSuite), 'List of Users to be emailed after the test')
                 configure addHiddenParameter('failure_email_list', '', getSuiteParameter("", "jenkinsFailedEmail", currentSuite))
+                configure addHiddenParameter('threshold_email_list', '', getSuiteParameter("", "jenkinsThresholdEmail", currentSuite))
+                configure addHiddenParameter('threshold_email_percent', '', getSuiteParameter("", "jenkinsThresholdEmailPercent", currentSuite))
                 choiceParam('retry_count', getRetryCountArray(currentSuite), 'Number of Times to Retry a Failed Test')
                 booleanParam('rerun_failures', false, 'During \"Rebuild\" pick it to execute only failed cases')
                 configure addHiddenParameter('overrideFields', '', getSuiteParameter("", "overrideFields", currentSuite))

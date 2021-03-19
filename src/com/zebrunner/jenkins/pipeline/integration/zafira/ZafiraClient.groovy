@@ -185,6 +185,19 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
 
+    public def getTestRunResults(testRunId) {
+        if (!isZafiraConnected()) {
+            return
+        }
+        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
+                          contentType       : 'APPLICATION_JSON',
+                          httpMode          : 'GET',
+                          validResponseCodes: "200:404",
+                          url               : this.serviceURL + "/api/reporting/api/tests/runs/${testRunId}/results"]
+
+        return sendRequestFormatted(parameters)
+    }
+
 
     public def createLaunchers(jenkinsJobsScanResult) {
         if (!isZafiraConnected()) {
