@@ -124,7 +124,7 @@ class ZafiraUpdater {
 
         String thresholdEmailList = Configuration.get("threshold_email_list")
         if (isFailure(testRun.status) && !isParamEmpty(thresholdEmailList)) {
-            def thresholdEmailPercent = Configuration.get("threshold_email_percent")
+            double thresholdEmailPercent = Configuration.get("threshold_email_percent") as Double
             def testRunResults = zc.getTestRunResults(testRun.id)
             int overallCount = 0
             int failedCount = 0
@@ -136,8 +136,8 @@ class ZafiraUpdater {
             }
             logger.info("Overall tests count: " + overallCount)
             logger.info("Failed tests count: " + failedCount)
-            def successRate = failedCount / overallCount
-            logger.info("Success rate: " + successRate)
+            def successRate = (overallCount - failedCount / overallCount) * 100
+            logger.info("Success rate(%): " + successRate)
             if (successRate < thresholdEmailPercent) {
                 logger.info("Sending email as success rate is less then threshold: ")
                 zc.sendEmail(uuid, thresholdEmailList, "all")
