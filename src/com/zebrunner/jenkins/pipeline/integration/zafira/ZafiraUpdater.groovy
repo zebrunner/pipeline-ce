@@ -123,8 +123,8 @@ class ZafiraUpdater {
         }
 
         String thresholdEmailList = Configuration.get("threshold_email_list")
-        double thresholdEmailPercent = Configuration.get("threshold_email_percent")
         if (isFailure(testRun.status) && !isParamEmpty(thresholdEmailList)) {
+            def thresholdEmailPercent = Configuration.get("threshold_email_percent")
             def testRunResults = zc.getTestRunResults(testRun.id)
             int overallCount = 0
             int failedCount = 0
