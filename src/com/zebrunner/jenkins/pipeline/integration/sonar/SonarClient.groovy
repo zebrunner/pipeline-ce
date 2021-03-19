@@ -61,7 +61,7 @@ class SonarClient extends HttpClient {
         // Determine at run-time if we use maven or gradle.
         def extraGoals = ""
         if (isMaven()) {
-            extraGoals = " sonar:sonar"
+            extraGoals = " sonar:sonar -Dsonar.junit.reportPaths=target/surefire-reports/junitreports"
         }
         // Gradle has higher priority!
         if (isGradle()) {
