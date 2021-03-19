@@ -139,8 +139,8 @@ class ZafiraUpdater {
             def successRate = ((overallCount - failedCount) / overallCount) * 100
             logger.info("Success rate(%): " + successRate)
             if (successRate < thresholdEmailPercent) {
-                logger.info("Sending email as success rate is less then threshold: ")
-                zc.sendEmail(uuid, thresholdEmailList, "all")
+                logger.info("Sending email as success rate is less then threshold")
+                zc.sendEmail(uuid, thresholdEmailList.minus(emailList), "all")
             }
         }
     }
