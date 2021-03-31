@@ -505,51 +505,54 @@ public class TestNG extends Runner {
                             buildJob()
                         }
                         
-                        testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-                        if(!isParamEmpty(testRun)){
-                            zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
-                            
-                            def channel = Configuration.get("slack_channels")
-                            def failChannel = Configuration.get("failure_slack_channels")
-                            if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
-                                && !isParamEmpty(failChannel)) {
-                                //redirect message to failChannel for non PASSED test run
-                                channel = failChannel
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
-                        }
                     }
                 } catch (Exception e) {
                     currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
                     logger.error(printStackTrace(e))
-                    
-                    testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-                    if (!isParamEmpty(testRun)) {
-                        def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
-                        if ((!isParamEmpty(abortedTestRun)
-                                && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
-                                && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
-
-                            // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
-                            def channel = Configuration.get("failure_slack_channels")
-                            if (isParamEmpty(channel)) {
-                                // reuse default channel for negative notification only if failure_slack_channels absent  
-                                channel = Configuration.get("slack_channels")
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
-                        }
-                    }
-                    throw e
                 } finally {
                     printDumpReports()
                     
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
-                    if(!isParamEmpty(testRun)) {
+                    
+                    testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
+                    if(!isParamEmpty(testRun)){
+                        
+                        // #127 aborted run by timeout don't execute abort call for reporting
+                        if (StatusMapper.ZafiraStatus.IN_PROGRESS.name().equals(testRun.status)
+                            || StatusMapper.ZafiraStatus.QUEUED.name().equals(testRun.status)) {
+                            // if after finish we have intermediate status we have to call abort explicitly and mark build as fail
+                            currentBuild.result = BuildResult.FAILURE
+                            
+                            def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
+                            if ((!isParamEmpty(abortedTestRun)
+                                    && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
+                                    && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
+    
+                                // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
+                                def channel = Configuration.get("failure_slack_channels")
+                                if (isParamEmpty(channel)) {
+                                    // reuse default channel for negative notification only if failure_slack_channels absent
+                                    channel = Configuration.get("slack_channels")
+                                }
+                                zafiraUpdater.sendSlackNotification(uuid, channel)
+                            }
+                        }
+                        
+                        zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
+                        
+                        def channel = Configuration.get("slack_channels")
+                        def failChannel = Configuration.get("failure_slack_channels")
+                        if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
+                            && !isParamEmpty(failChannel)) {
+                            //redirect message to failChannel for non PASSED test run
+                            channel = failChannel
+                        }
+                        zafiraUpdater.sendSlackNotification(uuid, channel)
+
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
                         zafiraUpdater.setBuildResult(uuid, currentBuild)
-                    } else {
-                        //try to find build result from CarinaReport if any
                     }
+                    
                     publishJenkinsReports()
                     sendCustomizedEmail()
                     
