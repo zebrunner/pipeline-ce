@@ -94,6 +94,18 @@ public class TestJobFactory extends PipelineFactory {
                         }
                     }
                 }
+                // https://github.com/zebrunner/pipeline-ce/issues/143
+                if (!isParamEmpty(currentSuite.getParameter("jenkinsLocale"))) {
+                    activeChoiceParam("locale") {
+                        description("Please select locale(s) to run")
+                        filterable()
+                        choiceType("MULTI_SELECT")
+                        groovyScript {
+                            script(this.listToString(currentSuite, "jenkinsLocale"))
+                            fallbackScript("return ['error']")
+                        }
+                    }
+                }
                 if (currentSuite.getParameter("jenkinsJobDisabled")?.toBoolean()) {
                     disabled()
                 }
