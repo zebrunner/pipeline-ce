@@ -111,7 +111,6 @@ public class TestJobFactory extends PipelineFactory {
                 }
                 def defaultMobilePool = getSuiteParameter("ANY", "jenkinsMobileDefaultPool", currentSuite)
                 def autoScreenshot = getSuiteParameter("false", "jenkinsAutoScreenshot", currentSuite).toBoolean()
-                def enableVideo = getSuiteParameter("true", "jenkinsEnableVideo", currentSuite).toBoolean()
 
                 def jobType = getSuiteParameter("api", "jenkinsJobType", currentSuite).toLowerCase()
                 // TODO: add ios_web, android_web if needed
@@ -125,31 +124,25 @@ public class TestJobFactory extends PipelineFactory {
                         configure stringParam('capabilities', getSuiteParameter("browserName=chrome", "capabilities", currentSuite), 'Provide semicolon separated W3C driver capabilities.')
                         configure addExtensibleChoice('custom_capabilities', 'gc_CUSTOM_CAPABILITIES', "Set to NULL to run against Selenium Grid on Jenkin's Slave else, select an option for Browserstack.", 'NULL')
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         break
                     case "android":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "android-tv":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "android-web":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;browserName=chrome;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "ios":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=iOS;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "ios-web":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=iOS;browserName=safari;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                 // web ios: capabilities: browserName=safari, deviceName=ANY

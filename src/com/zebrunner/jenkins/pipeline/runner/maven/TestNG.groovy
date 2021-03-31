@@ -837,7 +837,6 @@ public class TestNG extends Runner {
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
         addCapability("suite", suiteName)
         addCapabilityIfPresent("rerun_failures", "zafira_rerun_failures")
-        addCapabilityIfPresent("enableVideo", "capabilities.enableVideo")
         // [VD] getting debug host works only on specific nodes which are detecetd by chooseNode.
         // on this stage this method is not fucntion properly!
         //TODO: move 8000 port into the global var
@@ -936,6 +935,8 @@ public class TestNG extends Runner {
         def provider = getProvider().toLowerCase()
         def platform = Configuration.get("job_type")
         if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
+            Configuration.set("capabilities.enableVideo", "true")            
+            
             if (platform.equalsIgnoreCase("ios")) {
                 Configuration.set("capabilities.enableVNC", "false")
             } else {

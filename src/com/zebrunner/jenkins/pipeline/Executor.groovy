@@ -362,7 +362,6 @@ public class Executor {
                                     "runnerClass",
                                     "BuildPriority",
                                     "auto_screenshot",
-                                    "enableVideo",
                                     "recoveryMode",
                                     "capabilities"
 
