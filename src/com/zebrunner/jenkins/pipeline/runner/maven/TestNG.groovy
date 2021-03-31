@@ -641,39 +641,7 @@ public class TestNG extends Runner {
             return Configuration.get("node")
         }
         
-        
-        def jobType = !isParamEmpty(Configuration.get(JOB_TYPE)) ? Configuration.get(JOB_TYPE) : ""
-        switch (jobType.toLowerCase()) {
-            case "api":
-            case "none":
-                logger.info("Suite Type: API")
-                Configuration.set("node", "api")
-                //TODO: remove browser later. For now all API jobs marked as web vs chrome without below line
-                Configuration.set("browser", "NULL")
-                break;
-            case "android":
-            case "android-web":
-                logger.info("Suite Type: ANDROID")
-                Configuration.set("node", "android")
-                break;
-            case "android-tv":
-                logger.info("Suite Type: ANDROID TV")
-                Configuration.set("node", "android-tv")
-                break;   
-            case "ios":
-            case "ios-web":
-                logger.info("Suite Type: iOS")
-                Configuration.set("node", "ios")
-                break;
-            case "web":
-                logger.info("Suite Type: Web")
-                Configuration.set("node", "web")
-                break;
-            default:
-                logger.info("Suite Type: Default")
-                Configuration.set("node", "default")
-        }
-
+        Configuration.set("node", "maven")
         logger.info("node: " + Configuration.get("node"))
         return Configuration.get("node")
     }
