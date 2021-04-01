@@ -208,7 +208,7 @@ class ZafiraClient extends HttpClient {
                           httpMode          : 'POST',
                           multipartName: file.name,
                           timeout: 900,
-                          uploadFile: file.path
+                          uploadFile: file.path,
                           validResponseCodes: "200:404",
                           url               : this.serviceURL + this.serviceURL + "/api/reporting/v1/test-runs/${testRunId}/artifacts"]
         return sendRequestFormatted(parameters)
