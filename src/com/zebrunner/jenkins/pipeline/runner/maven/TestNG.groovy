@@ -101,7 +101,7 @@ public class TestNG extends Runner {
             context.timestamps {
                 if (isValid) {
                     getScm().clonePush()
-                    compile("-U clean compile test -DskipTests")
+                    compile("-U clean compile test")
                 }
                 
                 clean()
