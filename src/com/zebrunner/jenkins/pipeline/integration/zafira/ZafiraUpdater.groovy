@@ -149,7 +149,7 @@ class ZafiraUpdater {
     
     public void publishTestRunArtifact(testRunId, file) {
         def response = zc.publishTestRunArtifact(testRunId, file)
-        logger.info("response : " + response.dump())
+        logger.info("response : " + response)
     }
 
     public def sendFailureEmail(uuid, emailList) {
