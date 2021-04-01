@@ -202,14 +202,17 @@ class ZafiraClient extends HttpClient {
         logger.info("publishing test log run artifact for ${testRunId}")
         logger.info(file.dump())
         logger.debug("token value: ${authToken}")
+        
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_OCTETSTREAM',
+                          contentType       : 'TEXT_PLAIN',
                           httpMode          : 'POST',
+                          ignoreSslErrors: true,
                           multipartName: file.name,
-                          timeout: 900,
                           uploadFile: file.path,
+                          responseHandle: 'NONE',
                           validResponseCodes: "200:404",
                           url               : this.serviceURL + "/api/reporting/v1/test-runs/${testRunId}/artifacts"]
+        logger.info("parameters: " + parameters)
         return sendRequestFormatted(parameters)
     }
 
