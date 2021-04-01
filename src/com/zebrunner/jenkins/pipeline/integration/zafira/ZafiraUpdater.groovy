@@ -146,6 +146,11 @@ class ZafiraUpdater {
         logger.debug(zafiraReport)
         context.writeFile file: "${workspace}/zafira/report.html", text: zafiraReport
     }
+    
+    public void publishTestRunArtifact(testRunId, file) {
+        def response = zc.publishTestRunArtifact(testRunId, file)
+        logger.info("response : " + response.dump())
+    }
 
     public def sendFailureEmail(uuid, emailList) {
         if (isParamEmpty(emailList)) {

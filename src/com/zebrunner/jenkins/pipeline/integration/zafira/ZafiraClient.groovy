@@ -199,9 +199,8 @@ class ZafiraClient extends HttpClient {
             return
         }
 
-        logger.info("publishing test log run artifact....")
-        logger.dump(testRunId)
-        logger.dump(file)
+        logger.info("publishing test log run artifact for ${testRunId}")
+        logger.info(file.dump())
         logger.debug("token value: ${authToken}")
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
                           contentType       : 'APPLICATION_OCTETSTREAM',
