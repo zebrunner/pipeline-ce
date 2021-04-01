@@ -194,7 +194,7 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
     
-    public def publishTestRunArtifact(testRunId, file) {
+    public def publishTestRunArtifact(testRunId, file, workspace) {
         if (!isZafiraConnected()) {
             return
         }
@@ -208,7 +208,7 @@ class ZafiraClient extends HttpClient {
                           httpMode          : 'POST',
                           ignoreSslErrors: true,
                           multipartName: file.name,
-                          uploadFile: file.path,
+                          uploadFile: workspace + "/" + file.path,
                           responseHandle: 'NONE',
                           validResponseCodes: "200:404",
                           url               : this.serviceURL + "/api/reporting/v1/test-runs/${testRunId}/artifacts"]

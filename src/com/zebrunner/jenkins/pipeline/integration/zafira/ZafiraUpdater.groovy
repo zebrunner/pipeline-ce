@@ -147,8 +147,8 @@ class ZafiraUpdater {
         context.writeFile file: "${workspace}/zafira/report.html", text: zafiraReport
     }
     
-    public void publishTestRunArtifact(testRunId, file) {
-        def response = zc.publishTestRunArtifact(testRunId, file)
+    public void publishTestRunArtifact(testRunId, file, workspace) {
+        def response = zc.publishTestRunArtifact(testRunId, file, workspace)
         logger.info("response : " + response)
     }
 
