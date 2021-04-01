@@ -551,6 +551,13 @@ public class TestNG extends Runner {
 
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
                         zafiraUpdater.setBuildResult(uuid, currentBuild)
+                        
+                        //if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status) {
+                            def files = context.findFiles(glob: '**/target/logs/test.log')
+                            for (int i = 0; i < files.length; i++) {
+                                zc.publishTestRunArtifact(testRun.id, files[i])
+                            }
+                        //}
                     }
                     
                     publishJenkinsReports()

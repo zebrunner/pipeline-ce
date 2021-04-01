@@ -193,6 +193,26 @@ class ZafiraClient extends HttpClient {
                           url               : this.serviceURL + "/api/reporting/api/launchers/create"]
         return sendRequestFormatted(parameters)
     }
+    
+    public def publishTestRunArtifact(testRunId, file) {
+        if (!isZafiraConnected()) {
+            return
+        }
+
+        logger.info("publishing test log run artifact....")
+        logger.dump(testRunId)
+        logger.dump(file)
+        logger.debug("token value: ${authToken}")
+        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
+                          contentType       : 'APPLICATION_OCTETSTREAM',
+                          httpMode          : 'POST',
+                          multipartName: file.name,
+                          timeout: 900,
+                          uploadFile: file.path
+                          validResponseCodes: "200:404",
+                          url               : this.serviceURL + this.serviceURL + "/api/reporting/v1/test-runs/${testRunId}/artifacts"]
+        return sendRequestFormatted(parameters)
+    }
 
     protected boolean isTokenExpired() {
         return authToken == null || System.currentTimeMillis() > tokenExpTime
