@@ -203,6 +203,13 @@ class ZafiraClient extends HttpClient {
         logger.info(file.dump())
         logger.debug("token value: ${authToken}")
         
+        JsonBuilder jsonBuilder = new JsonBuilder()
+        jsonBuilder file: workspace + "/" + file.path
+
+        logger.debug("REQUEST: " + jsonBuilder.toPrettyString())
+
+        String requestBody = jsonBuilder.toString()
+        
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
                           contentType       : 'TEXT_PLAIN',
                           httpMode          : 'POST',
@@ -210,6 +217,7 @@ class ZafiraClient extends HttpClient {
                           multipartName: file.name,
                           uploadFile: workspace + "/" + file.path,
                           responseHandle: 'NONE',
+                          requestBody       : requestBody,
                           validResponseCodes: "200:404",
                           url               : this.serviceURL + "/api/reporting/v1/test-runs/${testRunId}/artifacts"]
         logger.info("parameters: " + parameters)
