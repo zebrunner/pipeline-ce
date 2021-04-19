@@ -169,11 +169,12 @@ public class TestNG extends Runner {
         def zbrProperties = context.findFiles glob: subProjectFilter + "/**/agent.properties"
         zbrProperties.each {
             Map properties  = context.readProperties file: it.path
-            if (!isParamEmpty(properties.reporting.project-key)){
+            if (!isParamEmpty(properties.reporting)){
+                properties.reportinglogger.info("properties.reporting: " + properties.reporting)
                 zbrProject = properties.reporting.project-key
-                logger.info("Zebrunner Project: " + zbrProject)
             }
         }
+        logger.info("Zebrunner Project: " + zbrProject)
         return zbrProject
     }
 
