@@ -170,7 +170,7 @@ public class TestNG extends Runner {
         zbrProperties.each {
             Map properties  = context.readProperties file: it.path
             if (!isParamEmpty(properties.reporting)){
-                properties.reportinglogger.info("properties.reporting: " + properties.reporting)
+                logger.info("properties.reporting: " + properties.reporting)
                 zbrProject = properties.reporting.project-key
             }
         }
