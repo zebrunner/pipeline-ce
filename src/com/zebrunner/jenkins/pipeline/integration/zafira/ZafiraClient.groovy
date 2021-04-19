@@ -178,7 +178,8 @@ class ZafiraClient extends HttpClient {
         }
         
         logger.error("Launchers creation is disabled!")
-        return
+        // reset json to empty list to finish scan and don't generate laucnhers        
+        jenkinsJobsScanResult = [:]
 
         JsonBuilder jsonBuilder = new JsonBuilder()
         jsonBuilder jenkinsJobsScanResult
