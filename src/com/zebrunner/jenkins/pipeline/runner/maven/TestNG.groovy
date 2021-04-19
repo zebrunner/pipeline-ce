@@ -56,10 +56,7 @@ public class TestNG extends Runner {
 	protected static final String JENKINS_REGRESSION_MATRIX = "jenkinsRegressionMatrix"
 	protected static final String JENKINS_REGRESSION_SCHEDULING = "jenkinsRegressionScheduling"
 	
-	protected static final String RESOURCES_PATH = "/resources/"
-	protected static final String CARINA_SUITES_PATH = RESOURCES_PATH +  "testng_suites/"
-
-
+	protected static final String CARINA_SUITES_PATH = "/resources/testng_suites/"
 
     public TestNG(context) {
         super(context)
@@ -197,7 +194,7 @@ public class TestNG extends Runner {
 			//verify if it is testNG suite xml file and continue scan only in this case!
 			def currentSuitePath = workspace + "/" + suitePath
 			
-			if (!currentSuitePath.contains(RESOURCES_PATH) || !isTestNgSuite(currentSuitePath)) {
+			if (!isTestNgSuite(currentSuitePath)) {
 				logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
 				// not under /src/test/resources or not a TestNG suite file
 				continue
@@ -210,16 +207,13 @@ public class TestNG extends Runner {
 				int testResourceIndex = currentSuitePath.toLowerCase().lastIndexOf(CARINA_SUITES_PATH)
 				logger.debug("testResourceIndex : " + testResourceIndex)
 				suiteName = currentSuitePath.substring(testResourceIndex + CARINA_SUITES_PATH.length(), currentSuitePath.length() - 4)
-			} else {
-				// external TestNG suite
-				int testResourceIndex = currentSuitePath.lastIndexOf(RESOURCES_PATH)
-				logger.debug("testResourceIndex : " + testResourceIndex)
-				suiteName = currentSuitePath.substring(testResourceIndex + RESOURCES_PATH.length(), currentSuitePath.length())
+                
+                if (suiteName.isEmpty()) {
+                    continue
+                }
 			}
 			
-			if (suiteName.isEmpty()) {
-				continue
-			}
+
 
             logger.info("suite name: " + suiteName)
             logger.info("suite path: " + suitePath)
@@ -1069,7 +1063,7 @@ public class TestNG extends Runner {
         logger.info("Number of Test Suites to Scan Through: " + files.length)
         for (file in files){
             def currentSuitePath = workspace + "/" + file.path
-            if (!currentSuitePath.contains(RESOURCES_PATH) || !isTestNgSuite(currentSuitePath)) {
+            if (!isTestNgSuite(currentSuitePath)) {
                 logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
                 // not under /src/test/resources or not a TestNG suite file
                 continue

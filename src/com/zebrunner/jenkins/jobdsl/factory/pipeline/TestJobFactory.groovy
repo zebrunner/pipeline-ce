@@ -168,7 +168,9 @@ public class TestJobFactory extends PipelineFactory {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
                 configure addHiddenParameter('zafira_project', '', zafira_project)
-                configure addHiddenParameter('suite', '', suiteName)
+                if (!isParamEmpty(suiteName)) {
+                    configure addHiddenParameter('suite', '', suiteName)
+                }
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
                 configure addHiddenParameter('slack_channels', '', getSuiteParameter("", "jenkinsSlackChannels", currentSuite))
