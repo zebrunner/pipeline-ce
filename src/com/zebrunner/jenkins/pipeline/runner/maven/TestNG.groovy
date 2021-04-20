@@ -392,7 +392,7 @@ public class TestNG extends Runner {
         jenkinsJobsScanResult.jenkinsJobs = []
         try {
             if (build) {
-                //jenkinsJobsScanResult.jenkinsJobs = generateJenkinsJobs(build)
+                jenkinsJobsScanResult.jenkinsJobs = generateJenkinsJobs(build)
                 jenkinsJobsScanResult.success = true
             }
             zafiraUpdater.createLaunchers(jenkinsJobsScanResult)
