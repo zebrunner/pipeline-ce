@@ -141,8 +141,8 @@ public class TestNG extends Runner {
                 def subProject = Paths.get(pomFile).getParent() ? Paths.get(pomFile).getParent().toString() : "."
                 logger.debug("subProject: " + subProject)
                 def subProjectFilter = subProject.equals(".") ? "**" : subProject
-                def zafiraProject = getZafiraProject(subProjectFilter)
-                generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch)
+                def zbrProject = getZebrunnerProject(subProjectFilter)
+                generateDslObjects(repoFolder, zbrProject, subProject, subProjectFilter, branch)
 
 				factoryRunner.run(dslObjects, Configuration.get("removedConfigFilesAction"),
 										Configuration.get("removedJobAction"),
@@ -164,20 +164,21 @@ public class TestNG extends Runner {
         return context.findFiles(glob: subDirectory + "**/pom.xml")
     }
 
-    def getZafiraProject(subProjectFilter){
-        def zafiraProject = "unknown"
-        def zafiraProperties = context.findFiles glob: subProjectFilter + "/**/zafira.properties"
-        zafiraProperties.each {
+    def getZebrunnerProject(subProjectFilter){
+        def zbrProject = "DEF"
+        def zbrProperties = context.findFiles glob: subProjectFilter + "/**/agent.properties"
+        zbrProperties.each {
             Map properties  = context.readProperties file: it.path
-            if (!isParamEmpty(properties.zafira_project)){
-                zafiraProject = properties.zafira_project
-                logger.info("ZafiraProject: " + zafiraProject)
+            if (!isParamEmpty(properties."reporting.project-key")){
+                logger.debug("reporting.project-key: " + properties."reporting.project-key")
+                zbrProject = properties."reporting.project-key"
             }
         }
-        return zafiraProject
+        logger.info("Zebrunner Project: " + zbrProject)
+        return zbrProject
     }
 
-    def generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch){
+    def generateDslObjects(repoFolder, zbrProject, subProject, subProjectFilter, branch){
 	
         // VIEWS
         registerObject("cron", new ListViewFactory(repoFolder, 'CRON', '.*cron.*'))
@@ -230,10 +231,10 @@ public class TestNG extends Runner {
                 suiteOwner = suiteOwner.split(",")[0].trim()
             }
 
-            def currentZafiraProject = getSuiteParameter(zafiraProject, "zafira_project", currentSuite)
+            def currentZbrProject = getSuiteParameter(zbrProject, "reporting.project-key", currentSuite)
 
             // put standard views factory into the map
-            registerObject(currentZafiraProject, new ListViewFactory(repoFolder, currentZafiraProject.toUpperCase(), ".*${currentZafiraProject}.*"))
+            registerObject(currentZbrProject, new ListViewFactory(repoFolder, currentZbrProject.toUpperCase(), ".*${currentZbrProject}.*"))
             registerObject(suiteOwner, new ListViewFactory(repoFolder, suiteOwner, ".*${suiteOwner}"))
 
             switch(suiteName.toLowerCase()){
@@ -258,9 +259,9 @@ public class TestNG extends Runner {
             }
 
             //pipeline job
-            def jobDesc = "zafira_project: ${currentZafiraProject}; owner: ${suiteOwner}"
+            def jobDesc = "zbr_project: ${currentZbrProject}; owner: ${suiteOwner}"
             branch = getSuiteParameter(Configuration.get("branch"), "jenkinsDefaultGitBranch", currentSuite)
-            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentZafiraProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
+            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
 
 			//cron job
             if (!isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))) {
@@ -778,7 +779,6 @@ public class TestNG extends Runner {
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
-                            -Dreporting.projectKey=${Configuration.get('zafira_project')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
         

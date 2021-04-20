@@ -12,7 +12,6 @@ public class TestJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def sub_project
-    def zafira_project
     def suitePath
     def suiteName
     def orgRepoScheduling
@@ -20,14 +19,13 @@ public class TestJobFactory extends PipelineFactory {
     def threadCount
     def dataProviderThreadCount
 
-    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, zafira_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
+    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
         this.folder = folder
         this.description = jobDesc
         this.pipelineScript = pipelineScript
         this.repoUrl = repoUrl
         this.branch = branch
         this.sub_project = sub_project
-        this.zafira_project = zafira_project
         this.suitePath = suitePath
         this.suiteName = suiteName
         this.orgRepoScheduling = orgRepoScheduling
@@ -167,7 +165,6 @@ public class TestJobFactory extends PipelineFactory {
                 configure stringParam('branch', this.branch, "repository branch to run against")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
-                configure addHiddenParameter('zafira_project', '', zafira_project)
                 if (!isParamEmpty(suiteName)) {
                     configure addHiddenParameter('suite', '', suiteName)
                 }

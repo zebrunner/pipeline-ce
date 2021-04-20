@@ -176,7 +176,7 @@ class ZafiraClient extends HttpClient {
         if (!isZafiraConnected()) {
             return
         }
-
+        
         JsonBuilder jsonBuilder = new JsonBuilder()
         jsonBuilder jenkinsJobsScanResult
 
