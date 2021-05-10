@@ -28,15 +28,6 @@ class ZafiraUpdater {
         return testRun
     }
 
-    public def queueZafiraTestRun(uuid) {
-        if (isParamEmpty(Configuration.get("queue_registration")) || Configuration.get("queue_registration").toBoolean()) {
-            if (isParamEmpty(Configuration.get('test_run_rules'))) {
-                def response = zc.queueZafiraTestRun(uuid)
-                logger.info("Queued TestRun: " + formatJson(response))
-            }
-        }
-    }
-
     public def smartRerun() {
         def response = zc.smartRerun()
         logger.info("Results : " + response.size())
@@ -119,7 +110,30 @@ class ZafiraUpdater {
         }
         String failureEmailList = Configuration.get("failure_email_list")
         if (isFailure(testRun.status) && !isParamEmpty(failureEmailList)) {
-            zc.sendEmail(uuid, failureEmailList, "failures")
+            if (!isParamEmpty(Configuration.get("failure_email_pass_rate_threshold"))) {
+                double thresholdEmailPercent = Configuration.get("failure_email_pass_rate_threshold") as Double
+                def testRunResults = zc.getTestRunResults(testRun.id)
+                int overallCount = 0
+                int failedCount = 0
+                testRunResults.each { trr ->
+                    if (isFailure(trr.status) && !trr.knownIssue) {
+                        failedCount ++
+                    }
+                    overallCount ++
+                }
+                logger.info("Overall tests count: " + overallCount)
+                logger.info("Failed tests count: " + failedCount)
+                def successRate = ((overallCount - failedCount) / overallCount) * 100
+                logger.info("Success rate(%): " + successRate)
+                if (successRate < thresholdEmailPercent) {
+                    logger.info("Sending failure email as success rate is less then pass rate threshold")
+                    zc.sendEmail(uuid, failureEmailList.minus(emailList), "all")
+                } else {
+                    logger.info("Not sending failure email as success rate is greater then pass rate threshold")
+                }
+            } else {
+                zc.sendEmail(uuid, failureEmailList.minus(emailList), "all")
+            }
         }
     }
 

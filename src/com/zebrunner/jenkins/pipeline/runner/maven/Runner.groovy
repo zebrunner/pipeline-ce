@@ -22,7 +22,7 @@ public class Runner extends AbstractRunner {
             logger.info("Runner->onPush")
             getScm().clonePush()
             // [VD] don't remove -U otherwise latest dependencies are not downloaded
-            compile("-U clean compile test -DskipTests", false)
+            compile("-U clean compile test", false)
             
             //TODO: test if we can execute Jenkinsfile jobdsl on maven node 
             jenkinsFileScan()
@@ -33,7 +33,7 @@ public class Runner extends AbstractRunner {
         context.node("maven") {
             logger.info("Runner->onPullRequest")
             getScm().clonePR()
-            compile("-U clean compile test -DskipTests", true)
+            compile("-U clean compile test", true)
         }
     }
 
@@ -44,7 +44,7 @@ public class Runner extends AbstractRunner {
             logger.info("Runner->build")
             scmClient.clone()
             context.stage("Maven Build") {
-                context.mavenBuild(Configuration.get("maven_goals"), getMavenSettings())
+                context.mavenBuild(Configuration.get("goals"), getMavenSettings())
             }
         }
     }

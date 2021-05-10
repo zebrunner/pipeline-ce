@@ -362,7 +362,6 @@ public class Executor {
                                     "runnerClass",
                                     "BuildPriority",
                                     "auto_screenshot",
-                                    "enableVideo",
                                     "recoveryMode",
                                     "capabilities"
 
@@ -415,7 +414,7 @@ public class Executor {
     }
 
     static void putNotNull(map, key, value) {
-        if (value != null && !value.equalsIgnoreCase("null")) {
+        if (value != null && !value.equalsIgnoreCase("null") && !value.isEmpty()) {
             map.put(key, value)
         }
     }

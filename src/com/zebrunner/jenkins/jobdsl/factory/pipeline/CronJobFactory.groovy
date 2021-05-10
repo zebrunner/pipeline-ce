@@ -33,6 +33,8 @@ public class CronJobFactory extends PipelineFactory {
         def pipelineJob = super.create()
 
         pipelineJob.with {
+            authenticationToken('ciStart')
+            
             //** Properties & Parameters Area **//*
             if (scheduling != null && orgRepoScheduling) {
                 triggers {

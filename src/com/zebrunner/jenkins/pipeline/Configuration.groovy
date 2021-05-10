@@ -69,25 +69,6 @@ public class Configuration {
         JOB_BASE_NAME("JOB_BASE_NAME", mustOverride),
         BUILD_NUMBER("BUILD_NUMBER", mustOverride),
 
-        // TODO: parameter is deprecated and should be removed in 1.5 release: https://github.com/zebrunner/pipeline-ce/issues/49
-        // it is restored for the compatibility with 6.4 carina and original 1.10.0 selenoid
-        SCREEN_RECORD_HOST("screen_record_host", "http://\${INFRA_HOST}/video/%s"),
-        
-        SCREEN_RECORD_FTP("screen_record_ftp", "ftp://\${INFRA_HOST}/%s.mp4"),
-        SCREEN_RECORD_USER("screen_record_user", "qpsdemo"),
-        SCREEN_RECORD_PASS("screen_record_pass", "qpsdemo"),
-        SCREEN_RECORD_DURATION("screen_record_duration", "1800"),
-
-        S3_SAVE_SCREENSHOTS("s3_save_screenshots", "true"),
-
-        VNC_DESKTOP("vnc_desktop", "%s://%s:%s/vnc/%s"),
-        VNC_MOBILE("vnc_mobile", "%s://%s:%s/websockify"),
-        VNC_PROTOCOL("vnc_protocol", "ws"),
-        VNC_HOST("vnc_host", "\${INFRA_HOST}"),
-        VNC_PORT("vnc_port", "80"),
-
-        ENABLE_VIDEO("capabilities.enableVideo", "false"),
-
         TIMEZONE("user.timezone", "UTC"),
 
         S3_LOCAL_STORAGE("s3_local_storage", "/opt/apk"),

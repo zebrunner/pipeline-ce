@@ -56,10 +56,7 @@ public class TestNG extends Runner {
 	protected static final String JENKINS_REGRESSION_MATRIX = "jenkinsRegressionMatrix"
 	protected static final String JENKINS_REGRESSION_SCHEDULING = "jenkinsRegressionScheduling"
 	
-	protected static final String RESOURCES_PATH = "/resources/"
-	protected static final String CARINA_SUITES_PATH = RESOURCES_PATH +  "testng_suites/"
-
-
+	protected static final String CARINA_SUITES_PATH = "/resources/testng_suites/"
 
     public TestNG(context) {
         super(context)
@@ -101,7 +98,7 @@ public class TestNG extends Runner {
             context.timestamps {
                 if (isValid) {
                     getScm().clonePush()
-                    compile("-U clean compile test -DskipTests")
+                    compile("-U clean compile test")
                 }
                 
                 clean()
@@ -144,8 +141,8 @@ public class TestNG extends Runner {
                 def subProject = Paths.get(pomFile).getParent() ? Paths.get(pomFile).getParent().toString() : "."
                 logger.debug("subProject: " + subProject)
                 def subProjectFilter = subProject.equals(".") ? "**" : subProject
-                def zafiraProject = getZafiraProject(subProjectFilter)
-                generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch)
+                def zbrProject = getZebrunnerProject(subProjectFilter)
+                generateDslObjects(repoFolder, zbrProject, subProject, subProjectFilter, branch)
 
 				factoryRunner.run(dslObjects, Configuration.get("removedConfigFilesAction"),
 										Configuration.get("removedJobAction"),
@@ -167,20 +164,21 @@ public class TestNG extends Runner {
         return context.findFiles(glob: subDirectory + "**/pom.xml")
     }
 
-    def getZafiraProject(subProjectFilter){
-        def zafiraProject = "unknown"
-        def zafiraProperties = context.findFiles glob: subProjectFilter + "/**/zafira.properties"
-        zafiraProperties.each {
+    def getZebrunnerProject(subProjectFilter){
+        def zbrProject = "DEF"
+        def zbrProperties = context.findFiles glob: subProjectFilter + "/**/agent.properties"
+        zbrProperties.each {
             Map properties  = context.readProperties file: it.path
-            if (!isParamEmpty(properties.zafira_project)){
-                zafiraProject = properties.zafira_project
-                logger.info("ZafiraProject: " + zafiraProject)
+            if (!isParamEmpty(properties."reporting.project-key")){
+                logger.debug("reporting.project-key: " + properties."reporting.project-key")
+                zbrProject = properties."reporting.project-key"
             }
         }
-        return zafiraProject
+        logger.info("Zebrunner Project: " + zbrProject)
+        return zbrProject
     }
 
-    def generateDslObjects(repoFolder, zafiraProject, subProject, subProjectFilter, branch){
+    def generateDslObjects(repoFolder, zbrProject, subProject, subProjectFilter, branch){
 	
         // VIEWS
         registerObject("cron", new ListViewFactory(repoFolder, 'CRON', '.*cron.*'))
@@ -197,7 +195,7 @@ public class TestNG extends Runner {
 			//verify if it is testNG suite xml file and continue scan only in this case!
 			def currentSuitePath = workspace + "/" + suitePath
 			
-			if (!currentSuitePath.contains(RESOURCES_PATH) || !isTestNgSuite(currentSuitePath)) {
+			if (!isTestNgSuite(currentSuitePath)) {
 				logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
 				// not under /src/test/resources or not a TestNG suite file
 				continue
@@ -210,16 +208,13 @@ public class TestNG extends Runner {
 				int testResourceIndex = currentSuitePath.toLowerCase().lastIndexOf(CARINA_SUITES_PATH)
 				logger.debug("testResourceIndex : " + testResourceIndex)
 				suiteName = currentSuitePath.substring(testResourceIndex + CARINA_SUITES_PATH.length(), currentSuitePath.length() - 4)
-			} else {
-				// external TestNG suite
-				int testResourceIndex = currentSuitePath.lastIndexOf(RESOURCES_PATH)
-				logger.debug("testResourceIndex : " + testResourceIndex)
-				suiteName = currentSuitePath.substring(testResourceIndex + RESOURCES_PATH.length(), currentSuitePath.length())
+                
+                if (suiteName.isEmpty()) {
+                    continue
+                }
 			}
 			
-			if (suiteName.isEmpty()) {
-				continue
-			}
+
 
             logger.info("suite name: " + suiteName)
             logger.info("suite path: " + suitePath)
@@ -236,10 +231,10 @@ public class TestNG extends Runner {
                 suiteOwner = suiteOwner.split(",")[0].trim()
             }
 
-            def currentZafiraProject = getSuiteParameter(zafiraProject, "zafira_project", currentSuite)
+            def currentZbrProject = getSuiteParameter(zbrProject, "reporting.project-key", currentSuite)
 
             // put standard views factory into the map
-            registerObject(currentZafiraProject, new ListViewFactory(repoFolder, currentZafiraProject.toUpperCase(), ".*${currentZafiraProject}.*"))
+            registerObject(currentZbrProject, new ListViewFactory(repoFolder, currentZbrProject.toUpperCase(), ".*${currentZbrProject}.*"))
             registerObject(suiteOwner, new ListViewFactory(repoFolder, suiteOwner, ".*${suiteOwner}"))
 
             switch(suiteName.toLowerCase()){
@@ -264,9 +259,9 @@ public class TestNG extends Runner {
             }
 
             //pipeline job
-            def jobDesc = "zafira_project: ${currentZafiraProject}; owner: ${suiteOwner}"
+            def jobDesc = "zbr_project: ${currentZbrProject}; owner: ${suiteOwner}"
             branch = getSuiteParameter(Configuration.get("branch"), "jenkinsDefaultGitBranch", currentSuite)
-            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentZafiraProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
+            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
 
 			//cron job
             if (!isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))) {
@@ -492,7 +487,6 @@ public class TestNG extends Runner {
         def isRerun = isRerun()
         String nodeName = "master"
         context.node(nodeName) {
-            //zafiraUpdater.queueZafiraTestRun(uuid)
             nodeName = chooseNode()
         }
         context.node(nodeName) {
@@ -506,51 +500,54 @@ public class TestNG extends Runner {
                             buildJob()
                         }
                         
-                        testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-                        if(!isParamEmpty(testRun)){
-                            zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
-                            
-                            def channel = Configuration.get("slack_channels")
-                            def failChannel = Configuration.get("failure_slack_channels")
-                            if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
-                                && !isParamEmpty(failChannel)) {
-                                //redirect message to failChannel for non PASSED test run
-                                channel = failChannel
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
-                        }
                     }
                 } catch (Exception e) {
                     currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
                     logger.error(printStackTrace(e))
-                    
-                    testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-                    if (!isParamEmpty(testRun)) {
-                        def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
-                        if ((!isParamEmpty(abortedTestRun)
-                                && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
-                                && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
-
-                            // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
-                            def channel = Configuration.get("failure_slack_channels")
-                            if (isParamEmpty(channel)) {
-                                // reuse default channel for negative notification only if failure_slack_channels absent  
-                                channel = Configuration.get("slack_channels")
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
-                        }
-                    }
-                    throw e
                 } finally {
                     printDumpReports()
                     
                     //TODO: send notification via email, slack, hipchat and whatever... based on subscription rules
-                    if(!isParamEmpty(testRun)) {
+                    
+                    testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
+                    if(!isParamEmpty(testRun)){
+                        
+                        // #127 aborted run by timeout don't execute abort call for reporting
+                        if (StatusMapper.ZafiraStatus.IN_PROGRESS.name().equals(testRun.status)
+                            || StatusMapper.ZafiraStatus.QUEUED.name().equals(testRun.status)) {
+                            // if after finish we have intermediate status we have to call abort explicitly and mark build as fail
+                            currentBuild.result = BuildResult.FAILURE
+                            
+                            def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
+                            if ((!isParamEmpty(abortedTestRun)
+                                    && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
+                                    && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
+    
+                                // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
+                                def channel = Configuration.get("failure_slack_channels")
+                                if (isParamEmpty(channel)) {
+                                    // reuse default channel for negative notification only if failure_slack_channels absent
+                                    channel = Configuration.get("slack_channels")
+                                }
+                                zafiraUpdater.sendSlackNotification(uuid, channel)
+                            }
+                        }
+                        
+                        zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
+                        
+                        def channel = Configuration.get("slack_channels")
+                        def failChannel = Configuration.get("failure_slack_channels")
+                        if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
+                            && !isParamEmpty(failChannel)) {
+                            //redirect message to failChannel for non PASSED test run
+                            channel = failChannel
+                        }
+                        zafiraUpdater.sendSlackNotification(uuid, channel)
+
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
                         zafiraUpdater.setBuildResult(uuid, currentBuild)
-                    } else {
-                        //try to find build result from CarinaReport if any
                     }
+                    
                     publishJenkinsReports()
                     sendCustomizedEmail()
                     
@@ -639,39 +636,7 @@ public class TestNG extends Runner {
             return Configuration.get("node")
         }
         
-        
-        def jobType = !isParamEmpty(Configuration.get(JOB_TYPE)) ? Configuration.get(JOB_TYPE) : ""
-        switch (jobType.toLowerCase()) {
-            case "api":
-            case "none":
-                logger.info("Suite Type: API")
-                Configuration.set("node", "api")
-                //TODO: remove browser later. For now all API jobs marked as web vs chrome without below line
-                Configuration.set("browser", "NULL")
-                break;
-            case "android":
-            case "android-web":
-                logger.info("Suite Type: ANDROID")
-                Configuration.set("node", "android")
-                break;
-            case "android-tv":
-                logger.info("Suite Type: ANDROID TV")
-                Configuration.set("node", "android-tv")
-                break;   
-            case "ios":
-            case "ios-web":
-                logger.info("Suite Type: iOS")
-                Configuration.set("node", "ios")
-                break;
-            case "web":
-                logger.info("Suite Type: Web")
-                Configuration.set("node", "web")
-                break;
-            default:
-                logger.info("Suite Type: Default")
-                Configuration.set("node", "default")
-        }
-
+        Configuration.set("node", "maven")
         logger.info("node: " + Configuration.get("node"))
         return Configuration.get("node")
     }
@@ -814,14 +779,12 @@ public class TestNG extends Runner {
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
-                            -Dreporting.projectKey=${Configuration.get('zafira_project')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
         ${zafiraGoals} \
-        -Ds3_save_screenshots=${Configuration.get(Configuration.Parameter.S3_SAVE_SCREENSHOTS)} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
         -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
@@ -835,7 +798,6 @@ public class TestNG extends Runner {
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
         addCapability("suite", suiteName)
         addCapabilityIfPresent("rerun_failures", "zafira_rerun_failures")
-        addCapabilityIfPresent("enableVideo", "capabilities.enableVideo")
         // [VD] getting debug host works only on specific nodes which are detecetd by chooseNode.
         // on this stage this method is not fucntion properly!
         //TODO: move 8000 port into the global var
@@ -934,6 +896,9 @@ public class TestNG extends Runner {
         def provider = getProvider().toLowerCase()
         def platform = Configuration.get("job_type")
         if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
+            Configuration.set("capabilities.enableVideo", "true")
+            Configuration.set("capabilities.enableLog", "true")
+            
             if (platform.equalsIgnoreCase("ios")) {
                 Configuration.set("capabilities.enableVNC", "false")
             } else {
@@ -1098,7 +1063,7 @@ public class TestNG extends Runner {
         logger.info("Number of Test Suites to Scan Through: " + files.length)
         for (file in files){
             def currentSuitePath = workspace + "/" + file.path
-            if (!currentSuitePath.contains(RESOURCES_PATH) || !isTestNgSuite(currentSuitePath)) {
+            if (!isTestNgSuite(currentSuitePath)) {
                 logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
                 // not under /src/test/resources or not a TestNG suite file
                 continue
@@ -1126,7 +1091,6 @@ public class TestNG extends Runner {
         def executionMode = currentSuite.getParameter("jenkinsJobExecutionMode")
         def supportedEnvs = getSuiteParameter(currentSuite.getParameter("jenkinsEnvironments"), "jenkinsPipelineEnvironments", currentSuite)
         def currentEnvs = getCronEnv(currentSuite)
-        def queueRegistration = !isParamEmpty(currentSuite.getParameter("jenkinsQueueRegistration"))?currentSuite.getParameter("jenkinsQueueRegistration"):Configuration.get("queue_registration")
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
@@ -1193,7 +1157,6 @@ public class TestNG extends Runner {
 						putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
 						putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
 						putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
-						putNotNull(pipelineMap, "queue_registration", queueRegistration)
 						// supported config matrix should be applied at the end to be able to override default args like retry_count etc
 						putMap(pipelineMap, supportedConfigurations)
 						registerPipeline(currentSuite, pipelineMap)

@@ -33,7 +33,7 @@ public class PipelineFactory extends JobFactory {
         def pipelineJob = _dslFactory.pipelineJob(getFullName()) {
             description "${description}"
             logRotator { numToKeep logRotator }
-
+            
             properties {
                 disableResume()
                 durabilityHint { hint("PERFORMANCE_OPTIMIZED") }
