@@ -449,6 +449,8 @@ public class TestNG extends Runner {
         def parameterDefinitions = job.getProperty('hudson.model.ParametersDefinitionProperty').parameterDefinitions
         Map parameters = [:]
 
+        // #153 do not provide any data for capabilities launcher to reporting
+        /*
         for (parameterDefinition in parameterDefinitions) {
             if (parameterDefinition.name == 'capabilities') {
                 def value = getObjectValue(parameterDefinition).split(';')
@@ -461,6 +463,7 @@ public class TestNG extends Runner {
                 }
             }
         }
+        */
 
         parameterDefinitions.each { parameterDefinition ->
             def value = getObjectValue(parameterDefinition)
