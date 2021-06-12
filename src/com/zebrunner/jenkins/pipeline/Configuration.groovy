@@ -71,6 +71,7 @@ public class Configuration {
 
         TIMEZONE("user.timezone", "UTC"),
 
+        //TODO: #156 deprecate and remove useless carina storage related params
         S3_LOCAL_STORAGE("s3_local_storage", "/opt/apk"),
         APPCENTER_LOCAL_STORAGE("appcenter_local_storage", "/opt/apk"),
 

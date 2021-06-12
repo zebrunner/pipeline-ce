@@ -449,6 +449,8 @@ public class TestNG extends Runner {
         def parameterDefinitions = job.getProperty('hudson.model.ParametersDefinitionProperty').parameterDefinitions
         Map parameters = [:]
 
+        // #153 do not provide any data for capabilities launcher to reporting
+        /*
         for (parameterDefinition in parameterDefinitions) {
             if (parameterDefinition.name == 'capabilities') {
                 def value = getObjectValue(parameterDefinition).split(';')
@@ -461,6 +463,7 @@ public class TestNG extends Runner {
                 }
             }
         }
+        */
 
         parameterDefinitions.each { parameterDefinition ->
             def value = getObjectValue(parameterDefinition)
@@ -783,7 +786,8 @@ public class TestNG extends Runner {
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
-        def defaultBaseMavenGoals = "-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+        def defaultBaseMavenGoals = "-Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+	-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
         ${zafiraGoals} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
