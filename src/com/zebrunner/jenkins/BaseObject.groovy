@@ -133,12 +133,7 @@ public abstract class BaseObject {
     protected def initOrg() {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         context.println "jobName: ${jobName}"
-        //Configuration.get(Configuration.Parameter.JOB_NAME)
-        int nameCount = Paths.get(jobName).getNameCount()
-        context.println "nameCount: ${nameCount}"
-
         def orgFolderName = ""
-        
         if (jobName.equals("RegisterRepository") || jobName.equals("launcher") || jobName.equals("qtest-updater") || jobName.equals("testrail-updater")) {
             //equals means just root folder, i.e. empty org name
             orgFolderName = ""
