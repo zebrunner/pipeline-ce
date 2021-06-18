@@ -134,6 +134,11 @@ public abstract class BaseObject {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
+        
+        // qps/RegisterRepository -> qps
+        // test/qps/RegisterRepository -> test/qps
+
+
 
         int slashIndex = jobName.lastIndexOf('/');
         if (slashIndex == -1) {
@@ -145,12 +150,21 @@ public abstract class BaseObject {
             // test/qps/RegisterRepository -> test/qps
             orgFolderName = jobName.substring(0, slashIndex)
         } else {
-            // cut twice everything after latest slash:
-            orgFolderName = jobName.substring(0, slashIndex)
+            // qps/carina-demo/API-CustomParams-Demo -> qps
+            // carina-demo/API-CustomParams-Demo -> ""
             
-            slashIndex = orgFolderName.lastIndexOf('/');
-            if (slashIndex != -1) {
+            // so cut twice everything after latest slash if 2+ slashes exists or set org to empty:
+            
+            int slashCount = jobName.count("/") {
+            if (slashCount == 1) {
+                orgFolderName = ""
+            } else {
                 orgFolderName = jobName.substring(0, slashIndex)
+                
+                slashIndex = orgFolderName.lastIndexOf('/');
+                if (slashIndex != -1) {
+                    orgFolderName = jobName.substring(0, slashIndex)
+                }
             }
         }
         
