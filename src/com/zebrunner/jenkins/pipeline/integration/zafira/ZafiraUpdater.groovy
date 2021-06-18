@@ -190,10 +190,6 @@ class ZafiraUpdater {
         return !isParamEmpty(zc.getTestRunByCiRunId(uuid))
     }
 
-    public def createLaunchers(jenkinsJobsScanResult) {
-        return zc.createLaunchers(jenkinsJobsScanResult)
-    }
-
     protected boolean isFailure(testRunStatus) {
         return !"PASSED".equals(testRunStatus)
     }

@@ -80,15 +80,12 @@ public class TestNG extends Runner {
                     getScm().clone(true)
                     if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
                         scan()
-                        //TODO: move getJenkinsJobsScanResult to the end of the regular scan and removed from catch block!
-                        getJenkinsJobsScanResult(currentBuild.rawBuild)
                     }
 
                     jenkinsFileScan()
                     isValid = true
                 } catch (Exception e) {
                     logger.error("Scan failed.\n" + e.getMessage())
-                    getJenkinsJobsScanResult(null)
                     this.currentBuild.result = BuildResult.FAILURE
                 }
             }
@@ -382,55 +379,6 @@ public class TestNG extends Runner {
 
     protected String getCronPipelineScript() {
         return "${getPipelineLibrary(this.library)}\nimport ${runnerClass};\nnew ${runnerClass}(this).runCron()"
-    }
-
-    protected def getJenkinsJobsScanResult(build) {
-        Map jenkinsJobsScanResult = [:]
-        jenkinsJobsScanResult.success = false
-        jenkinsJobsScanResult.repo = this.repo
-        jenkinsJobsScanResult.userId = !isParamEmpty(Configuration.get("userId")) ? Long.valueOf(Configuration.get("userId")) : 2
-        jenkinsJobsScanResult.jenkinsJobs = []
-        try {
-            if (build) {
-                jenkinsJobsScanResult.jenkinsJobs = generateJenkinsJobs(build)
-                jenkinsJobsScanResult.success = true
-            }
-            zafiraUpdater.createLaunchers(jenkinsJobsScanResult)
-        } catch (Exception e) {
-            throw new RuntimeException("Something went wrong during launchers creation", e)
-        }
-    }
-
-    protected def generateJenkinsJobs(build){
-        List jenkinsJobs = []
-        build.getAction(GeneratedJobsBuildAction).modifiedObjects.each { job ->
-            def jobFullName = replaceStartSlash(job.jobName)
-            def jenkinsJob = generateJenkinsJob(jobFullName)
-            jenkinsJobs.add(jenkinsJob)
-        }
-        logger.debug("jenkinsJobs for launchers: " + jenkinsJobs)
-        return jenkinsJobs
-    }
-
-    protected def generateJenkinsJob(jobFullName){
-        Map jenkinsJob = [:]
-
-        def job = getItemByFullName(jobFullName)
-        def jobUrl = getJobUrl(jobFullName)
-        Map parameters = getParametersMap(job)
-
-        if (!isParamEmpty(parameters.job_type)) {
-            jenkinsJob.type = parameters.job_type
-        } else {
-            //TODO: contact with zebrunner insight team to confirm it is valid/expceted jobType for crons
-            jenkinsJob.type = 'CRON'
-        }
-
-        parameters.remove("job_type")
-        jenkinsJob.url = jobUrl
-        jenkinsJob.parameters  = new JsonBuilder(parameters).toPrettyString()
-
-        return jenkinsJob
     }
 
     protected def getObjectValue(obj) {
