@@ -134,24 +134,24 @@ public abstract class BaseObject {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
-        //TODO: add verification for the substring method!
-        int index=jobName.lastIndexOf('/');
-        context.println "slash index: ${index}"
-        if (jobName.equals("RegisterRepository") || jobName.equals("launcher") || jobName.equals("qtest-updater") || jobName.equals("testrail-updater")) {
+
+        int slashIndex = jobName.lastIndexOf('/');
+        if (index == -1) {
             //equals means just root folder, i.e. empty org name
             orgFolderName = ""
         } else if ((jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
             // cut everything after latest slash:
             // qps/RegisterRepository -> qps
             // test/qps/RegisterRepository -> test/qps
-            index=jobName.lastIndexOf('/');
-            orgFolderName = jobName.substring(0, index)
+            orgFolderName = jobName.substring(0, slashIndex)
         } else {
             // cut twice everything after latest slash:
-            index=jobName.lastIndexOf('/');
-            orgFolderName = jobName.substring(0, index)
-            index=orgFolderName.lastIndexOf('/');
-            orgFolderName = jobName.substring(0, index)
+            orgFolderName = jobName.substring(0, slashIndex)
+            
+            slashIndex = orgFolderName.lastIndexOf('/');
+            if (slashIndex != -1) {
+                orgFolderName = jobName.substring(0, slashIndex)
+            }
         }
         
         context.println "orgFolderName: ${orgFolderName}"
