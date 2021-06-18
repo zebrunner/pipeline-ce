@@ -134,14 +134,21 @@ public abstract class BaseObject {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
+        //TODO: add verification for the substring method!
         if (jobName.equals("RegisterRepository") || jobName.equals("launcher") || jobName.equals("qtest-updater") || jobName.equals("testrail-updater")) {
             //equals means just root folder, i.e. empty org name
             orgFolderName = ""
-        } else {
+        } else if ((jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
             // cut everything after latest slash:
             // qps/RegisterRepository -> qps
             // test/qps/RegisterRepository -> test/qps
             int index=jobName.lastIndexOf('/');
+            orgFolderName = jobName.substring(0, index)
+        } else {
+            // cut twice everything after latest slash:
+            int index=jobName.lastIndexOf('/');
+            orgFolderName = jobName.substring(0, index)
+            index=jobName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
         }
         
