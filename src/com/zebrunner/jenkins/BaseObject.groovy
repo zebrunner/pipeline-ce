@@ -133,27 +133,42 @@ public abstract class BaseObject {
     protected def initOrg() {
         String jobName = context.env.getEnvironment().get("JOB_NAME")
         context.println "jobName: ${jobName}"
-        //Configuration.get(Configuration.Parameter.JOB_NAME)
-        int nameCount = Paths.get(jobName).getNameCount()
-        context.println "nameCount: ${nameCount}"
-
         def orgFolderName = ""
-        if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
-            // testrail-updater - i.e. empty org name
-            orgFolderName = ""
-        } else if (nameCount == 2 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
-            // stage/testrail-updater - i.e. stage
-            orgFolderName = Paths.get(jobName).getName(0).toString()
-        } else if (nameCount == 2) {
-            // carina-demo/API_Demo_Test - i.e. empty orgFolderName
-            orgFolderName = ""
-        } else if (nameCount == 3) { //TODO: need to test use-case with views!
-            // qaprosoft/carina-demo/API_Demo_Test - i.e. orgFolderName=qaprosoft
-            orgFolderName = Paths.get(jobName).getName(0).toString()
-        } else {
-            throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
-        }
+        
+        // qps/RegisterRepository -> qps
+        // test/qps/RegisterRepository -> test/qps
 
+
+
+        int slashIndex = jobName.lastIndexOf('/');
+        if (slashIndex == -1) {
+            //equals means just root folder, i.e. empty org name
+            orgFolderName = ""
+        } else if ((jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
+            // cut everything after latest slash:
+            // qps/RegisterRepository -> qps
+            // test/qps/RegisterRepository -> test/qps
+            orgFolderName = jobName.substring(0, slashIndex)
+        } else {
+            // qps/carina-demo/API-CustomParams-Demo -> qps
+            // carina-demo/API-CustomParams-Demo -> ""
+            
+            // so cut twice everything after latest slash if 2+ slashes exists or set org to empty:
+            
+            int slashCount = jobName.count("/")
+            context.println "slashCount: ${slashCount}"
+            if (slashCount == 1) {
+                orgFolderName = ""
+            } else {
+                orgFolderName = jobName.substring(0, slashIndex)
+                
+                slashIndex = orgFolderName.lastIndexOf('/');
+                if (slashIndex != -1) {
+                    orgFolderName = jobName.substring(0, slashIndex)
+                }
+            }
+        }
+        
         context.println "orgFolderName: ${orgFolderName}"
         return orgFolderName
     }
