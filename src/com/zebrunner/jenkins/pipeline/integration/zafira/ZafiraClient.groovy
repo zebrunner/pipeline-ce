@@ -171,29 +171,6 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
 
-
-    public def createLaunchers(jenkinsJobsScanResult) {
-        if (!isZafiraConnected()) {
-            return
-        }
-        
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder jenkinsJobsScanResult
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        logger.debug("token value: ${authToken}")
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:404",
-                          url               : this.serviceURL + "/api/reporting/api/launchers/create"]
-        return sendRequestFormatted(parameters)
-    }
-
     protected boolean isTokenExpired() {
         return authToken == null || System.currentTimeMillis() > tokenExpTime
     }
