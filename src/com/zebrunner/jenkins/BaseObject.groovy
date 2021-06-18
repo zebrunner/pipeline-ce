@@ -148,7 +148,7 @@ public abstract class BaseObject {
             // cut twice everything after latest slash:
             int index=jobName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
-            index=jobName.lastIndexOf('/');
+            index=orgFolderName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
         }
         
