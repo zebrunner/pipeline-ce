@@ -138,6 +138,19 @@ public abstract class BaseObject {
         context.println "nameCount: ${nameCount}"
 
         def orgFolderName = ""
+        
+        if (jobName.equals("RegisterRepository") || jobName.equals("launcher") || jobName.equals("qtest-updater") || jobName.equals("testrail-updater")) {
+            //equals means just root folder, i.e. empty org name
+            orgFolderName = ""
+        } else if (jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater") || jobName.contains("testrail-updater")) {
+            // cut everything after latest slash:
+            // qps/RegisterRepository -> qps
+            // test/qps/RegisterRepository -> test/qps
+            int index=jobName.lastIndexOf('/');
+            orgFolderName = jobName.substring(0, index)
+        }
+        
+/*        
         if (nameCount == 1 && (jobName.contains("qtest-updater") || jobName.contains("testrail-updater") || jobName.contains("launcher") || jobName.contains("RegisterRepository"))) {
             // testrail-updater - i.e. empty org name
             orgFolderName = ""
@@ -153,6 +166,7 @@ public abstract class BaseObject {
         } else {
             throw new RuntimeException("Invalid job organization structure: '${jobName}'!")
         }
+*/        
 
         context.println "orgFolderName: ${orgFolderName}"
         return orgFolderName
