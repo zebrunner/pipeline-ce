@@ -155,7 +155,8 @@ public abstract class BaseObject {
             
             // so cut twice everything after latest slash if 2+ slashes exists or set org to empty:
             
-            int slashCount = jobName.count("/") {
+            int slashCount = jobName.count("/")
+            context.println "slashCount: ${slashCount}"
             if (slashCount == 1) {
                 orgFolderName = ""
             } else {
