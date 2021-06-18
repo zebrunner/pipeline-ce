@@ -135,6 +135,8 @@ public abstract class BaseObject {
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
         //TODO: add verification for the substring method!
+        int index=jobName.lastIndexOf('/');
+        context.println "slash index: ${index}"
         if (jobName.equals("RegisterRepository") || jobName.equals("launcher") || jobName.equals("qtest-updater") || jobName.equals("testrail-updater")) {
             //equals means just root folder, i.e. empty org name
             orgFolderName = ""
@@ -142,11 +144,11 @@ public abstract class BaseObject {
             // cut everything after latest slash:
             // qps/RegisterRepository -> qps
             // test/qps/RegisterRepository -> test/qps
-            int index=jobName.lastIndexOf('/');
+            index=jobName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
         } else {
             // cut twice everything after latest slash:
-            int index=jobName.lastIndexOf('/');
+            index=jobName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
             index=orgFolderName.lastIndexOf('/');
             orgFolderName = jobName.substring(0, index)
