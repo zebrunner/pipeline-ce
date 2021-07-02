@@ -509,15 +509,6 @@ public class TestNG extends Runner {
                         testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                         if(!isParamEmpty(testRun)){
                             zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
-                            
-                            def channel = Configuration.get("slack_channels")
-                            def failChannel = Configuration.get("failure_slack_channels")
-                            if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
-                                && !isParamEmpty(failChannel)) {
-                                //redirect message to failChannel for non PASSED test run
-                                channel = failChannel
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
                         }
                     }
                 } catch (Exception e) {
@@ -527,18 +518,6 @@ public class TestNG extends Runner {
                     testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
                     if (!isParamEmpty(testRun)) {
                         def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
-                        if ((!isParamEmpty(abortedTestRun)
-                                && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
-                                && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
-
-                            // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
-                            def channel = Configuration.get("failure_slack_channels")
-                            if (isParamEmpty(channel)) {
-                                // reuse default channel for negative notification only if failure_slack_channels absent  
-                                channel = Configuration.get("slack_channels")
-                            }
-                            zafiraUpdater.sendSlackNotification(uuid, channel)
-                        }
                     }
                     throw e
                 } finally {

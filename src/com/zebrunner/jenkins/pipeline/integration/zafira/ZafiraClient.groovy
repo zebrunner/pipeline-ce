@@ -115,18 +115,6 @@ class ZafiraClient extends HttpClient {
         return sendRequest(parameters)
     }
 
-    public def sendSlackNotification(uuid, channels) {
-        if (!isZafiraConnected()) {
-            return
-        }
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'GET',
-                          validResponseCodes: "200",
-                          url               : this.serviceURL + "/api/reporting/api/slack/testrun/${uuid}/finish?channels=${channels}"]
-        return sendRequest(parameters)
-    }
-
     public def exportTcmData(uuid, tool) {
         if (!isZafiraConnected()) {
             return
