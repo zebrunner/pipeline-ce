@@ -807,10 +807,10 @@ public class TestNG extends Runner {
             && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
             // Ignore maven build result if Zafira integration is enabled
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
-                            -Dzafira_enabled=true \
+                            -Dzafira_enabled=false \
                             -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
-                            -Dreporting.enabled=true \
+                            -Dreporting.enabled=false \
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
