@@ -124,10 +124,11 @@ class ZafiraClient extends HttpClient {
             assignee: assignee,
             searchInterval: defaultSearchInterval
 
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-        
         logger.debug("REQUEST: " + jsonBuilder.toPrettyString())
+        
+        String requestBody = jsonBuilder.toString()
+        jsonBuilder = null        
+        
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
                           contentType       : 'APPLICATION_JSON',
                           httpMode          : 'POST',
