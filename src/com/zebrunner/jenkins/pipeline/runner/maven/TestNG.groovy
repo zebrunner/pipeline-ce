@@ -515,7 +515,7 @@ public class TestNG extends Runner {
                     clean()
                     customNotify()
 
-                    logger.info("testRun: " + testRun)
+                    logger.debug("testRun: " + testRun)
                     //TODO: try to find projectId/activeProjectId
                     if (Configuration.get("testrail_enabled")?.toBoolean()) {
                         def isIncludeAll = Configuration.get("include_all")?.toBoolean()
