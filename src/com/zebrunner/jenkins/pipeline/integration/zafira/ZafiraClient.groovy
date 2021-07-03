@@ -114,6 +114,28 @@ class ZafiraClient extends HttpClient {
                           url               : this.serviceURL + "/api/reporting/api/tests/runs/${uuid}/email?filter=${filter}"]
         return sendRequest(parameters)
     }
+    
+    public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
+        JsonBuilder jsonBuilder = new JsonBuilder()
+        jsonBuilder testRunName: testRunName,
+            runExists: isExists,
+            includeAll: isIncludeAll,
+            milestone: milestoneName,
+            assignee: assignee,
+            searchInterval: defaultSearchInterval
+
+        String requestBody = jsonBuilder.toString()
+        jsonBuilder = null
+        
+        logger.debug("REQUEST:\n" + formatJson(jsonBuilder))
+        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
+                          contentType       : 'APPLICATION_JSON',
+                          httpMode          : 'POST',
+                          requestBody       : requestBody,
+                          validResponseCodes: "200:401",
+                          url:              this.serviceURL + "/v1/integrations/testrail/results?projectId=${testRun.activeProjectId}&testRunId={testRun.id}"]
+        return sendRequestFormatted(parameters)
+    }
 
     public def exportTcmData(uuid, tool) {
         if (!isZafiraConnected()) {
@@ -172,8 +194,7 @@ class ZafiraClient extends HttpClient {
 
         return sendRequestFormatted(parameters)
     }
-
-
+    
     public def createLaunchers(jenkinsJobsScanResult) {
         if (!isZafiraConnected()) {
             return
