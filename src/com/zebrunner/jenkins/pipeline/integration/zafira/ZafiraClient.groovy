@@ -120,7 +120,7 @@ class ZafiraClient extends HttpClient {
         jsonBuilder testRunName: testRunName,
             runExists: isExists,
             includeAll: isIncludeAll,
-            milestone: milestoneName,
+            milestone: "testMilestone",
             assignee: assignee,
             searchInterval: defaultSearchInterval
 
