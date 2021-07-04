@@ -124,7 +124,7 @@ class ZafiraClient extends HttpClient {
             assignee: assignee,
             searchInterval: defaultSearchInterval
 
-        logger.debug("REQUEST: " + jsonBuilder.toPrettyString())
+        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
         
         String requestBody = jsonBuilder.toString()
         jsonBuilder = null        
