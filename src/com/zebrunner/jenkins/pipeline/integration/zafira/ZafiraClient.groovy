@@ -117,10 +117,10 @@ class ZafiraClient extends HttpClient {
     
     public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
         JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder testRunName: testRunName,
+        jsonBuilder testRunName: "testRunName",
             runExists: isExists,
             includeAll: isIncludeAll,
-            milestone: "testMilestone",
+            milestone: milestoneName,
             assignee: assignee,
             searchInterval: defaultSearchInterval
 
