@@ -134,7 +134,7 @@ class ZafiraClient extends HttpClient {
                           httpMode          : 'POST',
                           requestBody       : requestBody,
                           validResponseCodes: "200:401",
-                          url:              this.serviceURL + "/v1/integrations/testrail/results?projectId=${testRun.activeProjectId}&testRunId=${testRun.id}"]
+                          url:              this.serviceURL + "/api/reporting/v1/integrations/testrail/results?projectId=${testRun.activeProjectId}&testRunId=${testRun.id}"]
         return sendRequestFormatted(parameters)
     }
 
