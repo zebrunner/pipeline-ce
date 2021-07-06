@@ -32,7 +32,7 @@ class ZafiraUpdater {
         def response = zc.smartRerun()
         logger.info("Results : " + response.size())
     }
-
+    
     public def abortTestRun(uuid, currentBuild) {
         def abortedTestRun
         currentBuild.result = BuildResult.FAILURE
@@ -180,14 +180,14 @@ class ZafiraUpdater {
         }
     }
 
-    public def sendSlackNotification(uuid, channels) {
-        if (!isParamEmpty(channels)) {
-            return zc.sendSlackNotification(uuid, channels)
-        }
-    }
-
     public boolean isZafiraRerun(uuid) {
         return !isParamEmpty(zc.getTestRunByCiRunId(uuid))
+    }
+    
+    public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
+        def response = zc.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
+        //TODO: implement any verification
+        logger.info("Response: " + formatJson(response))
     }
 
     protected boolean isFailure(testRunStatus) {
