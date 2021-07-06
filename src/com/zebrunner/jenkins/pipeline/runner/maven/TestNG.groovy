@@ -739,7 +739,6 @@ public class TestNG extends Runner {
                 "job_type",
                 "repoUrl",
                 "sub_project",
-                "slack_channels",
                 "BuildPriority",
                 "queue_registration",
                 "overrideFields",
