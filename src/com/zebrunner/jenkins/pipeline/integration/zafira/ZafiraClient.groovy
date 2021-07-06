@@ -22,33 +22,6 @@ class ZafiraClient extends HttpClient {
         this.refreshToken = Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)
     }
 
-    public def queueZafiraTestRun(uuid) {
-        if (!isZafiraConnected()) {
-            return
-        }
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder jobUrl: replaceTrailingSlash(Configuration.get(Configuration.Parameter.JOB_URL)),
-                buildNumber: Configuration.get(Configuration.Parameter.BUILD_NUMBER),
-                branch: Configuration.get("branch"),
-                env: Configuration.get("env"),
-                ciRunId: uuid,
-                ciParentUrl: replaceTrailingSlash(Configuration.get("ci_parent_url")),
-                ciParentBuild: Configuration.get("ci_parent_build"),
-                project: Configuration.get("zafira_project")
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:401",
-                          url               : this.serviceURL + "/api/reporting/api/tests/runs/queue"]
-        return sendRequestFormatted(parameters)
-    }
-
     public def smartRerun() {
         if (!isZafiraConnected()) {
             return
@@ -195,26 +168,17 @@ class ZafiraClient extends HttpClient {
 
         return sendRequestFormatted(parameters)
     }
-    
-    public def createLaunchers(jenkinsJobsScanResult) {
+
+    public def getTestRunResults(testRunId) {
         if (!isZafiraConnected()) {
             return
         }
-
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder jenkinsJobsScanResult
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        logger.debug("token value: ${authToken}")
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
                           contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
+                          httpMode          : 'GET',
                           validResponseCodes: "200:404",
-                          url               : this.serviceURL + "/api/reporting/api/launchers/create"]
+                          url               : this.serviceURL + "/api/reporting/api/tests/runs/${testRunId}/results"]
+
         return sendRequestFormatted(parameters)
     }
 

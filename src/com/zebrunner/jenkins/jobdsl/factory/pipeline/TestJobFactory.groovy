@@ -12,7 +12,6 @@ public class TestJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def sub_project
-    def zafira_project
     def suitePath
     def suiteName
     def orgRepoScheduling
@@ -20,14 +19,13 @@ public class TestJobFactory extends PipelineFactory {
     def threadCount
     def dataProviderThreadCount
 
-    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, zafira_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
+    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
         this.folder = folder
         this.description = jobDesc
         this.pipelineScript = pipelineScript
         this.repoUrl = repoUrl
         this.branch = branch
         this.sub_project = sub_project
-        this.zafira_project = zafira_project
         this.suitePath = suitePath
         this.suiteName = suiteName
         this.orgRepoScheduling = orgRepoScheduling
@@ -94,12 +92,23 @@ public class TestJobFactory extends PipelineFactory {
                         }
                     }
                 }
+                // https://github.com/zebrunner/pipeline-ce/issues/143
+                if (!isParamEmpty(currentSuite.getParameter("jenkinsLocale"))) {
+                    activeChoiceParam("locale") {
+                        description("Please select locale(s) to run")
+                        filterable()
+                        choiceType("MULTI_SELECT")
+                        groovyScript {
+                            script(this.listToString(currentSuite, "jenkinsLocale"))
+                            fallbackScript("return ['error']")
+                        }
+                    }
+                }
                 if (currentSuite.getParameter("jenkinsJobDisabled")?.toBoolean()) {
                     disabled()
                 }
                 def defaultMobilePool = getSuiteParameter("ANY", "jenkinsMobileDefaultPool", currentSuite)
                 def autoScreenshot = getSuiteParameter("false", "jenkinsAutoScreenshot", currentSuite).toBoolean()
-                def enableVideo = getSuiteParameter("true", "jenkinsEnableVideo", currentSuite).toBoolean()
 
                 def jobType = getSuiteParameter("api", "jenkinsJobType", currentSuite).toLowerCase()
                 // TODO: add ios_web, android_web if needed
@@ -113,31 +122,25 @@ public class TestJobFactory extends PipelineFactory {
                         configure stringParam('capabilities', getSuiteParameter("browserName=chrome", "capabilities", currentSuite), 'Provide semicolon separated W3C driver capabilities.')
                         configure addExtensibleChoice('custom_capabilities', 'gc_CUSTOM_CAPABILITIES', "Set to NULL to run against Selenium Grid on Jenkin's Slave else, select an option for Browserstack.", 'NULL')
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         break
                     case "android":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "android-tv":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "android-web":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=ANDROID;browserName=chrome;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "ios":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=iOS;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                     case "ios-web":
                         booleanParam('auto_screenshot', autoScreenshot, 'Generate screenshots automatically during the test')
-                        booleanParam('enableVideo', enableVideo, 'Enable video recording')
                         configure stringParam('capabilities', getSuiteParameter("platformName=iOS;browserName=safari;deviceName=" + defaultMobilePool, "capabilities", currentSuite), 'Reserved for any semicolon separated W3C driver capabilities.')
                         break
                 // web ios: capabilities: browserName=safari, deviceName=ANY
@@ -162,21 +165,22 @@ public class TestJobFactory extends PipelineFactory {
                 configure stringParam('branch', this.branch, "repository branch to run against")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
-                configure addHiddenParameter('zafira_project', '', zafira_project)
-                configure addHiddenParameter('suite', '', suiteName)
+                if (!isParamEmpty(suiteName)) {
+                    configure addHiddenParameter('suite', '', suiteName)
+                }
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
                 configure addHiddenParameter('slack_channels', '', getSuiteParameter("", "jenkinsSlackChannels", currentSuite))
                 configure addHiddenParameter('failure_slack_channels', '', getSuiteParameter("", "jenkinsFailedSlackChannels", currentSuite))
                 configure addExtensibleChoice('ci_run_id', '', 'import static java.util.UUID.randomUUID\nreturn [randomUUID()]')
                 configure addExtensibleChoice('BuildPriority', "gc_BUILD_PRIORITY", "Priority of execution. Lower number means higher priority", "3")
-                configure addHiddenParameter('queue_registration', '', getSuiteParameter("true", "jenkinsQueueRegistration", currentSuite))
                 stringParam('thread_count', this.threadCount, 'number of threads, number')
                 if (!"1".equals(this.dataProviderThreadCount)) {
                     stringParam('data_provider_thread_count', this.dataProviderThreadCount, 'number of threads for data provider, number')
                 }
                 stringParam('email_list', getSuiteParameter("", "jenkinsEmail", currentSuite), 'List of Users to be emailed after the test')
                 configure addHiddenParameter('failure_email_list', '', getSuiteParameter("", "jenkinsFailedEmail", currentSuite))
+                configure addHiddenParameter('failure_email_pass_rate_threshold', '', getSuiteParameter("", "jenkinsFailedEmailPassRateThreshold", currentSuite))
                 choiceParam('retry_count', getRetryCountArray(currentSuite), 'Number of Times to Retry a Failed Test')
                 booleanParam('rerun_failures', false, 'During \"Rebuild\" pick it to execute only failed cases')
                 configure addHiddenParameter('overrideFields', '', getSuiteParameter("", "overrideFields", currentSuite))

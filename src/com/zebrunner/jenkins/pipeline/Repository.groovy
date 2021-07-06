@@ -132,10 +132,8 @@ class Repository extends BaseObject {
 
             def isTestNgRunner = extendsClass([TestNG])
             
-            def prJobDesc = "Verify compilation and/or do Sonar PullRequest analysis"
-            def pushJobDesc = "To finish GitHub WebHook setup, please, follow the steps below:\n- Go to your GitHub repository\n- Click \"Settings\" tab\n- Click \"Webhooks\" menu option\n" +
-                              "- Click \"Add webhook\" button\n- Type http://your-jenkins-domain.com/github-webhook/ into \"Payload URL\" field\n" +
-                              "- Select application/json in \"Content Type\" field\n- Tick \"Send me everything.\" option\n- Click \"Add webhook\" button"
+            def prJobDesc = "Follow Configuration Guide steps to setup WebHook: https://zebrunner.github.io/zebrunner/config-guide/#setup-webhook-events-push-and-pull-requests"
+            def pushJobDesc = "Follow Configuration Guide steps to setup WebHook: https://zebrunner.github.io/zebrunner/config-guide/#setup-webhook-events-push-and-pull-requests"
 
 
             // TODO: move folder and main trigger job creation onto the createRepository method

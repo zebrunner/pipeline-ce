@@ -362,7 +362,6 @@ public class Executor {
                                     "runnerClass",
                                     "BuildPriority",
                                     "auto_screenshot",
-                                    "enableVideo",
                                     "recoveryMode",
                                     "capabilities"
 
@@ -440,8 +439,8 @@ public class Executor {
             if (parameter.contains("token") || parameter.contains("TOKEN")) {
                 def arrayOfString = parameter.split("=")
                 resultString = arrayOfString[0] + "=********"
-            } else if (parameter.contains("-Dselenium_host")) {
-                def pattern = "(\\-Dselenium_host=http:\\/\\/.+:)\\S+(@.+)"
+            } else if (parameter.contains("-Dselenium_url")) {
+                def pattern = "(\\-Dselenium_url=http:\\/\\/.+:)\\S+(@.+)"
                 Matcher matcher = Pattern.compile(pattern).matcher(parameter)
                 while (matcher.find()) {
                     resultString = matcher.group(1) + "********" + matcher.group(2)
