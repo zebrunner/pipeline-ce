@@ -170,8 +170,6 @@ public class TestJobFactory extends PipelineFactory {
                 }
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
-                configure addHiddenParameter('slack_channels', '', getSuiteParameter("", "jenkinsSlackChannels", currentSuite))
-                configure addHiddenParameter('failure_slack_channels', '', getSuiteParameter("", "jenkinsFailedSlackChannels", currentSuite))
                 configure addExtensibleChoice('ci_run_id', '', 'import static java.util.UUID.randomUUID\nreturn [randomUUID()]')
                 configure addExtensibleChoice('BuildPriority', "gc_BUILD_PRIORITY", "Priority of execution. Lower number means higher priority", "3")
                 stringParam('thread_count', this.threadCount, 'number of threads, number')
