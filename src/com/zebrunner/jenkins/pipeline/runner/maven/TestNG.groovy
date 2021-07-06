@@ -117,7 +117,7 @@ public class TestNG extends Runner {
         def isExists = Configuration.get("run_exists")?.toBoolean()
         def testRunName = !isParamEmpty(Configuration.get("run_name")) ? Configuration.get("run_name") : ""
         // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
-        int defaultSearchInterval = Configuration.get("search_interval")
+        def defaultSearchInterval = Configuration.get("search_interval")
         
         zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
         
