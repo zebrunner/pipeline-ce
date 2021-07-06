@@ -4,8 +4,6 @@ import com.zebrunner.jenkins.jobdsl.factory.pipeline.CronJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
 import com.zebrunner.jenkins.pipeline.Configuration
-import com.zebrunner.jenkins.pipeline.integration.qtest.QTestUpdater
-import com.zebrunner.jenkins.pipeline.integration.testrail.TestRailUpdater
 import com.zebrunner.jenkins.pipeline.integration.zafira.StatusMapper
 import com.zebrunner.jenkins.pipeline.integration.zafira.ZafiraUpdater
 import com.wangyin.parameter.WHideParameterDefinition
@@ -40,8 +38,6 @@ public class TestNG extends Runner {
     protected def onlyUpdated = false
     protected def uuid
     protected ZafiraUpdater zafiraUpdater
-    protected TestRailUpdater testRailUpdater
-    protected QTestUpdater qTestUpdater
 
     protected qpsInfraCrossBrowserMatrixName = "qps-infra-matrix"
     protected qpsInfraCrossBrowserMatrixValue = "browser: chrome; browser: firefox" // explicit versions removed as we gonna to deliver auto upgrade for browsers
@@ -102,23 +98,25 @@ public class TestNG extends Runner {
             }
         }
     }
-
-	public void sendQTestResults() {
-		// set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-		setReportingCreds()
-		setQTestCreds()
-
-		def ci_run_id = Configuration.get("ci_run_id")
-		qTestUpdater.updateTestRun(ci_run_id)
-	}
-
-	public void sendTestRailResults() {
-		// set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-		setReportingCreds()
-		setTestRailCreds()
-
-		testRailUpdater.updateTestRun(Configuration.get("ci_run_id"))
-	}
+    
+    public void sendTestRailResults() {
+        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
+        setReportingCreds()
+        def uuid = Configuration.get("ci_run_id")
+        def testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
+        
+        def isIncludeAll = Configuration.get("include_all")?.toBoolean()
+        def milestoneName = !isParamEmpty(Configuration.get("milestone")) ? Configuration.get("milestone") : ""
+        def assignee = !isParamEmpty(Configuration.get("assignee")) ? Configuration.get("assignee") : ""
+        def isExists = Configuration.get("run_exists")?.toBoolean()
+        def testRunName = !isParamEmpty(Configuration.get("run_name")) ? Configuration.get("run_name") : ""
+        // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
+        def defaultSearchInterval = Configuration.get("search_interval")
+        
+        zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
+        
+    }
+    
 
 	protected void scan() {
 
@@ -450,7 +448,6 @@ public class TestNG extends Runner {
                         context.timeout(time: Integer.valueOf(Configuration.get(Configuration.Parameter.JOB_MAX_RUN_TIME)), unit: 'MINUTES') {
                             buildJob()
                         }
-                        
                     }
                 } catch (Exception e) {
                     currentBuild.result = BuildResult.FAILURE // making build failure explicitly in case of any exception in build/notify block
@@ -505,31 +502,22 @@ public class TestNG extends Runner {
                     clean()
                     customNotify()
 
-                    if (Configuration.get("testrail_enabled")?.toBoolean() && !isParamEmpty(getCurrentFolderFullName(Configuration.TESTRAIL_UPDATER_JOBNAME))) {
-                        String jobName = getCurrentFolderFullName(Configuration.TESTRAIL_UPDATER_JOBNAME)
-
-                        // TODO: rename include_all to something testrail related
-                        def includeAll = Configuration.get("include_all")?.toBoolean()
-                        def milestoneName = !isParamEmpty(Configuration.get("testrail_milestone"))?Configuration.get("testrail_milestone"):""
-                        def runName = !isParamEmpty(Configuration.get("testrail_run_name"))?Configuration.get("testrail_run_name"):""
-                        def runExists = Configuration.get("run_exists")?.toBoolean()
-                        def assignee = !isParamEmpty(Configuration.get("testrail_assignee"))?Configuration.get("testrail_assignee"):""
-
-                        context.node("master") {
-                            context.build job: jobName,
-                                    propagate: false,
-                                    wait: false,
-                                    parameters: [
-                                            context.string(name: 'ci_run_id', value: uuid),
-                                            context.booleanParam(name: 'include_all', value: includeAll),
-                                            context.string(name: 'milestone', value: milestoneName),
-                                            context.string(name: 'run_name', value: runName),
-                                            context.booleanParam(name: 'run_exists', value: runExists),
-                                            context.string(name: 'assignee', value: assignee)
-                                    ]
-                        }
+                    logger.debug("testRun: " + testRun)
+                    //TODO: try to find projectId/activeProjectId
+                    if (Configuration.get("testrail_enabled")?.toBoolean()) {
+                        def isIncludeAll = Configuration.get("include_all")?.toBoolean()
+                        def milestoneName = !isParamEmpty(Configuration.get("testrail_milestone")) ? Configuration.get("testrail_milestone") : ""
+                        def assignee = !isParamEmpty(Configuration.get("testrail_assignee")) ? Configuration.get("testrail_assignee") : ""
+                        def isExists = Configuration.get("run_exists")?.toBoolean()
+                        def testRunName = !isParamEmpty(Configuration.get("testrail_run_name")) ? Configuration.get("testrail_run_name") : ""
+                        // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
+                        int defaultSearchInterval = 7
+                        zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
                     }
                     if (Configuration.get("qtest_enabled")?.toBoolean() && !isParamEmpty(getCurrentFolderFullName(Configuration.QTEST_UPDATER_JOBNAME))) {
+                        //TODO: decomission qtest support via pipeline
+                        throw new RuntimeException("QTest imtegration temporary blocked! Need communicate with reporting team to enable it back!")
+/*                        
                         String jobName = getCurrentFolderFullName(Configuration.QTEST_UPDATER_JOBNAME)
                         def os = !isParamEmpty(Configuration.get("capabilities.os"))?Configuration.get("capabilities.os"):""
                         def osVersion = !isParamEmpty(Configuration.get("capabilities.os_version"))?Configuration.get("capabilities.os_version"):""
@@ -545,6 +533,7 @@ public class TestNG extends Runner {
                                             context.string(name: 'browser', value: browser)
                                     ]
                         }
+*/                        
                     }
                     
                 }
@@ -691,27 +680,6 @@ public class TestNG extends Runner {
         // obligatory init zafiraUpdater after getting valid url and token
         zafiraUpdater = new ZafiraUpdater(context)
     }
-
-	protected void setTestRailCreds() {
-		// update testRail integration items from credentials
-		Configuration.set(Configuration.Parameter.TESTRAIL_SERVICE_URL, getToken(Configuration.CREDS_TESTRAIL_SERVICE_URL))
-        
-        def (userName, userPassword) = getUserCreds(Configuration.CREDS_TESTRAIL)
-        Configuration.set(Configuration.Parameter.TESTRAIL_USERNAME, userName)
-        Configuration.set(Configuration.Parameter.TESTRAIL_PASSWORD, userPassword)
-        
-		// obligatory init testrailUpdater after getting valid url and creds reading
-		testRailUpdater = new TestRailUpdater(context)
-	}
-
-	protected void setQTestCreds() {
-		// update QTest serviceUrl and accessToken parameter based on values from credentials
-		Configuration.set(Configuration.Parameter.QTEST_SERVICE_URL, getToken(Configuration.CREDS_QTEST_SERVICE_URL))
-		Configuration.set(Configuration.Parameter.QTEST_ACCESS_TOKEN, getToken(Configuration.CREDS_QTEST_ACCESS_TOKEN))
-
-		// obligatory init qtestUpdater after getting valid url and token
-		qTestUpdater = new QTestUpdater(context)
-	}
 
     protected String getMavenGoals() {
         // When zafira is disabled use Maven TestNG build status as job status. RetryCount can't be supported well!
