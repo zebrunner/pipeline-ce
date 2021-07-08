@@ -144,7 +144,7 @@ public abstract class BaseObject {
         if (slashIndex == -1) {
             //equals means just root folder, i.e. empty org name
             orgFolderName = ""
-        } else if ((jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater") || jobName.contains("testrail-updater"))) {
+        } else if ((jobName.contains("RegisterRepository") || jobName.contains("launcher") || jobName.contains("qtest-updater"))) {
             // cut everything after latest slash:
             // qps/RegisterRepository -> qps
             // test/qps/RegisterRepository -> test/qps

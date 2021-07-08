@@ -186,7 +186,7 @@ class ZafiraUpdater {
     
     public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
         def response = zc.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-        //TODO: implement any verification
+        //TODO: implement verification
         logger.info("Response: " + formatJson(response))
     }
 

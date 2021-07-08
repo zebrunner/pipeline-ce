@@ -99,25 +99,6 @@ public class TestNG extends Runner {
         }
     }
     
-    public void sendTestRailResults() {
-        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-        setReportingCreds()
-        def uuid = Configuration.get("ci_run_id")
-        def testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-        
-        def isIncludeAll = Configuration.get("include_all")?.toBoolean()
-        def milestoneName = !isParamEmpty(Configuration.get("milestone")) ? Configuration.get("milestone") : ""
-        def assignee = !isParamEmpty(Configuration.get("assignee")) ? Configuration.get("assignee") : ""
-        def isExists = Configuration.get("run_exists")?.toBoolean()
-        def testRunName = !isParamEmpty(Configuration.get("run_name")) ? Configuration.get("run_name") : ""
-        // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
-        def defaultSearchInterval = Configuration.get("search_interval")
-        
-        zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-        
-    }
-    
-
 	protected void scan() {
 
         context.stage("Scan Repository") {
@@ -729,9 +710,6 @@ public class TestNG extends Runner {
                 "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
-                "TESTRAIL_SERVICE_URL",
-                "TESTRAIL_USERNAME",
-                "TESTRAIL_PASSWORD",
                 "testrail_enabled",
                 "QTEST_SERVICE_URL",
                 "QTEST_ACCESS_TOKEN",

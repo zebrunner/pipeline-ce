@@ -13,13 +13,10 @@ public class Configuration {
     public final static def CREDS_REPORTING_SERVICE_URL = "reporting_service_url"
     public final static def CREDS_REPORTING_ACCESS_TOKEN = "reporting_access_token"
     
-    public final static def CREDS_TESTRAIL_SERVICE_URL = "testrail_service_url"
-    public final static def CREDS_TESTRAIL = "testrail_creds"
     public final static def CREDS_QTEST_SERVICE_URL = "qtest_service_url"
     public final static def CREDS_QTEST_ACCESS_TOKEN = "qtest_token"
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
-    public final static def TESTRAIL_UPDATER_JOBNAME = "testrail-updater"
     public final static def QTEST_UPDATER_JOBNAME = "qtest-updater"
 
     private static final String CAPABILITIES = "capabilities"
@@ -72,11 +69,6 @@ public class Configuration {
         TIMEZONE("user.timezone", "UTC"),
 
         BROWSERSTACK_ACCESS_KEY("BROWSERSTACK_ACCESS_KEY", "\${BROWSERSTACK_ACCESS_KEY}", true),
-
-        //Make sure that URLs have trailing slash
-        TESTRAIL_SERVICE_URL("TESTRAIL_SERVICE_URL", ""), // "https://<CHANGE_ME>.testrail.com?/api/v2/"
-        TESTRAIL_USERNAME("TESTRAIL_USERNAME", ""),
-        TESTRAIL_PASSWORD("TESTRAIL_PASSWORD", "", true),
 
         QTEST_SERVICE_URL("QTEST_SERVICE_URL", ""), // "https://<CHANGE_ME>/api/v3/"
         QTEST_ACCESS_TOKEN("QTEST_ACCESS_TOKEN", "", true),
