@@ -711,8 +711,6 @@ public class TestNG extends Runner {
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
                 "testrail_enabled",
-                "QTEST_SERVICE_URL",
-                "QTEST_ACCESS_TOKEN",
                 "qtest_enabled",
                 "job_type",
                 "repoUrl",

@@ -13,11 +13,7 @@ public class Configuration {
     public final static def CREDS_REPORTING_SERVICE_URL = "reporting_service_url"
     public final static def CREDS_REPORTING_ACCESS_TOKEN = "reporting_access_token"
     
-    public final static def CREDS_QTEST_SERVICE_URL = "qtest_service_url"
-    public final static def CREDS_QTEST_ACCESS_TOKEN = "qtest_token"
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
-
-    public final static def QTEST_UPDATER_JOBNAME = "qtest-updater"
 
     private static final String CAPABILITIES = "capabilities"
 
@@ -69,9 +65,6 @@ public class Configuration {
         TIMEZONE("user.timezone", "UTC"),
 
         BROWSERSTACK_ACCESS_KEY("BROWSERSTACK_ACCESS_KEY", "\${BROWSERSTACK_ACCESS_KEY}", true),
-
-        QTEST_SERVICE_URL("QTEST_SERVICE_URL", ""), // "https://<CHANGE_ME>/api/v3/"
-        QTEST_ACCESS_TOKEN("QTEST_ACCESS_TOKEN", "", true),
 
         DOCKER_HUB_USERNAME("DOCKER_HUB_USERNAME", mustOverride),
         DOCKER_HUB_PASSWORD("DOCKER_HUB_PASSWORD", mustOverride)
