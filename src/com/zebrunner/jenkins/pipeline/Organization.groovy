@@ -3,8 +3,6 @@ package com.zebrunner.jenkins.pipeline
 import com.zebrunner.jenkins.BaseObject
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.LauncherJobFactory
-import com.zebrunner.jenkins.jobdsl.factory.pipeline.QTestJobFactory
-import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestRailJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.RegisterRepositoryJobFactory
 import com.zebrunner.jenkins.pipeline.integration.zebrunner.ZebrunnerUpdater
 import com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty
@@ -64,34 +62,6 @@ class Organization extends BaseObject {
                 deleteFolder(folder)
                 clean()
             }
-        }
-    }
-
-
-    public def registerQTestCredentials() {
-        logger.info("Organization->registerQTestCredentials")
-        context.node('master') {
-            def orgFolderName = Configuration.get("folderName")
-
-            // Example: https://<CHANGE_ME>/api/v3/
-            def url = Configuration.get("url")
-            def token = Configuration.get("token")
-
-            registerQTestCredentials(orgFolderName, url, token)
-        }
-    }
-
-    public def registerTestRailCredentials() {
-        logger.info("Organization->registerTestRailCredentials")
-        context.node('master') {
-            def orgFolderName = Configuration.get("folderName")
-
-            // Example: https://mytenant.testrail.com?/api/v2/
-            def url = Configuration.get("url")
-            def username = Configuration.get("username")
-            def password = Configuration.get("password")
-
-            registerTestRailCredentials(orgFolderName, url, username, password)
         }
     }
 
@@ -259,14 +229,6 @@ class Organization extends BaseObject {
         return "${getPipelineLibrary()}\nimport com.zebrunner.jenkins.pipeline.Repository;\nnew Repository(this).register()"
     }
 
-    protected String getTestRailScript() {
-        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendTestRailResults()"
-    }
-
-    protected String getQTestScript() {
-        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).sendQTestResults()"
-    }
-
     protected def generateCreds() {
         if (!isParamEmpty(this.reportingServiceUrl) && !isParamEmpty(this.reportingAccessToken)) {
             registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
@@ -354,60 +316,6 @@ class Organization extends BaseObject {
 
         updateJenkinsCredentials(reportingURLCredentials, "Reporting service URL", Configuration.Parameter.REPORTING_SERVICE_URL.getKey(), reportingServiceUrl)
         updateJenkinsCredentials(reportingTokenCredentials, "Reporting access token", Configuration.Parameter.REPORTING_ACCESS_TOKEN.getKey(), reportingAccessToken)
-    }
-
-    protected def registerTestRailCredentials(orgFolderName, url, username, password) {
-        def testrailURLCredentials = Configuration.CREDS_TESTRAIL_SERVICE_URL
-        def testrailUserCredentials = Configuration.CREDS_TESTRAIL
-
-        if (!isParamEmpty(orgFolderName)) {
-            testrailURLCredentials = orgFolderName + "-" + testrailURLCredentials
-            testrailUserCredentials = orgFolderName + "-" + testrailUserCredentials
-        }
-
-        if (isParamEmpty(url)) {
-            throw new RuntimeException("Unable to register TestRail credentials! Required field 'url' is missing!")
-        }
-
-        if (isParamEmpty(username)) {
-            throw new RuntimeException("Unable to register TestRail credentials! Required field 'username' is missing!")
-        }
-
-        if (isParamEmpty(password)) {
-            throw new RuntimeException("Unable to register TestRail credentials! Required field 'password' is missing!")
-        }
-
-        updateJenkinsCredentials(testrailURLCredentials, "TestRail Service API URL", Configuration.Parameter.TESTRAIL_SERVICE_URL.getKey(), url)
-        updateJenkinsCredentials(testrailUserCredentials, "TestRaul User credentials", username, password)
-
-        registerObject("testrail_job", new TestRailJobFactory(orgFolderName, getTestRailScript(), Configuration.TESTRAIL_UPDATER_JOBNAME, "Custom job testrail"))
-
-        factoryRunner.run(dslObjects)
-    }
-
-    protected def registerQTestCredentials(orgFolderName, url, token) {
-        def qtestURLCredentials = Configuration.CREDS_QTEST_SERVICE_URL
-        def qtestTokenCredentials = Configuration.CREDS_QTEST_ACCESS_TOKEN
-
-        if (!isParamEmpty(orgFolderName)) {
-            qtestURLCredentials = orgFolderName + "-" + qtestURLCredentials
-            qtestTokenCredentials = orgFolderName + "-" + qtestTokenCredentials
-        }
-
-        if (isParamEmpty(url)) {
-            throw new RuntimeException("Unable to register QTest credentials! Required field 'url' is missing!")
-        }
-
-        if (isParamEmpty(token)) {
-            throw new RuntimeException("Unable to register QTest credentials! Required field 'token' is missing!")
-        }
-
-        updateJenkinsCredentials(qtestURLCredentials, "QTest Service API URL", Configuration.Parameter.QTEST_SERVICE_URL.getKey(), url)
-        updateJenkinsCredentials(qtestTokenCredentials, "QTest access token", Configuration.Parameter.QTEST_ACCESS_TOKEN.getKey(), token)
-
-        registerObject("qtest_job", new QTestJobFactory(orgFolderName, getQTestScript(), Configuration.QTEST_UPDATER_JOBNAME, "Custom job qtest"))
-
-        factoryRunner.run(dslObjects)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {
