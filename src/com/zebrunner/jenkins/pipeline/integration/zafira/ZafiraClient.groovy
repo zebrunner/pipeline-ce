@@ -111,18 +111,6 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
 
-    public def exportTcmData(uuid, tool) {
-        if (!isZafiraConnected()) {
-            return
-        }
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'GET',
-                          validResponseCodes: "200",
-                          url               : this.serviceURL + "/api/reporting/api/tcm/export/${uuid}?tool=${tool}"]
-        return sendRequestFormatted(parameters)
-    }
-
     public def sendFailureEmail(uuid, emailList, suiteOwner, suiteRunner) {
         if (!isZafiraConnected()) {
             return

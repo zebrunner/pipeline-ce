@@ -99,25 +99,6 @@ public class TestNG extends Runner {
         }
     }
     
-    public void sendTestRailResults() {
-        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-        setReportingCreds()
-        def uuid = Configuration.get("ci_run_id")
-        def testRun = zafiraUpdater.getTestRunByCiRunId(uuid)
-        
-        def isIncludeAll = Configuration.get("include_all")?.toBoolean()
-        def milestoneName = !isParamEmpty(Configuration.get("milestone")) ? Configuration.get("milestone") : ""
-        def assignee = !isParamEmpty(Configuration.get("assignee")) ? Configuration.get("assignee") : ""
-        def isExists = Configuration.get("run_exists")?.toBoolean()
-        def testRunName = !isParamEmpty(Configuration.get("run_name")) ? Configuration.get("run_name") : ""
-        // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
-        def defaultSearchInterval = Configuration.get("search_interval")
-        
-        zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-        
-    }
-    
-
 	protected void scan() {
 
         context.stage("Scan Repository") {
@@ -467,31 +448,9 @@ public class TestNG extends Runner {
                             currentBuild.result = BuildResult.FAILURE
                             
                             def abortedTestRun = zafiraUpdater.abortTestRun(uuid, currentBuild)
-                            if ((!isParamEmpty(abortedTestRun)
-                                    && !StatusMapper.ZafiraStatus.ABORTED.name().equals(abortedTestRun.status)
-                                    && !BuildResult.ABORTED.name().equals(currentBuild.result)) || Configuration.get("notify_slack_on_abort")?.toBoolean()) {
-    
-                                // send failure slack notification to "failure_slack_channels" if applicable otherwise send to default one
-                                def channel = Configuration.get("failure_slack_channels")
-                                if (isParamEmpty(channel)) {
-                                    // reuse default channel for negative notification only if failure_slack_channels absent
-                                    channel = Configuration.get("slack_channels")
-                                }
-                                zafiraUpdater.sendSlackNotification(uuid, channel)
-                            }
                         }
                         
                         zafiraUpdater.sendZafiraEmail(uuid, overrideRecipients(Configuration.get("email_list")))
-                        
-                        def channel = Configuration.get("slack_channels")
-                        def failChannel = Configuration.get("failure_slack_channels")
-                        if (!StatusMapper.ZafiraStatus.PASSED.name().equals(testRun.status)
-                            && !isParamEmpty(failChannel)) {
-                            //redirect message to failChannel for non PASSED test run
-                            channel = failChannel
-                        }
-                        zafiraUpdater.sendSlackNotification(uuid, channel)
-
                         zafiraUpdater.exportZafiraReport(uuid, getWorkspace())
                         zafiraUpdater.setBuildResult(uuid, currentBuild)
                     }
@@ -751,17 +710,11 @@ public class TestNG extends Runner {
                 "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
-                "TESTRAIL_SERVICE_URL",
-                "TESTRAIL_USERNAME",
-                "TESTRAIL_PASSWORD",
                 "testrail_enabled",
-                "QTEST_SERVICE_URL",
-                "QTEST_ACCESS_TOKEN",
                 "qtest_enabled",
                 "job_type",
                 "repoUrl",
                 "sub_project",
-                "slack_channels",
                 "BuildPriority",
                 "queue_registration",
                 "overrideFields",
