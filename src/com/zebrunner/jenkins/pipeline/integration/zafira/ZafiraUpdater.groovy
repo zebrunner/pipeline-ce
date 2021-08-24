@@ -184,12 +184,6 @@ class ZafiraUpdater {
         return !isParamEmpty(zc.getTestRunByCiRunId(uuid))
     }
     
-    public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
-        def response = zc.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-        //TODO: implement verification
-        logger.info("Response: " + formatJson(response))
-    }
-
     protected boolean isFailure(testRunStatus) {
         return !"PASSED".equals(testRunStatus)
     }
