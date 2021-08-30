@@ -651,8 +651,8 @@ public class TestNG extends Runner {
             // Ignore maven build result if Zafira integration is enabled
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
                             -Dzafira_enabled=true \
-                            -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
+                            -Dzafira_service_url=https://tr.zebrunner.org \
+                            -Dzafira_access_token=FwbrH7i8jC3wNfhczXQwSsiaOV5999EsccdweorkXbnJ9VT6WR \
                             -Dreporting.enabled=true \
                             -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
                             -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
