@@ -654,8 +654,8 @@ public class TestNG extends Runner {
                             -Dzafira_service_url=https://tr.zebrunner.org \
                             -Dzafira_access_token=FwbrH7i8jC3wNfhczXQwSsiaOV5999EsccdweorkXbnJ9VT6WR \
                             -Dreporting.enabled=true \
-                            -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
+                            -Dreporting.server.hostname=https://tr.zebrunner.org \
+                            -Dreporting.server.accessToken=FwbrH7i8jC3wNfhczXQwSsiaOV5999EsccdweorkXbnJ9VT6WR \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
