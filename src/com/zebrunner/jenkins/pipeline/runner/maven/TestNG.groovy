@@ -662,7 +662,7 @@ public class TestNG extends Runner {
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "-Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-	-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+        -Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
         ${zafiraGoals} \
         -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
         -Dmax_screen_history=1 \
@@ -672,6 +672,11 @@ public class TestNG extends Runner {
         -Dgit_url=${Configuration.get("scm_url")} \
         -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
         -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
+        -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
+        -Dinclude_all=${Configuration.get("include_all")} \
+        -Dmilestone=${Configuration.get("milestone")} \
+        -Drun_name=${Configuration.get("run_name")} \
+        -Dassignee=${Configuration.get("assignee")} \
         clean test"
 
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
