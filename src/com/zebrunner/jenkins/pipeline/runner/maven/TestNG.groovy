@@ -672,6 +672,11 @@ public class TestNG extends Runner {
         -Dgit_url=${Configuration.get("scm_url")} \
         -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
         -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
+        -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
+        -Dinclude_all=${Configuration.get("include_all")} \
+        -Dmilestone=${Configuration.get("milestone")} \
+        -Drun_name=${Configuration.get("run_name")} \
+        -Dassignee=${Configuration.get("assignee")} \
         clean test"
 
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
@@ -1265,8 +1270,12 @@ public class TestNG extends Runner {
     
     protected def getProvider() {
         if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            //we have to set default provider otherwise 6.5 carina can't register artifacts correctly 
-            Configuration.set("capabilities.provider", "selenium")
+            // #177: setup default capabilities.provider=zebrunner by default
+            Configuration.set("capabilities.provider", "zebrunner")
+            
+            // 6.x carina is not supported anymore!
+//            //we have to set default provider otherwise 6.5 carina can't register artifacts correctly 
+//            Configuration.set("capabilities.provider", "selenium")
         } 
         
         return Configuration.get("capabilities.provider")
