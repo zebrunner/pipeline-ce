@@ -240,7 +240,8 @@ public class Configuration {
     }
 
     public static void set(String paramName, String value) {
-        vars.put(paramName, value)
+        // explicit setter should override in params as it has the highest priority order
+        params.put(paramName, value)
     }
 
     // simple way to reload as a bundle all project custom arguments from private pipeline
