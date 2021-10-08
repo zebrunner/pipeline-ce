@@ -583,6 +583,16 @@ public class TestNG extends Runner {
         Configuration.set("mobile_app_clear_cache", "true")
         Configuration.set("capabilities.autoGrantPermissions", "true")
         Configuration.set("capabilities.noSign", "true")
+        
+        /* https://issuetracker.google.com/issues/170867658?pli=1
+         * Multiple application reinstalls cause INSTALL_FAILED_INSUFFICIENT_STORAGE exception, which could only be fixed by device reboot 
+         */
+        
+        /* https://github.com/zebrunner/pipeline-ce/issues/185
+         * disable cache for android mobile testing by default
+         */
+        Configuration.set("capabilities.remoteAppsCacheLimit", "0")
+        
 //        Configuration.set("capabilities.appWaitDuration", "270000")
 //        Configuration.set("capabilities.androidInstallTimeout", "270000")
 //        Configuration.set("capabilities.adbExecTimeout", "270000")
