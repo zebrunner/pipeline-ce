@@ -92,7 +92,8 @@ abstract class Scm implements ISCM {
     public def clone(gitUrl, branch, subFolder) {
         context.stage('Checkout Repository') {
             logger.debug("REPO_URL: ${gitUrl}\n branch: ${branch}")
-            return context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            return scmVars
         }
     }
 
@@ -100,7 +101,8 @@ abstract class Scm implements ISCM {
         context.stage('Checkout Repository') {
             logger.debug("REPO_URL: ${this.repoUrl}\n prRefSpec: ${prRefSpec}\n branchSpec: ${branchSpec()}")
 
-            return context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
+            return scmVars
         }
     }
 
@@ -108,7 +110,8 @@ abstract class Scm implements ISCM {
         context.stage('Checkout Repository') {
             def branch = Configuration.get("branch")
             logger.debug("REPO_URL: ${this.repoUrl}\n branch: ${branch}")
-            return context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            return scmVars
         }
     }
 
