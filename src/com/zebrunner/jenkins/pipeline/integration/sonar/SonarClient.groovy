@@ -26,7 +26,7 @@ class SonarClient extends HttpClient {
             return goals
         }
 
-        goals = " -Dsonar.host.url=${this.serviceUrl} -Dsonar.log.level=${this.logger.pipelineLogLevel} -Dsonar.junit.reportPaths=target/surefire-reports/TEST-*.xml "
+        goals = " -Dsonar.host.url=${this.serviceUrl} -Dsonar.log.level=${this.logger.pipelineLogLevel} -Dsonar.junit.reportPaths=target/surefire-reports "
 
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
