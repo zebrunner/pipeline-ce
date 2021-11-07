@@ -9,8 +9,9 @@ class BuildJobFactory extends PipelineFactory {
     def branch
     def isDockerRepo
 
-    public BuildJobFactory(folder, pipelineScript, jobName, repoUrl, branch, isDockerRepo) {
+    public BuildJobFactory(folder, pipelineScript, jobName, desc, repoUrl, branch, isDockerRepo) {
         this.name = jobName
+        this.description = desc
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.repoUrl = repoUrl

@@ -132,15 +132,14 @@ class Repository extends BaseObject {
 
             def isTestNgRunner = extendsClass([TestNG])
             
-            def prJobDesc = "Follow Configuration Guide steps to setup WebHook: https://zebrunner.github.io/zebrunner/config-guide/#setup-webhook-events-push-and-pull-requests"
-            def pushJobDesc = "Follow Configuration Guide steps to setup WebHook: https://zebrunner.github.io/zebrunner/config-guide/#setup-webhook-events-push-and-pull-requests"
+            def systemJobDesc = "Configuration Guide: https://zebrunner.github.io/community-edition/config-guide"
 
 
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", pushJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", prJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs()))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs()))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
             if (isBuildToolDependent) {
@@ -156,7 +155,7 @@ class Repository extends BaseObject {
                     registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.repoUrl, this.branch))
                 }
 
-                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", this.repoUrl, this.branch, isDockerRunner))
+                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", systemJobDesc, this.repoUrl, this.branch, isDockerRunner))
             }
 
             logger.debug("before - factoryRunner.run(dslObjects)")
