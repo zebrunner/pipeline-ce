@@ -25,8 +25,10 @@ class SonarClient extends HttpClient {
             logger.warn("The sonarqube ${this.serviceUrl} server is not available, sonarqube scan will be skipped!")
             return goals
         }
-
-        goals = " -Dsonar.host.url=${this.serviceUrl} -Dsonar.log.level=${this.logger.pipelineLogLevel} -Dsonar.junit.reportPaths=target/surefire-reports/junitreports "
+        goals = " -Dsonar.host.url=${this.serviceUrl} \
+                  -Dsonar.log.level=${this.logger.pipelineLogLevel} \
+                  -Dsonar.jacoco.reportPaths=target/site/jacoco/jacoco.xml \
+                  -Dsonar.junit.reportPaths=target/surefire-reports "
 
         if (isPullRequest) {
             // goals needed to decorete pr with sonar analysis
