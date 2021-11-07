@@ -83,6 +83,13 @@ abstract class Scm implements ISCM {
             Configuration.set("scm_url", gitUrl)
             Configuration.set("scm_branch", branch)
             Configuration.set("scm_commit", scmVars.GIT_COMMIT)
+
+            /*
+             * among existing argument in scmVars populated from github are:
+             * GIT_BRANCH:origin/master, 
+             * GIT_COMMIT:sha1, GIT_PREVIOUS_COMMIT:sha1, GIT_PREVIOUS_SUCCESSFUL_COMMIT:sha1, 
+             * GIT_URL:git@github.com:zebrunner/carina.git]            
+             */
             
             return scmVars
         }
@@ -129,6 +136,7 @@ abstract class Scm implements ISCM {
             def subfolderExtension = [[$class: 'RelativeTargetDirectory', relativeTargetDir: subFolder]]
             checkoutParams.get("scm")["extensions"] = subfolderExtension
         }
+        
         return checkoutParams
     }
 
