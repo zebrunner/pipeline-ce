@@ -13,7 +13,7 @@ class GitHubClient extends HttpClient {
         this.authToken = authToken
     }
     
-    public def commentSha(repo, sha1, context, state, desc, targetUrl) {
+    public def commentSha(context, repo, sha1, state, desc, targetUrl) {
         JsonBuilder jsonBuilder = new JsonBuilder()
         jsonBuilder context: "build",
                 state: state,
