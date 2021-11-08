@@ -33,7 +33,8 @@ class GitHubClient extends HttpClient {
                           contentType  : 'APPLICATION_JSON',
                           httpMode     : 'GET',
                           url          : this.serviceURL + "/repos/${repo}/releases/latest",]
-        return sendRequestFormatted(parameters)
+        def response = sendRequestFormatted(parameters)
+        return response.tag_name
         
     }
 }
