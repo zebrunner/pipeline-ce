@@ -27,4 +27,13 @@ class GitHubClient extends HttpClient {
                           url          : this.serviceURL + "/repos/${repo}/statuses/${sha1}",]
         return sendRequestFormatted(parameters)
     }
+    
+    public def getLatestTag(repo) {
+        def parameters = [customHeaders: [[name: 'Authorization', value: "${authToken}"]],
+                          contentType  : 'APPLICATION_JSON',
+                          httpMode     : 'GET',
+                          url          : this.serviceURL + "/repos/${repo}/releases/latest",]
+        return sendRequestFormatted(parameters)
+        
+    }
 }
