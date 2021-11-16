@@ -786,10 +786,10 @@ public class TestNG extends Runner {
         def platform = Configuration.get("job_type")
         if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
             // #190: setup default settings only if no explicit disabler via overrideFields!
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVideo")) {
+            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVideo"))) {
                 Configuration.set("capabilities.enableVideo", "true")
             }
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableLog")) {
+            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableLog"))) {
                 Configuration.set("capabilities.enableLog", "true")
             }
             
@@ -797,7 +797,7 @@ public class TestNG extends Runner {
                 // no sense to compare as we disable forcible as unsupported
                 Configuration.set("capabilities.enableVNC", "false")
             } else {
-                if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVNC")) {
+                if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVNC"))) {
                     Configuration.set("capabilities.enableVNC", "true")
                 }
             }
