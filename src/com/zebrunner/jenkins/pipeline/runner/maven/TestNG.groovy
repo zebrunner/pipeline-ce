@@ -717,9 +717,6 @@ public class TestNG extends Runner {
         // This is an array of parameters, that we need to exclude from list of transmitted parameters to maven
         def necessaryMavenParams  = [
                 "capabilities",
-                "capabilities.enableVideo",
-                "capabilities.enableLog",
-                "capabilities.enableVNC",
                 "REPORTING_SERVICE_URL",
                 "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
