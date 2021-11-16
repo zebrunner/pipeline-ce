@@ -785,13 +785,21 @@ public class TestNG extends Runner {
         def provider = getProvider().toLowerCase()
         def platform = Configuration.get("job_type")
         if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
-            Configuration.set("capabilities.enableVideo", "true")
-            Configuration.set("capabilities.enableLog", "true")
+            // #190: setup default settings only if no explicit disabler via overrideFields!
+            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVideo")) {
+                Configuration.set("capabilities.enableVideo", "true")
+            }
+            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableLog")) {
+                Configuration.set("capabilities.enableLog", "true")
+            }
             
             if (platform.equalsIgnoreCase("ios")) {
+                // no sense to compare as we disable forcible as unsupported
                 Configuration.set("capabilities.enableVNC", "false")
             } else {
-                Configuration.set("capabilities.enableVNC", "true")
+                if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVNC")) {
+                    Configuration.set("capabilities.enableVNC", "true")
+                }
             }
             
             // forcible disable mobile_recorder carina option
