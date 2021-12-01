@@ -420,6 +420,15 @@ public class TestNG extends Runner {
             nodeName = chooseNode()
         }
         context.node(nodeName) {
+            // copy env files from config files
+            context.configFileProvider(
+                    [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
+                        def props = context.readProperties file: context.agent
+                        def hostname = props['REPORTING_SERVER_HOSTNAME']
+                        logger.info("hostname: ${hostname}")
+                        logger.info(props)
+            }
+                    
             context.wrap([$class: 'BuildUser']) {
                 try {
                     context.timestamps {
@@ -517,17 +526,6 @@ public class TestNG extends Runner {
                 //this is mobile test
                 prepareForMobile()
             }
-            
-            // copy env files from config files
-            context.configFileProvider(
-                    [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
-                        def props = context.readProperties file: context.agent
-                        def hostname = props['REPORTING_SERVER_HOSTNAME']
-                        logger.info("hostname: ${hostname}")
-                        logger.info(props)
-                    }
-                    
-
         }
     }
 
