@@ -671,24 +671,25 @@ public class TestNG extends Runner {
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
-        def defaultBaseMavenGoals = "-Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+        def defaultBaseMavenGoals = "--no-transfer-progress \
+            -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             -Dtestng.strict.parallel=true \
-        -Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-        ${zafiraGoals} \
-        -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
-        -Dmax_screen_history=1 \
-        -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
-        -Dgit_branch=${Configuration.get("branch")} \
-        -Dgit_commit=${Configuration.get("scm_commit")} \
-        -Dgit_url=${Configuration.get("scm_url")} \
-        -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
-        -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
-        -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
-        -Dinclude_all=${Configuration.get("include_all")} \
-        -Dmilestone=${Configuration.get("milestone")} \
-        -Drun_name=${Configuration.get("run_name")} \
-        -Dassignee=${Configuration.get("assignee")} \
-        clean test"
+            -Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+            ${zafiraGoals} \
+            -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
+            -Dmax_screen_history=1 \
+            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
+            -Dgit_branch=${Configuration.get("branch")} \
+            -Dgit_commit=${Configuration.get("scm_commit")} \
+            -Dgit_url=${Configuration.get("scm_url")} \
+            -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
+            -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
+            -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
+            -Dinclude_all=${Configuration.get("include_all")} \
+            -Dmilestone=${Configuration.get("milestone")} \
+            -Drun_name=${Configuration.get("run_name")} \
+            -Dassignee=${Configuration.get("assignee")} \
+            clean test"
 
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
         addCapability("suite", suiteName)
