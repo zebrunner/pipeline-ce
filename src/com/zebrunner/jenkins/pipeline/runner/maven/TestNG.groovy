@@ -600,7 +600,7 @@ public class TestNG extends Runner {
     }
 
     protected void setReportingCreds() {
-        context.configFileProvider([configFile(fileId: 'agent.env', variable: 'AGENT_ENV')]) {
+        context.configFileProvider([context.configFile(fileId: 'agent.env', variable: 'AGENT_ENV')]) {
             context.sh 'echo $AGENT_ENV'
         }
         
