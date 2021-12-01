@@ -524,16 +524,10 @@ public class TestNG extends Runner {
                         def props = context.readProperties file: context.agent
                         def hostname = props['REPORTING_SERVER_HOSTNAME']
                         logger.info("hostname: ${hostname}")
-//                        def props = context.readProperties file: "${AGENT_ENV}"
-//                        logger.info(props)
+                        logger.info(props)
                     }
                     
 
-
-//            context.configFileProvider(
-//                    [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
-//                        logger.info("agent2.env file was saved to workspace")
-//                    }
         }
     }
 
