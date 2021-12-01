@@ -523,12 +523,14 @@ public class TestNG extends Runner {
                     [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
                         logger.info("agent.env file was saved to workspace")
                     }
+                    
+            context.readProperties('agent.env')
 
 
-            context.configFileProvider(
-                    [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
-                        logger.info("agent2.env file was saved to workspace")
-                    }
+//            context.configFileProvider(
+//                    [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
+//                        logger.info("agent2.env file was saved to workspace")
+//                    }
         }
     }
 
