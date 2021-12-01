@@ -674,7 +674,6 @@ public class TestNG extends Runner {
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             -Dtestng.strict.parallel=true \
-            -Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zafiraGoals} \
             -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
             -Dmax_screen_history=1 \
