@@ -517,6 +517,18 @@ public class TestNG extends Runner {
                 //this is mobile test
                 prepareForMobile()
             }
+            
+            // copy env files from config files
+            context.configFileProvider(
+                    [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
+                        logger.info("agent.env file was saved to workspace")
+                    }
+
+
+            context.configFileProvider(
+                    [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
+                        logger.info("agent2.env file was saved to workspace")
+                    }
         }
     }
 
@@ -600,17 +612,6 @@ public class TestNG extends Runner {
     }
 
     protected void setReportingCreds() {
-        
-        context.configFileProvider(
-                [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
-                    logger.info("agent.env file was saved to workspace")
-                }
-
-
-        context.configFileProvider(
-                [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
-                    logger.info("agent2.env file was saved to workspace")
-                }
         
         def zafiraFields = Configuration.get("zafiraFields")
         if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
