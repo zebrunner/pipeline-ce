@@ -524,7 +524,7 @@ public class TestNG extends Runner {
                         logger.info("agent.env file was saved to workspace")
                     }
                     
-            def props = readProperties file: 'agent.env'
+            def props = context.readProperties file: 'agent.env'
             logger.info(props)
 
 
