@@ -520,10 +520,10 @@ public class TestNG extends Runner {
             
             // copy env files from config files
             context.configFileProvider(
-                    [context.configFile(fileId: 'agent.env', variable: 'AGENT_ENV')]) {
-                        logger.info("agent.env file location: ${AGENT_ENV}")
-                        def props = context.readProperties file: "${AGENT_ENV}"
-                        logger.info(props)
+                    [context.configFile(fileId: 'agent.env', variable: 'REPORTING_SERVER_HOSTNAME')]) {
+                        logger.info("env : ${REPORTING_SERVER_HOSTNAME}")
+//                        def props = context.readProperties file: "${AGENT_ENV}"
+//                        logger.info(props)
                     }
                     
 
