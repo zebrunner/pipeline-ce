@@ -462,39 +462,6 @@ public class TestNG extends Runner {
                     customNotify()
 
                     logger.debug("testRun: " + testRun)
-                    //TODO: try to find projectId/activeProjectId
-                    if (Configuration.get("testrail_enabled")?.toBoolean()) {
-                        def isIncludeAll = Configuration.get("include_all")?.toBoolean()
-                        def milestoneName = !isParamEmpty(Configuration.get("testrail_milestone")) ? Configuration.get("testrail_milestone") : ""
-                        def assignee = !isParamEmpty(Configuration.get("testrail_assignee")) ? Configuration.get("testrail_assignee") : ""
-                        def isExists = Configuration.get("run_exists")?.toBoolean()
-                        def testRunName = !isParamEmpty(Configuration.get("testrail_run_name")) ? Configuration.get("testrail_run_name") : ""
-                        // "- 60 * 60 * 24 * defaultSearchInterval" - an interval to support adding results into manually created TestRail runs
-                        int defaultSearchInterval = 7
-                        zafiraUpdater.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-                    }
-                    if (Configuration.get("qtest_enabled")?.toBoolean() && !isParamEmpty(getCurrentFolderFullName(Configuration.QTEST_UPDATER_JOBNAME))) {
-                        //TODO: decomission qtest support via pipeline
-                        throw new RuntimeException("QTest imtegration temporary blocked! Need communicate with reporting team to enable it back!")
-/*                        
-                        String jobName = getCurrentFolderFullName(Configuration.QTEST_UPDATER_JOBNAME)
-                        def os = !isParamEmpty(Configuration.get("capabilities.os"))?Configuration.get("capabilities.os"):""
-                        def osVersion = !isParamEmpty(Configuration.get("capabilities.os_version"))?Configuration.get("capabilities.os_version"):""
-                        def browser = getBrowser()
-                        context.node("master") {
-                            context.build job: jobName,
-                                    propagate: false,
-                                    wait: false,
-                                    parameters: [
-                                            context.string(name: 'ci_run_id', value: uuid),
-                                            context.string(name: 'os', value: os),
-                                            context.string(name: 'os_version', value: osVersion),
-                                            context.string(name: 'browser', value: browser)
-                                    ]
-                        }
-*/                        
-                    }
-                    
                 }
             }
         }
@@ -726,8 +693,6 @@ public class TestNG extends Runner {
                 "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
-                "testrail_enabled",
-                "qtest_enabled",
                 "job_type",
                 "repoUrl",
                 "sub_project",
