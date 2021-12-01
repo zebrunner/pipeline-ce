@@ -600,6 +600,10 @@ public class TestNG extends Runner {
     }
 
     protected void setReportingCreds() {
+        context.configFileProvider([configFile(fileId: 'agent.env', variable: 'AGENT_ENV')]) {
+            context.sh 'echo $AGENT_ENV'
+        }
+        
         def zafiraFields = Configuration.get("zafiraFields")
         if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
             // init Zafira serviceUrl and accessToken parameter based on zafiraFields parameter
@@ -613,6 +617,7 @@ public class TestNG extends Runner {
             Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, getToken(Configuration.CREDS_REPORTING_ACCESS_TOKEN))
         }
 
+        //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
         // obligatory init zafiraUpdater after getting valid url and token
         zafiraUpdater = new ZafiraUpdater(context)
     }
