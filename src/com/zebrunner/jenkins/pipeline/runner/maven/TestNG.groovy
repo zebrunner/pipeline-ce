@@ -520,11 +520,11 @@ public class TestNG extends Runner {
             
             // copy env files from config files
             context.configFileProvider(
-                    [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace() + "/agent.env")]) {
+                    [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
                         logger.info("agent.env file was saved to workspace")
                     }
                     
-            def props = context.readProperties file: 'agent.env'
+            def props = context.readProperties file: getWorkspace() + "/" + 'agent.env'
             logger.info(props)
 
 
