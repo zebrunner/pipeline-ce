@@ -2,7 +2,6 @@ package com.zebrunner.jenkins.pipeline
 
 import com.zebrunner.jenkins.BaseObject
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
-import com.zebrunner.jenkins.jobdsl.factory.pipeline.LauncherJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.RegisterRepositoryJobFactory
 import com.zebrunner.jenkins.pipeline.integration.zebrunner.ZebrunnerUpdater
 import com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty
@@ -90,7 +89,6 @@ class Organization extends BaseObject {
             if (!isParamEmpty(folder)) {
                 registerObject("project_folder", new FolderFactory(folder, ""))
             }
-            registerObject("launcher_job", new LauncherJobFactory(folder, getLauncherScript(), "launcher", "Custom job launcher"))
 
             registerObject("register_repository_job", new RegisterRepositoryJobFactory(folder, getRegisterRepositoryScript(), 'RegisterRepository', ''))
 
@@ -221,10 +219,6 @@ class Organization extends BaseObject {
         return integrationParameters
     }
 
-    protected String getLauncherScript() {
-        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).runJob()"
-    }
-    
     protected String getRegisterRepositoryScript() {
         return "${getPipelineLibrary()}\nimport com.zebrunner.jenkins.pipeline.Repository;\nnew Repository(this).register()"
     }
