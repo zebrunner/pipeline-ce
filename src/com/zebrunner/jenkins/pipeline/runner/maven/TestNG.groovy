@@ -520,7 +520,7 @@ public class TestNG extends Runner {
             
             // copy env files from config files
             context.configFileProvider(
-                    [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
+                    [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace() + "/agent.env")]) {
                         logger.info("agent.env file was saved to workspace")
                     }
                     
