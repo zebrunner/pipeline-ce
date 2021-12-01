@@ -522,7 +522,6 @@ public class TestNG extends Runner {
             context.configFileProvider(
                     [context.configFile(fileId: 'agent.env', variable: 'REPORTING_SERVER_HOSTNAME')]) {
                         logger.info("env : ${context.env.REPORTING_SERVER_HOSTNAME}")
-                        context.sh "export"
 //                        def props = context.readProperties file: "${AGENT_ENV}"
 //                        logger.info(props)
                     }
