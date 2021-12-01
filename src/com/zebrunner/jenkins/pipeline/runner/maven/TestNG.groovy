@@ -592,7 +592,7 @@ public class TestNG extends Runner {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
         } else {
             logger.debug("no custom SELENIUM_URL detected. Using default value...")
-            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
+            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://selenoid:4444/wd/hub")
         }
 
         seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
