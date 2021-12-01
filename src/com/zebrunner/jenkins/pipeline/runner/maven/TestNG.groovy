@@ -13,8 +13,6 @@ import javaposse.jobdsl.plugin.actions.GeneratedJobsBuildAction
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition
 import org.testng.xml.XmlSuite
 
-import hudson.FilePath
-
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.regex.Matcher
@@ -602,9 +600,17 @@ public class TestNG extends Runner {
     }
 
     protected void setReportingCreds() {
-        context.configFileProvider([context.configFile(fileId: 'agent.env', variable: 'AGENT_ENV')]) {
-            context.sh 'echo $AGENT_ENV'
-        }
+        
+        context.configFileProvider(
+                [context.configFile(fileId: 'agent.env', targetLocation: getWorkspace())]) {
+                    logger.info("agent.env file was saved to workspace")
+                }
+
+
+        context.configFileProvider(
+                [context.configFile(fileId: 'agent2.env', targetLocation: getWorkspace())]) {
+                    logger.info("agent2.env file was saved to workspace")
+                }
         
         def zafiraFields = Configuration.get("zafiraFields")
         if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
