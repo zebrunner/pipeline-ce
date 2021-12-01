@@ -13,6 +13,8 @@ import javaposse.jobdsl.plugin.actions.GeneratedJobsBuildAction
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition
 import org.testng.xml.XmlSuite
 
+import hudson.FilePath
+
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.regex.Matcher
