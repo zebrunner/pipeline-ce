@@ -653,7 +653,7 @@ public class TestNG extends Runner {
             -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
             -Dinclude_all=${Configuration.get("include_all")} \
             -Dmilestone=${Configuration.get("milestone")} \
-            -Drun_name=${Configuration.get("run_name")} \
+            -Drun_name=\"${Configuration.get("run_name")}\" \
             -Dassignee=${Configuration.get("assignee")} \
             clean test"
 
