@@ -300,7 +300,7 @@ class Organization extends BaseObject {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
         
-        configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
+        def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
         logger.info("configs: " + configs)
 
     }
