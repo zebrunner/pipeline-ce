@@ -600,9 +600,9 @@ public class TestNG extends Runner {
     protected def getAgentVars() {
         def agentVars = []
         
-        // copy and parse agent.env file from config files and return as list of env vars
+        // copy and parse AGENT_VAR file from config files and return as list of env vars
         context.configFileProvider(
-                [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
+                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
                     logger.debug(props)
                     
@@ -672,8 +672,6 @@ public class TestNG extends Runner {
         // This is an array of parameters, that we need to exclude from list of transmitted parameters to maven
         def necessaryMavenParams  = [
                 "capabilities",
-                "REPORTING_SERVICE_URL",
-                "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
                 "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",

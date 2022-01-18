@@ -6,7 +6,7 @@ import static com.zebrunner.jenkins.Utils.*
 import com.zebrunner.jenkins.pipeline.Configuration
 
 /*
- * Prerequisites: valid REPORTING_SERVICE_URL and REPORTING_ACCESS_TOKEN already defined in Configuration
+ * Prerequisites: valid REPORTING_SERVER_HOSTNAME and REPORTING_SERVER_ACCESS_TOKEN values as env vars
  */
 
 class ZafiraClient extends HttpClient {
