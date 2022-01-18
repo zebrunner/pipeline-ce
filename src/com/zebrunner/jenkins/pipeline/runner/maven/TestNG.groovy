@@ -406,9 +406,6 @@ public class TestNG extends Runner {
     }
 
     public void runJob() {
-        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-        setReportingCreds()
-        setSeleniumUrl()
         
         logger.info("TestNG->runJob")
         uuid = getUUID()
@@ -420,6 +417,10 @@ public class TestNG extends Runner {
             nodeName = chooseNode()
         }
         context.node(nodeName) {
+            // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
+            setReportingCreds()
+            setSeleniumUrl()
+            
             context.wrap([$class: 'BuildUser']) {
                 try {
                     context.timestamps {
@@ -1218,6 +1219,7 @@ public class TestNG extends Runner {
         }
     }
 
+    //TODO: remove this method as out-of-dated including smartRerun in zafira updater/client 
     public void rerunJobs(){
         context.stage('Rerun Tests'){
             //updates zafira credentials with values from Jenkins Credentials (if present)
