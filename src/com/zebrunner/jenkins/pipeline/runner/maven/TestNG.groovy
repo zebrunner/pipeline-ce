@@ -599,6 +599,11 @@ public class TestNG extends Runner {
         context.configFileProvider(
                 [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
+                    
+                    context.withEnv(props) {
+                        logger.info("context.env.REPORTING_ENABLED: ${context.env.REPORTING_ENABLED}")
+                    }
+                    
                     logger.debug(props)
                     
                     context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
