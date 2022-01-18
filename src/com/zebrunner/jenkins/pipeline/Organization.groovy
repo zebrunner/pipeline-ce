@@ -300,9 +300,10 @@ class Organization extends BaseObject {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
         
-        def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
-        context.println("configs: " + configs)
-
+        // generate agent.env custom file with reporting integration env vars as content  
+        def content = 
+              "REPORTING_ENABLED=true\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
+        addCustomConfigFile(orgFolderName, Configuration.AGENT_ENV, Configuration.AGENT_ENV, "", content)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {

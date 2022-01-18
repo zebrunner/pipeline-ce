@@ -108,14 +108,11 @@ public class Executor {
         return reportParameters
     }
 
-    static def addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken) {
-        ConfigFileStore store = ((Folder) getItemByFullName(orgFolderName)).getAction(FolderConfigFileAction.class).getStore();
+    static void addCustomConfigFile(folderName, id, name, comment, content) {
+        ConfigFileStore store = ((Folder) getItemByFullName(folderName)).getAction(FolderConfigFileAction.class).getStore();
         Collection<Config> configs = store.getConfigs();
-        
-        CustomConfig config = new CustomConfig(Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", "a=b\nb=c");
+        CustomConfig config = new CustomConfig(id, name, comment, content);
         store.save(config);
-        
-        return configs
     }
     
     static def updateJenkinsCredentials(id, description, user, password) {
