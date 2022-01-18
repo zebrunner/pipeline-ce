@@ -601,7 +601,7 @@ public class TestNG extends Runner {
                     def props = context.readProperties file: context.agent
                     logger.info(props)
                     
-                    def agentVars
+                    def agentVars = [];
                     for (String agentVar : props.keySet()) {
                         logger.info("adding: " + agentVar + "=" + props[agentVar])
                         agentVars.add(agentVar + "=" + props[agentVar])
