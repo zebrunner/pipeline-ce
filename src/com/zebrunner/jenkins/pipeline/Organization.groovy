@@ -300,8 +300,14 @@ class Organization extends BaseObject {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
         
+        if (!isParamEmpty(orgFolderName)) {
+            // find folder object where to place AGENT_VAR config file
+            logger.info("orgFolderName: ${orgFolderName}")
+        }
+        
         def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
-        context.println("configs: " + configs)
+        logger.info("configs: " + configs)
+
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {
