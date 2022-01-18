@@ -599,12 +599,20 @@ public class TestNG extends Runner {
         context.configFileProvider(
                 [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
+                    logger.info(props)
                     
-                    context.withEnv(props) {
+                    def agentKeys = pros.keySet()
+                    logger.info(agentKeys.getClass())     // class java.util.LinkedHashMap$LinkedKeySet
+                     
+                    def agentVars = agentKeys as ArrayList
+                    logger.info(agentVars.getClass())    // class java.util.ArrayList
+                    logger.info(agentVars)
+                    
+                    context.withEnv(agentVars) {
                         logger.info("context.env.REPORTING_ENABLED: ${context.env.REPORTING_ENABLED}")
                     }
                     
-                    logger.debug(props)
+                    
                     
                     context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
                     context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
