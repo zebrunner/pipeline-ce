@@ -70,7 +70,6 @@ public class TestNG extends Runner {
         context.node("master") {
             context.timestamps {
                 logger.info("TestNG->onPush")
-                setReportingCreds()
 
                 try {
                     getScm().clone(true)
@@ -417,7 +416,6 @@ public class TestNG extends Runner {
         }
         context.node(nodeName) {
             // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-            setReportingCreds()
             setSeleniumUrl()
             
             context.wrap([$class: 'BuildUser']) {
@@ -566,9 +564,14 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            def goals = getMavenGoals()
-            def pomFile = getMavenPomFile()
-            context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            context.withEnv(getAgentVars()) {
+                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                this.zafiraUpdater = new ZafiraUpdater(context)
+                
+                def goals = getMavenGoals()
+                def pomFile = getMavenPomFile()
+                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            }
         }
     }
 
@@ -594,62 +597,24 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected void setReportingCreds() {
+    protected def getAgentVars() {
+        def agentVars = []
+        
         // copy and parse agent.env file from config files
         context.configFileProvider(
                 [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
                     logger.info(props)
                     
-                    def agentVars = [];
+                    
                     for (String agentVar : props.keySet()) {
                         logger.info("adding: " + agentVar + "=" + props[agentVar])
                         agentVars.add(agentVar + "=" + props[agentVar])
                     }
                     logger.info(agentVars)
                     
-                    context.withEnv(agentVars) {
-                        logger.info("context.env.REPORTING_ENABLED: ${context.env.REPORTING_ENABLED}")
-                    }
-                    
-                    
-                    context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
-                    context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
-                    context.env.REPORTING_SERVER_ACCESS_TOKEN = props['REPORTING_SERVER_ACCESS_TOKEN']
-                    
-                    context.env.REPORTING_PROJECT_KEY = props['REPORTING_PROJECT_KEY']
-                    context.env.REPORTING_RUN_DISPLAY_NAME = props['REPORTING_RUN_DISPLAY_NAME']
-                    
-                    //context.env.REPORTING_RUN_BUILD = props['REPORTING_RUN_BUILD']
-                    //context.env.REPORTING_RUN_ENVIRONMENT = props['REPORTING_RUN_ENVIRONMENT']
-
-                    context.env.REPORTING_RUN_RETRY_KNOWN_ISSUES = props['REPORTING_RUN_RETRY_KNOWN_ISSUES']
-                    context.env.REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE = props['REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE']
-                    context.env.REPORTING_NOTIFICATION_SLACK_CHANNELS = props['REPORTING_NOTIFICATION_SLACK_CHANNELS']
-                    context.env.REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS = props['REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS']
-                    context.env.REPORTING_NOTIFICATION_EMAILS = props['REPORTING_NOTIFICATION_EMAILS']
-                    context.env.REPORTING_MILESTONE_ID = props['REPORTING_MILESTONE_ID']
-                    context.env.REPORTING_MILESTONE_NAME = props['REPORTING_MILESTONE_NAME']
-                    
         }
-        
-        //TODO: remove Configuration.Parameter.* usage for reporting integration        
-        def zafiraFields = Configuration.get("zafiraFields")
-        if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
-            // init Zafira serviceUrl and accessToken parameter based on zafiraFields parameter
-            logger.debug("init ZafiraUpdater from zafiraFields: " + zafiraFields)
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, Configuration.get("zafira_service_url"))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, Configuration.get("zafira_access_token"))
-        } else {
-            // init Zafira serviceUrl and accessToken parameter based on values from credentials
-            logger.debug("init ZafiraUpdater from credentials")
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, getToken(Configuration.CREDS_REPORTING_SERVICE_URL))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, getToken(Configuration.CREDS_REPORTING_ACCESS_TOKEN))
-        }
-
-        //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
-        // obligatory init zafiraUpdater after getting valid url and token
-        zafiraUpdater = new ZafiraUpdater(context)
+        return agentVars
     }
 
     protected String getMavenGoals() {

@@ -18,9 +18,8 @@ class ZafiraClient extends HttpClient {
 
     public ZafiraClient(context) {
         super(context)
-        //TODO: switch onto the env var usage instead of configuration 
-        this.serviceURL = Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)
-        this.refreshToken = Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)
+        this.serviceURL = context.env.REPORTING_SERVER_HOSTNAME 
+        this.refreshToken = context.env.REPORTING_SERVER_ACCESS_TOKEN
     }
 
     public def abortTestRun(uuid, failureReason) {
