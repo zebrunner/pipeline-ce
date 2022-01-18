@@ -110,6 +110,10 @@ public class Executor {
     static def addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken) {
         ConfigFileStore store = ((Folder) getItemByFullName(orgFolderName)).getAction(FolderConfigFileAction.class).getStore();
         Collection<Config> configs = store.getConfigs();
+        
+        CustomConfig config = new CustomConfig(Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", "a=b\nb=c");
+        store.save(config);
+        
         return configs
     }
     
