@@ -424,8 +424,11 @@ public class TestNG extends Runner {
             context.configFileProvider(
                     [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                         def props = context.readProperties file: context.agent
+                        
                         def hostname = props['REPORTING_SERVER_HOSTNAME']
-                        context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
+                        
+                        dev var1 = 'REPORTING_ENABLED'
+                        context.env.${var1} = props['REPORTING_ENABLED']
                         context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
                         context.env.REPORTING_SERVER_ACCESS_TOKEN = props['REPORTING_SERVER_ACCESS_TOKEN']
                         logger.info("hostname: ${hostname}")
