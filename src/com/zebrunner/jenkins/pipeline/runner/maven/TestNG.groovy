@@ -1225,16 +1225,6 @@ public class TestNG extends Runner {
         }
     }
 
-    //TODO: remove this method as out-of-dated including smartRerun in zafira updater/client 
-    public void rerunJobs(){
-        context.stage('Rerun Tests'){
-            //updates zafira credentials with values from Jenkins Credentials (if present)
-            this.organization = Configuration.get("folderName")
-            setReportingCreds()
-            zafiraUpdater.smartRerun()
-        }
-    }
-
     def getSettingsFileProviderContent(fileId){
         context.configFileProvider([context.configFile(fileId: fileId, variable: "MAVEN_SETTINGS")]) {
             context.readFile context.env.MAVEN_SETTINGS

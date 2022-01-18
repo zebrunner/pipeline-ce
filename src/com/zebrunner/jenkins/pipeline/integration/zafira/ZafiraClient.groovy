@@ -23,32 +23,6 @@ class ZafiraClient extends HttpClient {
         this.refreshToken = Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)
     }
 
-    public def smartRerun() {
-        if (!isZafiraConnected()) {
-            return
-        }
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder owner: Configuration.get("owner"),
-                cause: Configuration.get("cause"),
-                upstreamJobId: Configuration.get("upstreamJobId"),
-                upstreamJobBuildNumber: Configuration.get("upstreamJobBuildNumber"),
-                repoUrl: Configuration.get("repoUrl"),
-                hashcode: Configuration.get("hashcode")
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:401",
-                          url               : this.serviceURL + "/api/reporting/api/tests/runs/rerun/jobs?doRebuild=${Configuration.get("doRebuild")}&rerunFailures=${Configuration.get("rerunFailures")}",
-                          timeout           : 300000]
-        return sendRequestFormatted(parameters)
-    }
-
     public def abortTestRun(uuid, failureReason) {
         if (!isZafiraConnected()) {
             return
