@@ -302,7 +302,7 @@ class Organization extends BaseObject {
         
         if (!isParamEmpty(orgFolderName)) {
             // find folder object where to place AGENT_VAR config file
-            logger.info("orgFolderName: " + orgFolderName)
+            logger.info("orgFolderName: ${orgFolderName}")
         }
         
         def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
