@@ -600,18 +600,16 @@ public class TestNG extends Runner {
     protected def getAgentVars() {
         def agentVars = []
         
-        // copy and parse agent.env file from config files
+        // copy and parse agent.env file from config files and return as list of env vars
         context.configFileProvider(
                 [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
-                    logger.info(props)
-                    
+                    logger.debug(props)
                     
                     for (String agentVar : props.keySet()) {
-                        logger.info("adding: " + agentVar + "=" + props[agentVar])
+                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
                         agentVars.add(agentVar + "=" + props[agentVar])
                     }
-                    logger.info(agentVars)
                     
         }
         return agentVars
