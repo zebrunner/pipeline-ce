@@ -601,17 +601,16 @@ public class TestNG extends Runner {
                     def props = context.readProperties file: context.agent
                     logger.info(props)
                     
-                    def agentKeys = props.keySet()
-                    logger.info(agentKeys.getClass())     // class java.util.LinkedHashMap$LinkedKeySet
-                     
-                    def agentVars = agentKeys as ArrayList
-                    logger.info(agentVars.getClass())    // class java.util.ArrayList
+                    def agentVars
+                    for (String agentVar : props.keySet()) {
+                        logger.info("adding: " + agentVar + "=" + props[agentVar])
+                        agentVars.add(agentVar + "=" + props[agentVar])
+                    }
                     logger.info(agentVars)
                     
                     context.withEnv(agentVars) {
                         logger.info("context.env.REPORTING_ENABLED: ${context.env.REPORTING_ENABLED}")
                     }
-                    
                     
                     
                     context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
