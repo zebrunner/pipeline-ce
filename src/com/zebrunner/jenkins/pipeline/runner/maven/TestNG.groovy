@@ -411,7 +411,6 @@ public class TestNG extends Runner {
         uuid = getUUID()
         logger.info("UUID: " + uuid)
         def testRun
-        def isRerun = isRerun()
         String nodeName = "master"
         context.node(nodeName) {
             nodeName = chooseNode()
@@ -481,11 +480,6 @@ public class TestNG extends Runner {
     // to be able to organize custom notifications on private pipeline layer
     protected void customNotify() {
         // do nothing
-    }
-
-    // Possible to override in private pipelines
-    protected boolean isRerun() {
-        return zafiraUpdater.isZafiraRerun(uuid)
     }
 
     // Possible to override in private pipelines

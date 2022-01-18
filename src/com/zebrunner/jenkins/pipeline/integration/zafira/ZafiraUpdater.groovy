@@ -180,10 +180,6 @@ class ZafiraUpdater {
         }
     }
 
-    public boolean isZafiraRerun(uuid) {
-        return !isParamEmpty(zc.getTestRunByCiRunId(uuid))
-    }
-    
     protected boolean isFailure(testRunStatus) {
         return !"PASSED".equals(testRunStatus)
     }
