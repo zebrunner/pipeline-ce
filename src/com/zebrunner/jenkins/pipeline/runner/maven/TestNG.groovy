@@ -425,6 +425,9 @@ public class TestNG extends Runner {
                     [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
                         def props = context.readProperties file: context.agent
                         def hostname = props['REPORTING_SERVER_HOSTNAME']
+                        context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
+                        context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
+                        context.env.REPORTING_SERVER_ACCESS_TOKEN = props['REPORTING_SERVER_ACCESS_TOKEN']
                         logger.info("hostname: ${hostname}")
                         logger.info(props)
             }
@@ -629,21 +632,17 @@ public class TestNG extends Runner {
     }
 
     protected String getMavenGoals() {
-        // When zafira is disabled use Maven TestNG build status as job status. RetryCount can't be supported well!
-        def zafiraGoals = "-Dzafira_enabled=false -Dmaven.test.failure.ignore=false"
+        //TODO: remove completely zebrunner/zafira goals from maven integration!
+        
+        // When Zebrunner is disabled use Maven TestNG build status as job status. RetryCount can't be supported correctly!
+        def zafiraGoals = "-Dmaven.test.failure.ignore=false"
         logger.debug("REPORTING_SERVICE_URL: " + Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL))
         logger.debug("REPORTING_ACCESS_TOKEN: " + Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))
 
         if (!Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)) 
             && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
-            // Ignore maven build result if Zafira integration is enabled
+            // Ignore maven build result if Zafira/Zebrunner integration is enabled
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
-                            -Dzafira_enabled=true \
-                            -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
-                            -Dreporting.enabled=true \
-                            -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
