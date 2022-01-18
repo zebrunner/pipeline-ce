@@ -594,14 +594,14 @@ public class TestNG extends Runner {
             return
         }
 
-        // update SELENIUM_URL parameter based on capabilities.provider.
+        // update SELENIUM_URL parameter based on `provider`.
         def hubUrl = getProvider() + "_hub"
 
         if (!isParamEmpty(getToken(hubUrl))) {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
         } else {
             logger.debug("no custom SELENIUM_URL detected. Using default value...")
-            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
+            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://selenoid:4444/wd/hub")
         }
 
         seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
@@ -678,7 +678,6 @@ public class TestNG extends Runner {
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
         
         addBrowserStackCapabilities()
-        addProviderCapabilities()
 
         def goals = Configuration.resolveVars(defaultBaseMavenGoals)
 
@@ -757,32 +756,6 @@ public class TestNG extends Runner {
         return Configuration.get(parameterName)?.toBoolean() ? capabilityName : ""
     }
     
-    protected addProviderCapabilities() {
-        def provider = getProvider().toLowerCase()
-        def platform = Configuration.get("job_type")
-        if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
-            // #190: setup default settings only if no explicit disabler via overrideFields!
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVideo"))) {
-                Configuration.set("capabilities.enableVideo", "true")
-            }
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableLog"))) {
-                Configuration.set("capabilities.enableLog", "true")
-            }
-            
-            if (platform.equalsIgnoreCase("ios")) {
-                // no sense to compare as we disable forcible as unsupported
-                Configuration.set("capabilities.enableVNC", "false")
-            } else {
-                if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVNC"))) {
-                    Configuration.set("capabilities.enableVNC", "true")
-                }
-            }
-            
-            // forcible disable mobile_recorder carina option
-            Configuration.set("driver_recorder", "false")
-        }
-    }
-
     protected def addBrowserStackCapabilities() {
         if (isBrowserStackRunning()) {
             def uniqueBrowserInstance = "\"#${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}-" + Configuration.get("suite") + "-" +
@@ -1264,16 +1237,12 @@ public class TestNG extends Runner {
     }
     
     protected def getProvider() {
-        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            // #177: setup default capabilities.provider=zebrunner by default
-            Configuration.set("capabilities.provider", "zebrunner")
-            
-            // 6.x carina is not supported anymore!
-//            //we have to set default provider otherwise 6.5 carina can't register artifacts correctly 
-//            Configuration.set("capabilities.provider", "selenium")
+        if (isParamEmpty(Configuration.get("provider"))) {
+            // #177: setup default provider=zebrunner by default
+            Configuration.set("provider", "zebrunner")
         } 
         
-        return Configuration.get("capabilities.provider")
+        return Configuration.get("provider")
     }
 
 }
