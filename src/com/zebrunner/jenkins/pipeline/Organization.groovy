@@ -287,11 +287,11 @@ class Organization extends BaseObject {
     
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
-            Organization.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
+            this.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
         }
     }
 
-    public static void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
+    public void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
         if (isParamEmpty(reportingServiceUrl)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingServiceUrl' is missing!")
         }
