@@ -601,7 +601,7 @@ public class TestNG extends Runner {
                     def props = context.readProperties file: context.agent
                     logger.info(props)
                     
-                    def agentKeys = pros.keySet()
+                    def agentKeys = props.keySet()
                     logger.info(agentKeys.getClass())     // class java.util.LinkedHashMap$LinkedKeySet
                      
                     def agentVars = agentKeys as ArrayList
