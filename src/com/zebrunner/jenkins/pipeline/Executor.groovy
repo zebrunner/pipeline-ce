@@ -18,8 +18,11 @@ import com.cloudbees.plugins.credentials.impl.*
 import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.domains.*
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl;
-import org.jenkinsci.plugins.configfiles.ConfigFileStore;
 import hudson.util.Secret
+
+import org.jenkinsci.plugins.configfiles.ConfigFileStore;
+import com.cloudbees.hudson.plugins.folder.Folder;
+
 
 public class Executor {
 
