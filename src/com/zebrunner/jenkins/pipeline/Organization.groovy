@@ -305,7 +305,7 @@ class Organization extends BaseObject {
             logger.info("orgFolderName: " + orgFolderName)
         }
         
-        configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
+        def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
         logger.info("configs: " + configs)
 
     }
