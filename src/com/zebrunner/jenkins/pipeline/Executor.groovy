@@ -18,6 +18,7 @@ import com.cloudbees.plugins.credentials.impl.*
 import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.domains.*
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl;
+import org.jenkinsci.plugins.configfiles.ConfigFileStore;
 import hudson.util.Secret
 
 public class Executor {
@@ -102,6 +103,12 @@ public class Executor {
         return reportParameters
     }
 
+    static def addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken) {
+        ConfigFileStore store = ((Folder) getItemByFullName(orgFolderName)).getAction(FolderConfigFileAction.class).getStore();
+        Collection<Config> configs = store.getConfigs();
+        return configs
+    }
+    
     static def updateJenkinsCredentials(id, description, user, password) {
         if (!isParamEmpty(password) && !isParamEmpty(user)) {
             def credentialsStore = SystemCredentialsProvider.getInstance().getStore()

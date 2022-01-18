@@ -292,14 +292,6 @@ class Organization extends BaseObject {
     }
 
     public static void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
-        def reportingURLCredentials = Configuration.CREDS_REPORTING_SERVICE_URL
-        def reportingTokenCredentials = Configuration.CREDS_REPORTING_ACCESS_TOKEN
-
-        if (!isParamEmpty(orgFolderName)) {
-            reportingURLCredentials = orgFolderName + "-" + reportingURLCredentials
-            reportingTokenCredentials = orgFolderName + "-" + reportingTokenCredentials
-        }
-
         if (isParamEmpty(reportingServiceUrl)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingServiceUrl' is missing!")
         }
@@ -307,9 +299,15 @@ class Organization extends BaseObject {
         if (isParamEmpty(reportingAccessToken)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
+        
+        if (!isParamEmpty(orgFolderName)) {
+            // find folder object where to place AGENT_VAR config file
+            logger.info("orgFolderName: " + orgFolderName)
+        }
+        
+        configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
+        logger.info("configs: " + configs)
 
-        updateJenkinsCredentials(reportingURLCredentials, "Reporting service URL", Configuration.Parameter.REPORTING_SERVICE_URL.getKey(), reportingServiceUrl)
-        updateJenkinsCredentials(reportingTokenCredentials, "Reporting access token", Configuration.Parameter.REPORTING_ACCESS_TOKEN.getKey(), reportingAccessToken)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {
