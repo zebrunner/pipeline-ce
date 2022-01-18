@@ -420,21 +420,6 @@ public class TestNG extends Runner {
             nodeName = chooseNode()
         }
         context.node(nodeName) {
-            // copy env files from config files
-            context.configFileProvider(
-                    [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
-                        def props = context.readProperties file: context.agent
-                        
-                        def hostname = props['REPORTING_SERVER_HOSTNAME']
-                        
-                        dev var1 = 'REPORTING_ENABLED'
-                        context.env.${var1} = props['REPORTING_ENABLED']
-                        context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
-                        context.env.REPORTING_SERVER_ACCESS_TOKEN = props['REPORTING_SERVER_ACCESS_TOKEN']
-                        logger.info("hostname: ${hostname}")
-                        logger.info(props)
-            }
-                    
             context.wrap([$class: 'BuildUser']) {
                 try {
                     context.timestamps {
@@ -615,7 +600,33 @@ public class TestNG extends Runner {
     }
 
     protected void setReportingCreds() {
+        // copy and parse agent.env file from config files
+        context.configFileProvider(
+                [context.configFile(fileId: 'agent.env', variable: 'agent')]) {
+                    def props = context.readProperties file: context.agent
+                    logger.debug(props)
+                    
+                    context.env.REPORTING_ENABLED = props['REPORTING_ENABLED']
+                    context.env.REPORTING_SERVER_HOSTNAME = props['REPORTING_SERVER_HOSTNAME']
+                    context.env.REPORTING_SERVER_ACCESS_TOKEN = props['REPORTING_SERVER_ACCESS_TOKEN']
+                    
+                    context.env.REPORTING_PROJECT_KEY = props['REPORTING_PROJECT_KEY']
+                    context.env.REPORTING_RUN_DISPLAY_NAME = props['REPORTING_RUN_DISPLAY_NAME']
+                    
+                    //context.env.REPORTING_RUN_BUILD = props['REPORTING_RUN_BUILD']
+                    //context.env.REPORTING_RUN_ENVIRONMENT = props['REPORTING_RUN_ENVIRONMENT']
+
+                    context.env.REPORTING_RUN_RETRY_KNOWN_ISSUES = props['REPORTING_RUN_RETRY_KNOWN_ISSUES']
+                    context.env.REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE = props['REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE']
+                    context.env.REPORTING_NOTIFICATION_SLACK_CHANNELS = props['REPORTING_NOTIFICATION_SLACK_CHANNELS']
+                    context.env.REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS = props['REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS']
+                    context.env.REPORTING_NOTIFICATION_EMAILS = props['REPORTING_NOTIFICATION_EMAILS']
+                    context.env.REPORTING_MILESTONE_ID = props['REPORTING_MILESTONE_ID']
+                    context.env.REPORTING_MILESTONE_NAME = props['REPORTING_MILESTONE_NAME']
+                    
+        }
         
+        //TODO: remove Configuration.Parameter.* usage for reporting integration        
         def zafiraFields = Configuration.get("zafiraFields")
         if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
             // init Zafira serviceUrl and accessToken parameter based on zafiraFields parameter
@@ -639,12 +650,7 @@ public class TestNG extends Runner {
         
         // When Zebrunner is disabled use Maven TestNG build status as job status. RetryCount can't be supported correctly!
         def zafiraGoals = "-Dmaven.test.failure.ignore=false"
-        logger.debug("REPORTING_SERVICE_URL: " + Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL))
-        logger.debug("REPORTING_ACCESS_TOKEN: " + Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))
-
-        if (!Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)) 
-            && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
-            // Ignore maven build result if Zafira/Zebrunner integration is enabled
+        if ("true".equalsIgnoreCase(context.env.REPORTING_ENABLED)) {
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
