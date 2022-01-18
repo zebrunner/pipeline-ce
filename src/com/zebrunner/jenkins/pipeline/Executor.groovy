@@ -22,7 +22,7 @@ import hudson.util.Secret
 
 import org.jenkinsci.plugins.configfiles.ConfigFileStore;
 import com.cloudbees.hudson.plugins.folder.Folder;
-
+import org.jenkinsci.lib.configprovider.model.Config;
 
 public class Executor {
 
