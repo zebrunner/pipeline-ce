@@ -301,7 +301,7 @@ class Organization extends BaseObject {
         }
         
         def configs = addCustomConfigFile(orgFolderName, reportingServiceUrl, reportingAccessToken)
-        logger.info("configs: " + configs)
+        context.println("configs: " + configs)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {
