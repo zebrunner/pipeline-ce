@@ -10,8 +10,7 @@ public class Configuration {
 
     public final static def CREDS_MAVEN_SETTINGS = "maven"
     
-    public final static def CREDS_REPORTING_SERVICE_URL = "reporting_service_url"
-    public final static def CREDS_REPORTING_ACCESS_TOKEN = "reporting_access_token"
+    public final static def AGENT_VAR = "agent.env"
     
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
@@ -53,9 +52,6 @@ public class Configuration {
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 
         SELENIUM_URL("SELENIUM_URL", mustOverride, true),
-
-        REPORTING_ACCESS_TOKEN("REPORTING_ACCESS_TOKEN", mustOverride, true),
-        REPORTING_SERVICE_URL("REPORTING_SERVICE_URL", mustOverride),
 
         JOB_URL("JOB_URL", mustOverride),
         JOB_NAME("JOB_NAME", mustOverride),
@@ -240,7 +236,8 @@ public class Configuration {
     }
 
     public static void set(String paramName, String value) {
-        vars.put(paramName, value)
+        // explicit setter should override in params as it has the highest priority order
+        params.put(paramName, value)
     }
 
     // simple way to reload as a bundle all project custom arguments from private pipeline

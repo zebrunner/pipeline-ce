@@ -70,7 +70,6 @@ public class TestNG extends Runner {
         context.node("master") {
             context.timestamps {
                 logger.info("TestNG->onPush")
-                setReportingCreds()
 
                 try {
                     getScm().clone(true)
@@ -406,20 +405,19 @@ public class TestNG extends Runner {
     }
 
     public void runJob() {
-        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-        setReportingCreds()
-        setSeleniumUrl()
         
         logger.info("TestNG->runJob")
         uuid = getUUID()
         logger.info("UUID: " + uuid)
         def testRun
-        def isRerun = isRerun()
         String nodeName = "master"
         context.node(nodeName) {
             nodeName = chooseNode()
         }
         context.node(nodeName) {
+            // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
+            setSeleniumUrl()
+            
             context.wrap([$class: 'BuildUser']) {
                 try {
                     context.timestamps {
@@ -459,6 +457,7 @@ public class TestNG extends Runner {
                     
                     clean()
                     customNotify()
+                    logger.debug("testRun: " + testRun)
                 }
             }
         }
@@ -477,11 +476,6 @@ public class TestNG extends Runner {
     // to be able to organize custom notifications on private pipeline layer
     protected void customNotify() {
         // do nothing
-    }
-
-    // Possible to override in private pipelines
-    protected boolean isRerun() {
-        return zafiraUpdater.isZafiraRerun(uuid)
     }
 
     // Possible to override in private pipelines
@@ -547,6 +541,16 @@ public class TestNG extends Runner {
         Configuration.set("mobile_app_clear_cache", "true")
         Configuration.set("capabilities.autoGrantPermissions", "true")
         Configuration.set("capabilities.noSign", "true")
+        
+        /* https://issuetracker.google.com/issues/170867658?pli=1
+         * Multiple application reinstalls cause INSTALL_FAILED_INSUFFICIENT_STORAGE exception, which could only be fixed by device reboot 
+         */
+        
+        /* https://github.com/zebrunner/pipeline-ce/issues/185
+         * disable cache for android mobile testing by default
+         */
+        Configuration.set("capabilities.remoteAppsCacheLimit", "0")
+        
 //        Configuration.set("capabilities.appWaitDuration", "270000")
 //        Configuration.set("capabilities.androidInstallTimeout", "270000")
 //        Configuration.set("capabilities.adbExecTimeout", "270000")
@@ -558,9 +562,14 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            def goals = getMavenGoals()
-            def pomFile = getMavenPomFile()
-            context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            context.withEnv(getAgentVars()) {
+                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                this.zafiraUpdater = new ZafiraUpdater(context)
+                
+                def goals = getMavenGoals()
+                def pomFile = getMavenPomFile()
+                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            }
         }
     }
 
@@ -572,71 +581,68 @@ public class TestNG extends Runner {
             return
         }
 
-        // update SELENIUM_URL parameter based on capabilities.provider.
+        // update SELENIUM_URL parameter based on `provider`.
         def hubUrl = getProvider() + "_hub"
 
         if (!isParamEmpty(getToken(hubUrl))) {
             Configuration.set(Configuration.Parameter.SELENIUM_URL, getToken(hubUrl))
         } else {
             logger.debug("no custom SELENIUM_URL detected. Using default value...")
-            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://demo:demo@\${INFRA_HOST}/selenoid/wd/hub")
+            Configuration.set(Configuration.Parameter.SELENIUM_URL, "http://selenoid:4444/wd/hub")
         }
 
         seleniumUrl = Configuration.get(Configuration.Parameter.SELENIUM_URL)
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected void setReportingCreds() {
-        def zafiraFields = Configuration.get("zafiraFields")
-        if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
-            // init Zafira serviceUrl and accessToken parameter based on zafiraFields parameter
-            logger.debug("init ZafiraUpdater from zafiraFields: " + zafiraFields)
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, Configuration.get("zafira_service_url"))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, Configuration.get("zafira_access_token"))
-        } else {
-            // init Zafira serviceUrl and accessToken parameter based on values from credentials
-            logger.debug("init ZafiraUpdater from credentials")
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, getToken(Configuration.CREDS_REPORTING_SERVICE_URL))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, getToken(Configuration.CREDS_REPORTING_ACCESS_TOKEN))
+    protected def getAgentVars() {
+        def agentVars = []
+        
+        // copy and parse AGENT_VAR file from config files and return as list of env vars
+        context.configFileProvider(
+                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
+                    def props = context.readProperties file: context.agent
+                    logger.debug(props)
+                    
+                    for (String agentVar : props.keySet()) {
+                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
+                        agentVars.add(agentVar + "=" + props[agentVar])
+                    }
+                    
         }
-
-        // obligatory init zafiraUpdater after getting valid url and token
-        zafiraUpdater = new ZafiraUpdater(context)
+        return agentVars
     }
 
     protected String getMavenGoals() {
-        // When zafira is disabled use Maven TestNG build status as job status. RetryCount can't be supported well!
-        def zafiraGoals = "-Dzafira_enabled=false -Dmaven.test.failure.ignore=false"
-        logger.debug("REPORTING_SERVICE_URL: " + Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL))
-        logger.debug("REPORTING_ACCESS_TOKEN: " + Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))
-
-        if (!Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)) 
-            && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
-            // Ignore maven build result if Zafira integration is enabled
+        //TODO: remove completely zebrunner/zafira goals from maven integration!
+        
+        // When Zebrunner is disabled use Maven TestNG build status as job status. RetryCount can't be supported correctly!
+        def zafiraGoals = "-Dmaven.test.failure.ignore=false"
+        if ("true".equalsIgnoreCase(context.env.REPORTING_ENABLED)) {
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
-                            -Dzafira_enabled=true \
-                            -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
-                            -Dreporting.enabled=true \
-                            -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
-        def defaultBaseMavenGoals = "-Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-	-Dselenium_host=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-        ${zafiraGoals} \
-        -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
-        -Dmax_screen_history=1 \
-        -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
-        -Dgit_branch=${Configuration.get("branch")} \
-        -Dgit_commit=${Configuration.get("scm_commit")} \
-        -Dgit_url=${Configuration.get("scm_url")} \
-        -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
-        -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
-        clean test"
+        def defaultBaseMavenGoals = "--no-transfer-progress \
+            -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
+            -Dtestng.strict.parallel=true \
+            ${zafiraGoals} \
+            -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
+            -Dmax_screen_history=1 \
+            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
+            -Dgit_branch=${Configuration.get("branch")} \
+            -Dgit_commit=${Configuration.get("scm_commit")} \
+            -Dgit_url=${Configuration.get("scm_url")} \
+            -Dci_url=${Configuration.get(Configuration.Parameter.JOB_URL)} \
+            -Dci_build=${Configuration.get(Configuration.Parameter.BUILD_NUMBER)} \
+            -Dtestrail_enabled=${Configuration.get("testrail_enabled")} \
+            -Dinclude_all=${Configuration.get("include_all")} \
+            -Dmilestone=${Configuration.get("milestone")} \
+            -Drun_name=\"${Configuration.get("run_name")}\" \
+            -Dassignee=${Configuration.get("assignee")} \
+            clean test"
 
         addCapability("ci_build_cause", getBuildCause((Configuration.get(Configuration.Parameter.JOB_NAME)), currentBuild))
         addCapability("suite", suiteName)
@@ -648,7 +654,6 @@ public class TestNG extends Runner {
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
         
         addBrowserStackCapabilities()
-        addProviderCapabilities()
 
         def goals = Configuration.resolveVars(defaultBaseMavenGoals)
 
@@ -665,8 +670,6 @@ public class TestNG extends Runner {
         // This is an array of parameters, that we need to exclude from list of transmitted parameters to maven
         def necessaryMavenParams  = [
                 "capabilities",
-                "REPORTING_SERVICE_URL",
-                "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
                 "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",
@@ -674,8 +677,6 @@ public class TestNG extends Runner {
                 "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
-                "testrail_enabled",
-                "qtest_enabled",
                 "job_type",
                 "repoUrl",
                 "sub_project",
@@ -729,24 +730,6 @@ public class TestNG extends Runner {
         return Configuration.get(parameterName)?.toBoolean() ? capabilityName : ""
     }
     
-    protected addProviderCapabilities() {
-        def provider = getProvider().toLowerCase()
-        def platform = Configuration.get("job_type")
-        if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
-            Configuration.set("capabilities.enableVideo", "true")
-            Configuration.set("capabilities.enableLog", "true")
-            
-            if (platform.equalsIgnoreCase("ios")) {
-                Configuration.set("capabilities.enableVNC", "false")
-            } else {
-                Configuration.set("capabilities.enableVNC", "true")
-            }
-            
-            // forcible disable mobile_recorder carina option
-            Configuration.set("driver_recorder", "false")
-        }
-    }
-
     protected def addBrowserStackCapabilities() {
         if (isBrowserStackRunning()) {
             def uniqueBrowserInstance = "\"#${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}-" + Configuration.get("suite") + "-" +
@@ -1201,15 +1184,6 @@ public class TestNG extends Runner {
         }
     }
 
-    public void rerunJobs(){
-        context.stage('Rerun Tests'){
-            //updates zafira credentials with values from Jenkins Credentials (if present)
-            this.organization = Configuration.get("folderName")
-            setReportingCreds()
-            zafiraUpdater.smartRerun()
-        }
-    }
-
     def getSettingsFileProviderContent(fileId){
         context.configFileProvider([context.configFile(fileId: fileId, variable: "MAVEN_SETTINGS")]) {
             context.readFile context.env.MAVEN_SETTINGS
@@ -1228,12 +1202,12 @@ public class TestNG extends Runner {
     }
     
     protected def getProvider() {
-        if (isParamEmpty(Configuration.get("capabilities.provider"))) {
-            //we have to set default provider otherwise 6.5 carina can't register artifacts correctly 
-            Configuration.set("capabilities.provider", "selenium")
+        if (isParamEmpty(Configuration.get("provider"))) {
+            // #177: setup default provider=zebrunner by default
+            Configuration.set("provider", "zebrunner")
         } 
         
-        return Configuration.get("capabilities.provider")
+        return Configuration.get("provider")
     }
 
 }

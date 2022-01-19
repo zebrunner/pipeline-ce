@@ -2,7 +2,6 @@ package com.zebrunner.jenkins.pipeline
 
 import com.zebrunner.jenkins.BaseObject
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
-import com.zebrunner.jenkins.jobdsl.factory.pipeline.LauncherJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.RegisterRepositoryJobFactory
 import com.zebrunner.jenkins.pipeline.integration.zebrunner.ZebrunnerUpdater
 import com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty
@@ -40,8 +39,8 @@ class Organization extends BaseObject {
         currentBuild.displayName = getDisplayName()
         context.node('master') {
             context.timestamps {
-                generateCreds()
                 generateCiItems()
+                generateCreds()
                 logger.info("securityEnabled: " + Configuration.get("securityEnabled"))
                 if (Configuration.get("securityEnabled")?.toBoolean()) {
                     setSecurity()
@@ -90,7 +89,6 @@ class Organization extends BaseObject {
             if (!isParamEmpty(folder)) {
                 registerObject("project_folder", new FolderFactory(folder, ""))
             }
-            registerObject("launcher_job", new LauncherJobFactory(folder, getLauncherScript(), "launcher", "Custom job launcher"))
 
             registerObject("register_repository_job", new RegisterRepositoryJobFactory(folder, getRegisterRepositoryScript(), 'RegisterRepository', ''))
 
@@ -221,10 +219,6 @@ class Organization extends BaseObject {
         return integrationParameters
     }
 
-    protected String getLauncherScript() {
-        return "${getPipelineLibrary()}\nimport ${RUNNER_CLASS};\nnew ${RUNNER_CLASS}(this).runJob()"
-    }
-    
     protected String getRegisterRepositoryScript() {
         return "${getPipelineLibrary()}\nimport com.zebrunner.jenkins.pipeline.Repository;\nnew Repository(this).register()"
     }
@@ -293,19 +287,11 @@ class Organization extends BaseObject {
     
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
-            Organization.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
+            this.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
         }
     }
 
-    public static void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
-        def reportingURLCredentials = Configuration.CREDS_REPORTING_SERVICE_URL
-        def reportingTokenCredentials = Configuration.CREDS_REPORTING_ACCESS_TOKEN
-
-        if (!isParamEmpty(orgFolderName)) {
-            reportingURLCredentials = orgFolderName + "-" + reportingURLCredentials
-            reportingTokenCredentials = orgFolderName + "-" + reportingTokenCredentials
-        }
-
+    public void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
         if (isParamEmpty(reportingServiceUrl)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingServiceUrl' is missing!")
         }
@@ -313,9 +299,13 @@ class Organization extends BaseObject {
         if (isParamEmpty(reportingAccessToken)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
-
-        updateJenkinsCredentials(reportingURLCredentials, "Reporting service URL", Configuration.Parameter.REPORTING_SERVICE_URL.getKey(), reportingServiceUrl)
-        updateJenkinsCredentials(reportingTokenCredentials, "Reporting access token", Configuration.Parameter.REPORTING_ACCESS_TOKEN.getKey(), reportingAccessToken)
+        
+        logger.info("orgFolderName: " + orgFolderName)
+        
+        // generate agent.env custom file with reporting integration env vars as content  
+        def content = 
+              "REPORTING_ENABLED=true\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
+        addCustomConfigFile(orgFolderName, Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", content)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {

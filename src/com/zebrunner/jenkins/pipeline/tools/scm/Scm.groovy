@@ -83,6 +83,15 @@ abstract class Scm implements ISCM {
             Configuration.set("scm_url", gitUrl)
             Configuration.set("scm_branch", branch)
             Configuration.set("scm_commit", scmVars.GIT_COMMIT)
+
+            /*
+             * among existing argument in scmVars populated from github are:
+             * GIT_BRANCH:origin/master, 
+             * GIT_COMMIT:sha1, GIT_PREVIOUS_COMMIT:sha1, GIT_PREVIOUS_SUCCESSFUL_COMMIT:sha1, 
+             * GIT_URL:git@github.com:zebrunner/carina.git]            
+             */
+            
+            return scmVars
         }
     }
 
@@ -90,7 +99,8 @@ abstract class Scm implements ISCM {
     public def clone(gitUrl, branch, subFolder) {
         context.stage('Checkout Repository') {
             logger.debug("REPO_URL: ${gitUrl}\n branch: ${branch}")
-            context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(gitUrl, branch, subFolder, true, false, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            return scmVars
         }
     }
 
@@ -98,7 +108,8 @@ abstract class Scm implements ISCM {
         context.stage('Checkout Repository') {
             logger.debug("REPO_URL: ${this.repoUrl}\n prRefSpec: ${prRefSpec}\n branchSpec: ${branchSpec()}")
 
-            context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(this.repoUrl, branchSpec(), ".", true, false, prRefSpec, this.credentialsId)
+            return scmVars
         }
     }
 
@@ -106,7 +117,8 @@ abstract class Scm implements ISCM {
         context.stage('Checkout Repository') {
             def branch = Configuration.get("branch")
             logger.debug("REPO_URL: ${this.repoUrl}\n branch: ${branch}")
-            context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            Map scmVars = context.checkout getCheckoutParams(this.repoUrl, branch, null, false, true, "+refs/heads/${branch}:refs/remotes/origin/${branch}", this.credentialsId)
+            return scmVars
         }
     }
 
@@ -124,6 +136,7 @@ abstract class Scm implements ISCM {
             def subfolderExtension = [[$class: 'RelativeTargetDirectory', relativeTargetDir: subFolder]]
             checkoutParams.get("scm")["extensions"] = subfolderExtension
         }
+        
         return checkoutParams
     }
 

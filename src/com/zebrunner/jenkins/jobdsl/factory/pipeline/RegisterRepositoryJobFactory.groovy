@@ -20,7 +20,7 @@ public class RegisterRepositoryJobFactory extends PipelineFactory {
         pipelineJob.with {
             parameters {
                 configure addExtensibleChoice('scmType', "gc_GIT_TYPE", "Version control system type", "github")
-                configure stringParam('repoUrl', "https://github.com/qaprosoft/carina-demo.git", 'Repository for scanning')
+                configure stringParam('repoUrl', "https://github.com/zebrunner/carina-demo.git", 'Repository for scanning')
                 configure stringParam('branch', 'master', 'SCM repository branch to run against')
                 configure stringParam('scmUser', '', 'SCM user')
                 configure stringParam('scmToken', '', 'CSM token with read permissions')
