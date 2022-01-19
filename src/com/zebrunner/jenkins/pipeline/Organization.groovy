@@ -287,19 +287,11 @@ class Organization extends BaseObject {
     
     public def registerReportingCredentials() {
         context.stage("Register Reporting Credentials") {
-            Organization.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
+            this.registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
         }
     }
 
-    public static void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
-        def reportingURLCredentials = Configuration.CREDS_REPORTING_SERVICE_URL
-        def reportingTokenCredentials = Configuration.CREDS_REPORTING_ACCESS_TOKEN
-
-        if (!isParamEmpty(orgFolderName)) {
-            reportingURLCredentials = orgFolderName + "-" + reportingURLCredentials
-            reportingTokenCredentials = orgFolderName + "-" + reportingTokenCredentials
-        }
-
+    public void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
         if (isParamEmpty(reportingServiceUrl)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingServiceUrl' is missing!")
         }
@@ -307,9 +299,11 @@ class Organization extends BaseObject {
         if (isParamEmpty(reportingAccessToken)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
-
-        updateJenkinsCredentials(reportingURLCredentials, "Reporting service URL", Configuration.Parameter.REPORTING_SERVICE_URL.getKey(), reportingServiceUrl)
-        updateJenkinsCredentials(reportingTokenCredentials, "Reporting access token", Configuration.Parameter.REPORTING_ACCESS_TOKEN.getKey(), reportingAccessToken)
+        
+        // generate agent.env custom file with reporting integration env vars as content  
+        def content = 
+              "REPORTING_ENABLED=true\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
+        addCustomConfigFile(orgFolderName, Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", content)
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {

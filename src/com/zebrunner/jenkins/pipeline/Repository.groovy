@@ -111,10 +111,6 @@ class Repository extends BaseObject {
                 logger.debug("reportingRefreshToken: " + reportingRefreshToken)
             }
 
-            if (!isParamEmpty(reportingServiceUrl) && !isParamEmpty(reportingRefreshToken)) {
-                Organization.registerReportingCredentials(this.organization, reportingServiceUrl, reportingRefreshToken)
-            }
-            
             logger.debug("organization: ${this.organization}")
 
             repoFolder = this.organization + "/" + repoFolder

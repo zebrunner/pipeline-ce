@@ -70,7 +70,6 @@ public class TestNG extends Runner {
         context.node("master") {
             context.timestamps {
                 logger.info("TestNG->onPush")
-                setReportingCreds()
 
                 try {
                     getScm().clone(true)
@@ -406,20 +405,19 @@ public class TestNG extends Runner {
     }
 
     public void runJob() {
-        // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
-        setReportingCreds()
-        setSeleniumUrl()
         
         logger.info("TestNG->runJob")
         uuid = getUUID()
         logger.info("UUID: " + uuid)
         def testRun
-        def isRerun = isRerun()
         String nodeName = "master"
         context.node(nodeName) {
             nodeName = chooseNode()
         }
         context.node(nodeName) {
+            // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
+            setSeleniumUrl()
+            
             context.wrap([$class: 'BuildUser']) {
                 try {
                     context.timestamps {
@@ -480,11 +478,6 @@ public class TestNG extends Runner {
     // to be able to organize custom notifications on private pipeline layer
     protected void customNotify() {
         // do nothing
-    }
-
-    // Possible to override in private pipelines
-    protected boolean isRerun() {
-        return zafiraUpdater.isZafiraRerun(uuid)
     }
 
     // Possible to override in private pipelines
@@ -571,9 +564,14 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            def goals = getMavenGoals()
-            def pomFile = getMavenPomFile()
-            context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            context.withEnv(getAgentVars()) {
+                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                this.zafiraUpdater = new ZafiraUpdater(context)
+                
+                def goals = getMavenGoals()
+                def pomFile = getMavenPomFile()
+                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            }
         }
     }
 
@@ -599,40 +597,31 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected void setReportingCreds() {
-        def zafiraFields = Configuration.get("zafiraFields")
-        if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
-            // init Zafira serviceUrl and accessToken parameter based on zafiraFields parameter
-            logger.debug("init ZafiraUpdater from zafiraFields: " + zafiraFields)
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, Configuration.get("zafira_service_url"))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, Configuration.get("zafira_access_token"))
-        } else {
-            // init Zafira serviceUrl and accessToken parameter based on values from credentials
-            logger.debug("init ZafiraUpdater from credentials")
-            Configuration.set(Configuration.Parameter.REPORTING_SERVICE_URL, getToken(Configuration.CREDS_REPORTING_SERVICE_URL))
-            Configuration.set(Configuration.Parameter.REPORTING_ACCESS_TOKEN, getToken(Configuration.CREDS_REPORTING_ACCESS_TOKEN))
+    protected def getAgentVars() {
+        def agentVars = []
+        
+        // copy and parse AGENT_VAR file from config files and return as list of env vars
+        context.configFileProvider(
+                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
+                    def props = context.readProperties file: context.agent
+                    logger.debug(props)
+                    
+                    for (String agentVar : props.keySet()) {
+                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
+                        agentVars.add(agentVar + "=" + props[agentVar])
+                    }
+                    
         }
-
-        // obligatory init zafiraUpdater after getting valid url and token
-        zafiraUpdater = new ZafiraUpdater(context)
+        return agentVars
     }
 
     protected String getMavenGoals() {
-        // When zafira is disabled use Maven TestNG build status as job status. RetryCount can't be supported well!
-        def zafiraGoals = "-Dzafira_enabled=false -Dmaven.test.failure.ignore=false"
-        logger.debug("REPORTING_SERVICE_URL: " + Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL))
-        logger.debug("REPORTING_ACCESS_TOKEN: " + Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))
-
-        if (!Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)) 
-            && !Configuration.mustOverride.equals(Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN))) {
-            // Ignore maven build result if Zafira integration is enabled
+        //TODO: remove completely zebrunner/zafira goals from maven integration!
+        
+        // When Zebrunner is disabled use Maven TestNG build status as job status. RetryCount can't be supported correctly!
+        def zafiraGoals = "-Dmaven.test.failure.ignore=false"
+        if ("true".equalsIgnoreCase(context.env.REPORTING_ENABLED)) {
             zafiraGoals = "-Dmaven.test.failure.ignore=true \
-                            -Dzafira_enabled=true \
-                            -Dzafira_service_url=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dzafira_access_token=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
-                            -Dreporting.enabled=true \
-                            -Dreporting.server.hostname=${Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)} \
-                            -Dreporting.server.accessToken=${Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)} \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
@@ -683,8 +672,6 @@ public class TestNG extends Runner {
         // This is an array of parameters, that we need to exclude from list of transmitted parameters to maven
         def necessaryMavenParams  = [
                 "capabilities",
-                "REPORTING_SERVICE_URL",
-                "REPORTING_ACCESS_TOKEN",
                 "zafiraFields",
                 "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",
@@ -1196,15 +1183,6 @@ public class TestNG extends Runner {
 
                 context.emailext getEmailParams(body, subject, to)
             }
-        }
-    }
-
-    public void rerunJobs(){
-        context.stage('Rerun Tests'){
-            //updates zafira credentials with values from Jenkins Credentials (if present)
-            this.organization = Configuration.get("folderName")
-            setReportingCreds()
-            zafiraUpdater.smartRerun()
         }
     }
 
