@@ -296,7 +296,7 @@ class Organization extends BaseObject {
         }
 
         if (isParamEmpty(reportingAccessToken)) {
-            logger.error("Unable to register valid reporting integration! Required field 'reportingServiceUrl' is missing!")
+            logger.error("Unable to register valid reporting integration! Required field 'reportingAccessToken' is missing!")
             enabled = false
         }
         
