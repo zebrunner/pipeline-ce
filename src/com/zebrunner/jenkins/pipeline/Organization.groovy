@@ -39,8 +39,8 @@ class Organization extends BaseObject {
         currentBuild.displayName = getDisplayName()
         context.node('master') {
             context.timestamps {
-                generateCreds()
                 generateCiItems()
+                generateCreds()
                 logger.info("securityEnabled: " + Configuration.get("securityEnabled"))
                 if (Configuration.get("securityEnabled")?.toBoolean()) {
                     setSecurity()
@@ -299,6 +299,8 @@ class Organization extends BaseObject {
         if (isParamEmpty(reportingAccessToken)) {
             throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
         }
+        
+        logger.info("orgFolderName: " + orgFolderName)
         
         // generate agent.env custom file with reporting integration env vars as content  
         def content = 
