@@ -25,6 +25,7 @@ import com.cloudbees.hudson.plugins.folder.Folder;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.folder.FolderConfigFileAction;
 import org.jenkinsci.plugins.configfiles.custom.CustomConfig;
+import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 
 public class Executor {
 
