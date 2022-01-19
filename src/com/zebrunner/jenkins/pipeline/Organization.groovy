@@ -39,8 +39,9 @@ class Organization extends BaseObject {
         currentBuild.displayName = getDisplayName()
         context.node('master') {
             context.timestamps {
-                generateCiItems()
                 generateCreds()
+                generateCiItems()
+                registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
                 logger.info("securityEnabled: " + Configuration.get("securityEnabled"))
                 if (Configuration.get("securityEnabled")?.toBoolean()) {
                     setSecurity()
@@ -224,10 +225,6 @@ class Organization extends BaseObject {
     }
 
     protected def generateCreds() {
-        if (!isParamEmpty(this.reportingServiceUrl) && !isParamEmpty(this.reportingAccessToken)) {
-            registerReportingCredentials(this.folderName, this.reportingServiceUrl, this.reportingAccessToken)
-        }
-
         if (customPipeline?.toBoolean()) {
             registerCustomPipelineCreds(this.folderName, customPipeline)
         }
@@ -292,19 +289,22 @@ class Organization extends BaseObject {
     }
 
     public void registerReportingCredentials(orgFolderName, reportingServiceUrl, reportingAccessToken) {
+        def enabled = true
         if (isParamEmpty(reportingServiceUrl)) {
-            throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingServiceUrl' is missing!")
+            logger.error("Unable to register valid reporting integration! Required field 'reportingServiceUrl' is missing!")
+            enabled = false
         }
 
         if (isParamEmpty(reportingAccessToken)) {
-            throw new RuntimeException("Unable to register reporting credentials! Required field 'reportingAccessToken' is missing!")
+            logger.error("Unable to register valid reporting integration! Required field 'reportingServiceUrl' is missing!")
+            enabled = false
         }
         
         logger.info("orgFolderName: " + orgFolderName)
         
         // generate agent.env custom file with reporting integration env vars as content  
         def content = 
-              "REPORTING_ENABLED=true\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
+              "REPORTING_ENABLED=${enabled}\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
         addCustomConfigFile(orgFolderName, Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", content)
     }
 
