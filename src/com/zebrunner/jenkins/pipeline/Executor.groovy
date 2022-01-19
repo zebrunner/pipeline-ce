@@ -109,8 +109,20 @@ public class Executor {
     }
 
     static void addCustomConfigFile(folderName, id, name, comment, content) {
-        ConfigFileStore store = ((Folder) getItemByFullName(folderName)).getAction(FolderConfigFileAction.class).getStore();
-        Collection<Config> configs = store.getConfigs();
+        /*
+         * example for the global config file management in Jenkins:
+         * https://github.com/jenkinsci/config-file-provider-plugin/blob/b1d13ab708971e9f5ca22e467c25174b945934d6/src/test/java/org/jenkinsci/plugins/configfiles/GlobalConfigFilesTest.java
+         * 
+         * example for the folder config file management in Jenkins:
+         * https://github.com/jenkinsci/config-file-provider-plugin/tree/b1d13ab708971e9f5ca22e467c25174b945934d6/src/test/java/org/jenkinsci/plugins/configfiles/folder 
+         */
+        
+        ConfigFileStore store = Jenkins.instance.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
+        
+        if (!isParamEmpty(folderName)) {
+            store = ((Folder) getItemByFullName(folderName)).getAction(FolderConfigFileAction.class).getStore();
+        }
+        
         CustomConfig config = new CustomConfig(id, name, comment, content);
         store.save(config);
     }
