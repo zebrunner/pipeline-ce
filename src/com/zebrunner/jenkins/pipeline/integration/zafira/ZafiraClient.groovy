@@ -6,7 +6,7 @@ import static com.zebrunner.jenkins.Utils.*
 import com.zebrunner.jenkins.pipeline.Configuration
 
 /*
- * Prerequisites: valid REPORTING_SERVICE_URL and REPORTING_ACCESS_TOKEN already defined in Configuration
+ * Prerequisites: valid REPORTING_SERVER_HOSTNAME and REPORTING_SERVER_ACCESS_TOKEN values as env vars
  */
 
 class ZafiraClient extends HttpClient {
@@ -18,34 +18,8 @@ class ZafiraClient extends HttpClient {
 
     public ZafiraClient(context) {
         super(context)
-        this.serviceURL = Configuration.get(Configuration.Parameter.REPORTING_SERVICE_URL)
-        this.refreshToken = Configuration.get(Configuration.Parameter.REPORTING_ACCESS_TOKEN)
-    }
-
-    public def smartRerun() {
-        if (!isZafiraConnected()) {
-            return
-        }
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder owner: Configuration.get("owner"),
-                cause: Configuration.get("cause"),
-                upstreamJobId: Configuration.get("upstreamJobId"),
-                upstreamJobBuildNumber: Configuration.get("upstreamJobBuildNumber"),
-                repoUrl: Configuration.get("repoUrl"),
-                hashcode: Configuration.get("hashcode")
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null
-
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:401",
-                          url               : this.serviceURL + "/api/reporting/api/tests/runs/rerun/jobs?doRebuild=${Configuration.get("doRebuild")}&rerunFailures=${Configuration.get("rerunFailures")}",
-                          timeout           : 300000]
-        return sendRequestFormatted(parameters)
+        this.serviceURL = context.env.REPORTING_SERVER_HOSTNAME 
+        this.refreshToken = context.env.REPORTING_SERVER_ACCESS_TOKEN
     }
 
     public def abortTestRun(uuid, failureReason) {
@@ -88,29 +62,6 @@ class ZafiraClient extends HttpClient {
         return sendRequest(parameters)
     }
     
-    public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
-        JsonBuilder jsonBuilder = new JsonBuilder()
-        jsonBuilder testRunName: testRunName,
-            runExists: isExists,
-            includeAll: isIncludeAll,
-            milestone: milestoneName,
-            assignee: assignee,
-            searchInterval: defaultSearchInterval
-
-        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
-        
-        String requestBody = jsonBuilder.toString()
-        jsonBuilder = null        
-        
-        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
-                          contentType       : 'APPLICATION_JSON',
-                          httpMode          : 'POST',
-                          requestBody       : requestBody,
-                          validResponseCodes: "200:401",
-                          url:              this.serviceURL + "/api/reporting/v1/integrations/testrail/results?projectId=${testRun.activeProjectId}&testRunId=${testRun.id}"]
-        return sendRequestFormatted(parameters)
-    }
-
     public def sendFailureEmail(uuid, emailList, suiteOwner, suiteRunner) {
         if (!isZafiraConnected()) {
             return

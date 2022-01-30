@@ -28,11 +28,6 @@ class ZafiraUpdater {
         return testRun
     }
 
-    public def smartRerun() {
-        def response = zc.smartRerun()
-        logger.info("Results : " + response.size())
-    }
-    
     public def abortTestRun(uuid, currentBuild) {
         def abortedTestRun
         currentBuild.result = BuildResult.FAILURE
@@ -178,16 +173,6 @@ class ZafiraUpdater {
                 logger.debug("don't change currentBuild.result")
             }
         }
-    }
-
-    public boolean isZafiraRerun(uuid) {
-        return !isParamEmpty(zc.getTestRunByCiRunId(uuid))
-    }
-    
-    public def addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval) {
-        def response = zc.addTestRailResults(testRun, testRunName, isExists, isIncludeAll, milestoneName, assignee, defaultSearchInterval)
-        //TODO: implement verification
-        logger.info("Response: " + formatJson(response))
     }
 
     protected boolean isFailure(testRunStatus) {

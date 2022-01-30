@@ -20,6 +20,13 @@ import com.cloudbees.plugins.credentials.domains.*
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl;
 import hudson.util.Secret
 
+import org.jenkinsci.plugins.configfiles.ConfigFileStore;
+import com.cloudbees.hudson.plugins.folder.Folder;
+import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.folder.FolderConfigFileAction;
+import org.jenkinsci.plugins.configfiles.custom.CustomConfig;
+import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
+
 public class Executor {
 
     static enum BuildResult {
@@ -102,6 +109,25 @@ public class Executor {
         return reportParameters
     }
 
+    static void addCustomConfigFile(folderName, id, name, comment, content) {
+        /*
+         * example for the global config file management in Jenkins:
+         * https://github.com/jenkinsci/config-file-provider-plugin/blob/b1d13ab708971e9f5ca22e467c25174b945934d6/src/test/java/org/jenkinsci/plugins/configfiles/GlobalConfigFilesTest.java
+         * 
+         * example for the folder config file management in Jenkins:
+         * https://github.com/jenkinsci/config-file-provider-plugin/tree/b1d13ab708971e9f5ca22e467c25174b945934d6/src/test/java/org/jenkinsci/plugins/configfiles/folder 
+         */
+        
+        ConfigFileStore store = Jenkins.instance.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
+        
+        if (!isParamEmpty(folderName)) {
+            store = ((Folder) getItemByFullName(folderName)).getAction(FolderConfigFileAction.class).getStore();
+        }
+        
+        CustomConfig config = new CustomConfig(id, name, comment, content);
+        store.save(config);
+    }
+    
     static def updateJenkinsCredentials(id, description, user, password) {
         if (!isParamEmpty(password) && !isParamEmpty(user)) {
             def credentialsStore = SystemCredentialsProvider.getInstance().getStore()
