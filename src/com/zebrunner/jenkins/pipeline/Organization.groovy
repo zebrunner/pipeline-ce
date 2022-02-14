@@ -309,7 +309,7 @@ class Organization extends BaseObject {
         
         def callbackURL = Configuration.get("callbackUrl")
         if (!callbackURL.isEmpty()) {
-            zebrunnerUpdater.sendInitCredsResult(orgFolderName, initialized)
+            zebrunnerUpdater.sendInitCredsResult(orgFolderName, callbackURL)
         }
     }
 
