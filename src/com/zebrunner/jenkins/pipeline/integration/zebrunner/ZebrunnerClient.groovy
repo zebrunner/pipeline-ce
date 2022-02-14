@@ -23,4 +23,15 @@ class ZebrunnerClient extends HttpClient {
                           url          : callbackURL]
         return sendRequestFormatted(parameters)
     }
+    
+    public def sendInitCredsResult(tenancyName, callbackURL) {
+        JsonBuilder jsonBuilder = new JsonBuilder()
+        jsonBuilder tenant: tenancyName
+        logger.info("REQUEST: " + jsonBuilder.toPrettyString())
+        def parameters = [contentType  : 'APPLICATION_JSON',
+                          httpMode     : 'POST',
+                          requestBody  : "${jsonBuilder}",
+                          url          : callbackURL]
+        return sendRequestFormatted(parameters)
+    }
 }
