@@ -306,6 +306,11 @@ class Organization extends BaseObject {
         def content = 
               "REPORTING_ENABLED=${enabled}\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
         addCustomConfigFile(orgFolderName, Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", content)
+        
+        def callbackURL = Configuration.get("callbackUrl")
+        if (!callbackURL.isEmpty()) {
+            zebrunnerUpdater.sendInitCredsResult(orgFolderName, initialized)
+        }
     }
 
     protected def registerCustomPipelineCreds(orgFolderName, token) {
