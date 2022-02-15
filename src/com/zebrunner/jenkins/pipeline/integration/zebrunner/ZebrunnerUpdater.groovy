@@ -21,4 +21,8 @@ class ZebrunnerUpdater {
         def callbackURL = Configuration.get("callbackUrl")
         return zc.sendInitResult(integrationParameters, tenancyName, accessToken, callbackURL, initialized)
     }
+    
+    public def sendInitCredsResult(tenancyName, callbackURL) {
+        return zc.sendInitCredsResult(tenancyName, callbackURL)
+    }
 }
