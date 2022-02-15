@@ -1222,9 +1222,10 @@ public class TestNG extends Runner {
         if (isParamEmpty(Configuration.get("provider"))) {
             // #177: setup default provider=zebrunner by default
             Configuration.set("provider", "zebrunner")
-            
             Configuration.set("capabilities.provider", "zebrunner")
-        } 
+        } else {
+            Configuration.set("capabilities.provider", Configuration.get("provider"))
+        }
         
         return Configuration.get("provider")
     }
