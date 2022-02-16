@@ -618,12 +618,11 @@ public class TestNG extends Runner {
     }
     
     protected void getAdbKeys() {
-        def HOME = "/root" 
         context.configFileProvider(
-            [context.configFile(fileId: 'adbkey', targetLocation: '$HOME/.android'), 
-            context.configFile(fileId: 'adbkey.pub', targetLocation: '$HOME/.android')]
+            [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android'), 
+            context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android')]
         ) {
-            context.sh 'ls -la $HOME/.android/'
+            context.sh 'ls -la /root/.android/'
         }
     }
 
