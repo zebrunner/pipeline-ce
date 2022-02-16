@@ -620,14 +620,14 @@ public class TestNG extends Runner {
     protected void getAdbKeys() {
         try {
             context.configFileProvider(
-                [context.configFile(fileId: 'adbkey2', targetLocation: '/root/.android/adbkey'), 
-                context.configFile(fileId: 'adbkey2.pub', targetLocation: '/root/.android/adbkey.pub')]
+                [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android/adbkey'), 
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub')]
             ) {
                 context.sh 'ls -la /root/.android/'
             }
         } catch (Exception e) {
             // do nothing as files optional 
-            logger.info(e.getMessage())
+            logger.debug(e.getMessage())
         }
     }
 
