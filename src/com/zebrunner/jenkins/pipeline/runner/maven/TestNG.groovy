@@ -627,7 +627,7 @@ public class TestNG extends Runner {
             }
         } catch (Exception e) {
             // do nothing as files optional 
-            logger.info(e.getmessage())
+            logger.info(e.getMessage())
         }
     }
 
