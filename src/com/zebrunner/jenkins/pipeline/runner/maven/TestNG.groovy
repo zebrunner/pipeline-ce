@@ -568,6 +568,8 @@ public class TestNG extends Runner {
                 //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
                 this.zafiraUpdater = new ZafiraUpdater(context)
                 
+                getAdbKeys()
+                
                 def goals = getMavenGoals()
                 def pomFile = getMavenPomFile()
                 context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
@@ -613,6 +615,20 @@ public class TestNG extends Runner {
                     
         }
         return agentVars
+    }
+    
+    protected void getAdbKeys() {
+        try {
+            context.configFileProvider(
+                [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android/adbkey'), 
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub')]
+            ) {
+                context.sh 'ls -la /root/.android/'
+            }
+        } catch (Exception e) {
+            // do nothing as files optional 
+            logger.debug(e.getMessage())
+        }
     }
 
     protected String getMavenGoals() {
