@@ -204,6 +204,9 @@ public class TestJobFactory extends PipelineFactory {
                             case "choiceparam":
                                 choiceParam(name, Arrays.asList(param.value.split(',')), desc)
                                 break
+                            case "extensibleChoice":
+                                configure addExtensibleChoice(name, desc, param.value)
+                                break
                             case "booleanparam":
                                 booleanParam(name, param.value.toBoolean(), desc)
                                 break
