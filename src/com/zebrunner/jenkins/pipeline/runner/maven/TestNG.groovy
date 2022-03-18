@@ -921,7 +921,7 @@ public class TestNG extends Runner {
                 continue
             }
 
-            logger.info("Current suite path: " + currentSuitePath)
+            logger.debug("Current suite path: " + currentSuitePath)
             XmlSuite currentSuite = parsePipeline(currentSuitePath)
             if (currentSuite == null) {
                 logger.error("Unable to parse suite: " + currentSuitePath)
