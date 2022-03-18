@@ -952,7 +952,7 @@ public class TestNG extends Runner {
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
         
         // that's might be optional param
-        def currentLocales = Configuration.get("locale")
+        def currentLocales = Configuration.get("locales")
         
         for (def regressionPipeline : regressionPipelines?.split(",")) {
 			regressionPipeline = regressionPipeline.trim()
