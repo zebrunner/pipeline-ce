@@ -170,7 +170,7 @@ public class TestNG extends Runner {
 			def currentSuitePath = workspace + "/" + suitePath
 			
 			if (!isTestNgSuite(currentSuitePath)) {
-				logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
+				logger.debug("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
 				// not under /src/test/resources or not a TestNG suite file
 				continue
 			}
@@ -956,7 +956,7 @@ public class TestNG extends Runner {
                 continue
             }
             
-            def logLine = "regressionPipelines: ${regressionPipelines};\n   jobName: ${jobName};\n  " +
+            def logLine = "jobName: ${jobName};\n  regressionPipelines: ${regressionPipelines};\n   " +
                     "jobExecutionOrderNumber: ${orderNum};\n    email_list: ${emailList};\n " +
                     "currentBrowser: ${currentBrowser};"
             logger.info(logLine)
@@ -1025,7 +1025,7 @@ public class TestNG extends Runner {
         def orderNum = suite.getParameter("jenkinsJobExecutionOrder").toString()
         if (orderNum.equals("null")) {
             orderNum = "0"
-            logger.info("specify by default '0' order - start asap")
+            logger.debug("specify by default '0' order - start asap")
         } else if (orderNum.equals("ordered")) {
             orderedJobExecNum++
             orderNum = orderedJobExecNum.toString()
