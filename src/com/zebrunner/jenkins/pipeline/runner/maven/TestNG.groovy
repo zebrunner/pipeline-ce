@@ -1195,6 +1195,11 @@ public class TestNG extends Runner {
 					continue
 				}
                 
+                if ("env".equalsIgnoreCase(param.getKey())) {
+                    //env is parsed in different way so don't add it as dedictaed job param
+                    continue
+                }
+                
                 if ("locale".equalsIgnoreCase(param.getKey())) {
                     //locale is parsed in different way so don't add it as dedictaed job param
                     continue
