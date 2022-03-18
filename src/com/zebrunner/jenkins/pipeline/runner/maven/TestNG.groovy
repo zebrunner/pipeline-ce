@@ -990,6 +990,8 @@ public class TestNG extends Runner {
                         logger.info("supportedParams: ${supportedParams}")
                     }
 
+                    logger.info("locale: " + pipelineMap.get("locale"))
+                    
                     Map supportedConfigurations = getSupportedConfigurations(supportedParams)
                     logger.info("supportedConfigurations: ${supportedConfigurations}")
                     def pipelineMap = [:]
