@@ -1100,6 +1100,7 @@ public class TestNG extends Runner {
         String beginOrder = "0"
         String curOrder = ""
         for (Map jobParams : listPipelines) {
+            logger.info("building stage for jobParams: " + jobParams)
             def stageName = getStageName(jobParams)
             boolean propagateJob = true
             if (!isParamEmpty(jobParams.get("executionMode"))) {
@@ -1160,6 +1161,9 @@ public class TestNG extends Runner {
 			stageName += "Params: ${paramsName} "
 		}
 		//TODO: investigate if we can remove lower param for naming after adding "params_name"
+        if (!isParamEmpty(locale)) {
+            stageName += "Locale: ${locale} "
+        }
         if (!isParamEmpty(browser)) {
             stageName += "Browser: ${browser} "
         }
@@ -1209,7 +1213,8 @@ public class TestNG extends Runner {
             for (param in entry) {
                 jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
             }
-            logger.info(jobParams.dump())
+            
+            logger.info("jobParams: " + jobParams.dump())
 
             try {
                 context.build job: parseFolderName(getWorkspace()) + "/" + entry.get("jobName"),
