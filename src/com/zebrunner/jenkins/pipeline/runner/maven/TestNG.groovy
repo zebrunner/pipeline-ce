@@ -44,7 +44,6 @@ public class TestNG extends Runner {
 
     //CRON related vars
     protected def listPipelines = []
-    protected Map pipelineLocaleMap = [:]
     protected orderedJobExecNum = 0
     protected boolean multilingualMode = false
 
@@ -988,7 +987,6 @@ public class TestNG extends Runner {
                     logger.info("supportedConfigurations: ${supportedConfigurations}")
                     def pipelineMap = [:]
                     // put all not NULL args into the pipelineMap for execution
-                    putMap(pipelineMap, pipelineLocaleMap)
                     pipelineMap.put("name", regressionPipeline)
                     pipelineMap.put("params_name", supportedParams)
                     pipelineMap.put("branch", Configuration.get("branch"))
@@ -1013,7 +1011,7 @@ public class TestNG extends Runner {
                             pipelineMap.put("locale", currentLocale)
                             registerPipeline(currentSuite, pipelineMap)
                             // print resulting pipelineMap
-                            logger.info("pipelineMap: " + pipelineMap)
+                            logger.debug("pipelineMap: " + pipelineMap)
                         }
                     } else {
                         registerPipeline(currentSuite, pipelineMap)
