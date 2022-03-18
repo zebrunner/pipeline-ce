@@ -1200,15 +1200,15 @@ public class TestNG extends Runner {
                     if ("false".equalsIgnoreCase(param.getValue().toString()) || "true".equalsIgnoreCase(param.getValue().toString())) {
                         jobParams.add(context.booleanParam(name: param.getKey(), value: param.getValue()))
                     } else {
+                        if ("locale".equalsIgnoreCase(param.getKey())) {
+                            //locale is parsed in different way so don't add it as dedictaed job param
+                            continue
+                        }
                         jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
                     }
                 }
             }
             for (param in entry) {
-                if ("locale".equalsIgnoreCase(param.getKey())) {
-                    //locale is parsed in different way so don't add it as dedictaed job param 
-                    continue
-                }
                 jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
             }
             logger.info(jobParams.dump())
