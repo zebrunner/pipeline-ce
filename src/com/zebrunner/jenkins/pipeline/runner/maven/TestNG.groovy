@@ -1205,6 +1205,10 @@ public class TestNG extends Runner {
                 }
             }
             for (param in entry) {
+                if ("locale".equalsIgnoreCase(param.getKey())) {
+                    //locale is parsed in different way so don't add it as dedictaed job param 
+                    continue
+                }
                 jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
             }
             logger.info(jobParams.dump())
