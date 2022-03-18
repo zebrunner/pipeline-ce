@@ -1013,10 +1013,11 @@ public class TestNG extends Runner {
                     
                     if (!isParamEmpty(currentLocales)) {
                         for (def currentLocale : currentLocales.split(",")) {
+                            def pipelineLocaleMap = pipelineLocaleMap.clone() 
                             logger.info("currentLocale: " + currentLocale)
                             currentLocale = currentLocale.trim()
-                            pipelineMap.put("locale", currentLocale)
-                            registerPipeline(currentSuite, pipelineMap)
+                            pipelineLocaleMap.put("locale", currentLocale)
+                            registerPipeline(currentSuite, pipelineLocaleMap)
                             // print resulting pipelineMap
                             logger.debug("pipelineMap: " + pipelineMap)
                         }
