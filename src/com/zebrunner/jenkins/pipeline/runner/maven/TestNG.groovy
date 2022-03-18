@@ -1008,6 +1008,7 @@ public class TestNG extends Runner {
                     
                     if (!isParamEmpty(currentLocales)) {
                         for (def currentLocale : currentLocales.split(",")) {
+                            logger.info("currentLocale: " + currentLocale)
                             currentLocale = currentLocale.trim()
                             pipelineMap.put("locale", currentLocale)
                             registerPipeline(currentSuite, pipelineMap)
@@ -1018,6 +1019,8 @@ public class TestNG extends Runner {
                 }
             }
         }
+        // print resulting pipelineMap
+        logger.info(pipelineMap)
     }
 
     protected def getOrderNum(suite){
