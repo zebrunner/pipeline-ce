@@ -949,17 +949,17 @@ public class TestNG extends Runner {
         // that's might be optional param
         def currentLocales = Configuration.get("locale")
         
-        def logLine = "regressionPipelines: ${regressionPipelines};\n	jobName: ${jobName};\n	" +
-                "jobExecutionOrderNumber: ${orderNum};\n	email_list: ${emailList};\n	" +
-                "currentBrowser: ${currentBrowser};"
-        logger.info(logLine)
-
         for (def regressionPipeline : regressionPipelines?.split(",")) {
 			regressionPipeline = regressionPipeline.trim()
             if (!Configuration.get(Configuration.Parameter.JOB_BASE_NAME).equals(regressionPipeline)) {
                 //launch test only if current regressionPipeline exists among regressionPipelines
                 continue
             }
+            
+            def logLine = "regressionPipelines: ${regressionPipelines};\n   jobName: ${jobName};\n  " +
+                    "jobExecutionOrderNumber: ${orderNum};\n    email_list: ${emailList};\n " +
+                    "currentBrowser: ${currentBrowser};"
+            logger.info(logLine)
 
             for (def currentEnv : currentEnvs.split(",")) {
                 currentEnv = currentEnv.trim()
