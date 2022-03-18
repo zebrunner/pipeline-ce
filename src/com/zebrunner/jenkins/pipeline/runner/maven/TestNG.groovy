@@ -916,7 +916,7 @@ public class TestNG extends Runner {
         for (file in files){
             def currentSuitePath = workspace + "/" + file.path
             if (!isTestNgSuite(currentSuitePath)) {
-                logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
+                logger.debug("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
                 // not under /src/test/resources or not a TestNG suite file
                 continue
             }
