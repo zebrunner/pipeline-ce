@@ -956,9 +956,11 @@ public class TestNG extends Runner {
                 continue
             }
             
-            def logLine = "jobName: ${jobName};\n  regressionPipelines: ${regressionPipelines};\n   " +
-                    "jobExecutionOrderNumber: ${orderNum};\n    email_list: ${emailList};\n " +
-                    "currentBrowser: ${currentBrowser};"
+            def logLine = "jobName: ${jobName};\n" + 
+                    "   regressionPipelines: ${regressionPipelines};\n" +
+                    "   jobExecutionOrderNumber: ${orderNum};\n" + 
+                    "   email_list: ${emailList};\n" +
+                    "   currentBrowser: ${currentBrowser};"
             logger.info(logLine)
 
             for (def currentEnv : currentEnvs.split(",")) {
