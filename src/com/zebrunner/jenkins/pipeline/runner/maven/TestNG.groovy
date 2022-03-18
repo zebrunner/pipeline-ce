@@ -645,7 +645,6 @@ public class TestNG extends Runner {
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-            -Dtestng.strict.parallel=true \
             ${zafiraGoals} \
             -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
             -Dmax_screen_history=1 \
@@ -828,12 +827,13 @@ public class TestNG extends Runner {
     }
 
     protected void printDumpReports() {
-        // print "**/*.dump" file content into the log 
-        def files = context.findFiles(glob: '**/*.dump')
+        // print *.dump and *.dumpstream files content into the log. 
+        def files = context.findFiles(glob: '**/*.dump*')
         for (int i = 0; i < files.length; i++) {
             currentBuild.result = BuildResult.FAILURE //explicitly mark build as fail
             logger.error("Detected dump: " + files[i].path)
             logger.info(context.readFile(file: files[i].path))
+            logger.info("") //print empty line
         }
     }
     
