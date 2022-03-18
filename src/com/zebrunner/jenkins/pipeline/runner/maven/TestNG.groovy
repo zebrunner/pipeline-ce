@@ -900,7 +900,12 @@ public class TestNG extends Runner {
                 def subProject = Paths.get(pomFile).getParent()?Paths.get(pomFile).getParent().toString():"."
                 def subProjectFilter = subProject.equals(".")?"**":subProject
                 generatePipeLineList(subProjectFilter)
-                logger.info "Finished Dynamic Mapping:"
+                logger.info("Generated Pipelines Mapping:\n" + listPipelines)
+                listPipelines.each { pipeline ->
+                    logger.info(pipeline.toString())
+                }
+                
+                logger.info("Finished Pipelines Sorting:\n")
                 listPipelines = sortPipelineList(listPipelines)
                 listPipelines.each { pipeline ->
                     logger.info(pipeline.toString())
