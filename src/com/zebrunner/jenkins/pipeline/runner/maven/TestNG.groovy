@@ -942,7 +942,7 @@ public class TestNG extends Runner {
         def regressionPipelines = !isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))?currentSuite.getParameter("jenkinsRegressionPipeline"):""
         def orderNum = getJobExecutionOrderNumber(currentSuite)
         def executionMode = currentSuite.getParameter("jenkinsJobExecutionMode")
-        def currentEnvs = getCronEnv(currentSuite)
+        def currentEnvs = Configuration.get("env")
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
@@ -1029,11 +1029,6 @@ public class TestNG extends Runner {
             orderNum = orderedJobExecNum
         }
         return orderNum.toString()
-    }
-
-    protected def getCronEnv(currentSuite) {
-        //currentSuite is need to override action in private pipelines
-        return Configuration.get("env")
     }
 
     // do not remove currentSuite from this method! It is available here to be override on customer level.
