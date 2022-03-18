@@ -1160,7 +1160,7 @@ public class TestNG extends Runner {
 		if (!isParamEmpty(paramsName)) {
 			stageName += "Params: ${paramsName} "
 		}
-		//TODO: investigate if we can remove lower param for naming after adding "params_name"
+		// We can't remove lower param for naming even after adding "params_name"
         if (!isParamEmpty(locale)) {
             stageName += "Locale: ${locale} "
         }
@@ -1198,7 +1198,6 @@ public class TestNG extends Runner {
                 
                 if ("locale".equalsIgnoreCase(param.getKey())) {
                     //locale is parsed in different way so don't add it as dedictaed job param
-                    logger.info("ignoring locale param...")
                     continue
                 }
 
