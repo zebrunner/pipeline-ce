@@ -1054,6 +1054,7 @@ public class TestNG extends Runner {
 
     // do not remove currentSuite from this method! It is available here to be override on customer level.
     protected def registerPipeline(currentSuite, pipelineMap) {
+        logger.info("registering pipeline: " + pipelineMap)
         listPipelines.add(pipelineMap)
     }
 
