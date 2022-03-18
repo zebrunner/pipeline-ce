@@ -996,7 +996,7 @@ public class TestNG extends Runner {
                     pipelineMap.put("ci_parent_build", setDefaultIfEmpty("ci_parent_build", Configuration.Parameter.BUILD_NUMBER))
                     putNotNull(pipelineMap, "thread_count", Configuration.get("thread_count"))
                     pipelineMap.put("jobName", jobName)
-                    pipelineMap.put("env", supportedEnv)
+                    pipelineMap.put("env", currentEnv)
                     pipelineMap.put("order", orderNum)
                     pipelineMap.put("BuildPriority", priorityNum)
                     putNotNullWithSplit(pipelineMap, "email_list", emailList)
