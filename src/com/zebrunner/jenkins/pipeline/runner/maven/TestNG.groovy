@@ -946,6 +946,10 @@ public class TestNG extends Runner {
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
+        
+        // that's might be optional param
+        def currentLocales = Configuration.get("locale")
+        
         def logLine = "regressionPipelines: ${regressionPipelines};\n	jobName: ${jobName};\n	" +
                 "jobExecutionOrderNumber: ${orderNum};\n	email_list: ${emailList};\n	" +
                 "currentBrowser: ${currentBrowser};"
@@ -1001,7 +1005,16 @@ public class TestNG extends Runner {
                     putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
                     // supported config matrix should be applied at the end to be able to override default args like retry_count etc
                     putMap(pipelineMap, supportedConfigurations)
-                    registerPipeline(currentSuite, pipelineMap)
+                    
+                    if (!isParamEmpty(currentLocales)) {
+                        for (def currentLocale : currentLocales.split(",")) {
+                            currentLocale = currentLocale.trim()
+                            pipelineMap.put("locale", currentLocale)
+                            registerPipeline(currentSuite, pipelineMap)
+                        }
+                    } else {
+                        registerPipeline(currentSuite, pipelineMap)
+                    }
                 }
             }
         }
