@@ -1056,6 +1056,8 @@ public class TestNG extends Runner {
     protected def registerPipeline(currentSuite, pipelineMap) {
         logger.info("registering pipeline: " + pipelineMap)
         listPipelines.add(pipelineMap)
+        
+        logger.info("registered pipelines: " + listPipelines)
     }
 
     protected getSupportedConfigurations(configDetails){
