@@ -899,12 +899,12 @@ public class TestNG extends Runner {
                 def subProject = Paths.get(pomFile).getParent()?Paths.get(pomFile).getParent().toString():"."
                 def subProjectFilter = subProject.equals(".")?"**":subProject
                 generatePipeLineList(subProjectFilter)
-                logger.info("Generated Pipelines Mapping:\n" + listPipelines)
+                logger.debug("Generated Pipelines Mapping:\n" + listPipelines)
                 listPipelines.each { pipeline ->
                     logger.info(pipeline.toString())
                 }
                 
-                logger.info("Finished Pipelines Sorting:\n")
+                logger.info("Finished Pipelines Sorting:")
                 listPipelines = sortPipelineList(listPipelines)
                 listPipelines.each { pipeline ->
                     logger.info(pipeline.toString())
@@ -1013,7 +1013,7 @@ public class TestNG extends Runner {
                     if (!isParamEmpty(currentLocales)) {
                         for (def currentLocale : currentLocales.split(",")) {
                             def pipelineLocaleMap = pipelineMap.clone() 
-                            logger.info("currentLocale: " + currentLocale)
+                            logger.debug("currentLocale: " + currentLocale)
                             currentLocale = currentLocale.trim()
                             pipelineLocaleMap.put("locale", currentLocale)
                             registerPipeline(currentSuite, pipelineLocaleMap)
@@ -1054,10 +1054,9 @@ public class TestNG extends Runner {
 
     // do not remove currentSuite from this method! It is available here to be override on customer level.
     protected def registerPipeline(currentSuite, pipelineMap) {
-        logger.info("registering pipeline: " + pipelineMap)
+        logger.debug("registering pipeline: " + pipelineMap)
         listPipelines.add(pipelineMap)
-        
-        logger.info("registered pipelines: " + listPipelines)
+        logger.debug("registered pipelines: " + listPipelines)
     }
 
     protected getSupportedConfigurations(configDetails){
