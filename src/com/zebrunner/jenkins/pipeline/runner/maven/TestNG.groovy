@@ -942,14 +942,12 @@ public class TestNG extends Runner {
         def regressionPipelines = !isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))?currentSuite.getParameter("jenkinsRegressionPipeline"):""
         def orderNum = getJobExecutionOrderNumber(currentSuite)
         def executionMode = currentSuite.getParameter("jenkinsJobExecutionMode")
-        def supportedEnvs = getSuiteParameter(currentSuite.getParameter("jenkinsEnvironments"), "jenkinsPipelineEnvironments", currentSuite)
         def currentEnvs = getCronEnv(currentSuite)
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
         def logLine = "regressionPipelines: ${regressionPipelines};\n	jobName: ${jobName};\n	" +
                 "jobExecutionOrderNumber: ${orderNum};\n	email_list: ${emailList};\n	" +
-                "supportedEnvs: ${supportedEnvs};\n	currentEnv(s): ${currentEnvs};\n	" +
                 "currentBrowser: ${currentBrowser};"
         logger.info(logLine)
 
@@ -962,58 +960,48 @@ public class TestNG extends Runner {
 
             for (def currentEnv : currentEnvs.split(",")) {
                 currentEnv = currentEnv.trim()
-                for (def supportedEnv : supportedEnvs.split(",")) {
-                    supportedEnv = supportedEnv.trim()
-//                  logger.debug("supportedEnv: " + supportedEnv)
-                    if (!currentEnv.equals(supportedEnv) && !isParamEmpty(currentEnv)) {
-                        logger.info("Skip execution for env: ${supportedEnv}; currentEnv: ${currentEnv}")
-                        //launch test only if current suite support cron regression execution for current env
-                        continue
+
+                // organize children pipeline jobs according to the JENKINS_REGRESSION_MATRIX or execute at once with default params
+                def supportedParamsMatrix = ""
+                if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX))) {
+                    supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX)
+                    logger.info("Declared ${JENKINS_REGRESSION_MATRIX} detected!")
+                }
+
+                if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline))) {
+                    // override default parameters matrix using concrete cron params
+                    supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline)
+                    logger.info("Declared ${JENKINS_REGRESSION_MATRIX}_${regressionPipeline} detected!")
+                }
+
+                for (def supportedParams : supportedParamsMatrix.split(";")) {
+                    if (!isParamEmpty(supportedParams)) {
+                        supportedParams = supportedParams.trim()
+                        logger.info("supportedParams: ${supportedParams}")
                     }
 
-
-					// organize children pipeline jobs according to the JENKINS_REGRESSION_MATRIX or execute at once with default params
-					def supportedParamsMatrix = ""
-					if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX))) {
-						supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX)
-						logger.info("Declared ${JENKINS_REGRESSION_MATRIX} detected!")
-					}
-
-					if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline))) {
-						// override default parameters matrix using concrete cron params
-						supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline)
-						logger.info("Declared ${JENKINS_REGRESSION_MATRIX}_${regressionPipeline} detected!")
-					}
-
-					for (def supportedParams : supportedParamsMatrix.split(";")) {
-						if (!isParamEmpty(supportedParams)) {
-							supportedParams = supportedParams.trim()
-							logger.info("supportedParams: ${supportedParams}")
-						}
-
-						Map supportedConfigurations = getSupportedConfigurations(supportedParams)
-						logger.info("supportedConfigurations: ${supportedConfigurations}")
-						def pipelineMap = [:]
-						// put all not NULL args into the pipelineMap for execution
-						putMap(pipelineMap, pipelineLocaleMap)
-						pipelineMap.put("name", regressionPipeline)
-						pipelineMap.put("params_name", supportedParams)
-						pipelineMap.put("branch", Configuration.get("branch"))
-						pipelineMap.put("ci_parent_url", setDefaultIfEmpty("ci_parent_url", Configuration.Parameter.JOB_URL))
-						pipelineMap.put("ci_parent_build", setDefaultIfEmpty("ci_parent_build", Configuration.Parameter.BUILD_NUMBER))
-						putNotNull(pipelineMap, "thread_count", Configuration.get("thread_count"))
-						pipelineMap.put("jobName", jobName)
-						pipelineMap.put("env", supportedEnv)
-						pipelineMap.put("order", orderNum)
-						pipelineMap.put("BuildPriority", priorityNum)
-						putNotNullWithSplit(pipelineMap, "email_list", emailList)
-						putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
-						putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
-						putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
-						// supported config matrix should be applied at the end to be able to override default args like retry_count etc
-						putMap(pipelineMap, supportedConfigurations)
-						registerPipeline(currentSuite, pipelineMap)
-					}
+                    Map supportedConfigurations = getSupportedConfigurations(supportedParams)
+                    logger.info("supportedConfigurations: ${supportedConfigurations}")
+                    def pipelineMap = [:]
+                    // put all not NULL args into the pipelineMap for execution
+                    putMap(pipelineMap, pipelineLocaleMap)
+                    pipelineMap.put("name", regressionPipeline)
+                    pipelineMap.put("params_name", supportedParams)
+                    pipelineMap.put("branch", Configuration.get("branch"))
+                    pipelineMap.put("ci_parent_url", setDefaultIfEmpty("ci_parent_url", Configuration.Parameter.JOB_URL))
+                    pipelineMap.put("ci_parent_build", setDefaultIfEmpty("ci_parent_build", Configuration.Parameter.BUILD_NUMBER))
+                    putNotNull(pipelineMap, "thread_count", Configuration.get("thread_count"))
+                    pipelineMap.put("jobName", jobName)
+                    pipelineMap.put("env", supportedEnv)
+                    pipelineMap.put("order", orderNum)
+                    pipelineMap.put("BuildPriority", priorityNum)
+                    putNotNullWithSplit(pipelineMap, "email_list", emailList)
+                    putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
+                    putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
+                    putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
+                    // supported config matrix should be applied at the end to be able to override default args like retry_count etc
+                    putMap(pipelineMap, supportedConfigurations)
+                    registerPipeline(currentSuite, pipelineMap)
                 }
             }
         }
