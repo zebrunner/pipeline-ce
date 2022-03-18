@@ -1037,7 +1037,7 @@ public class TestNG extends Runner {
         def orderNum = suite.getParameter("jenkinsJobExecutionOrder")
         if (isParamEmpty(orderNum)) {
             orderNum = 0
-            logger.info("specify by default '0' order - start asap")
+            logger.debug("specify by default '0' order - start asap")
         } else if (orderNum.equals("ordered")) {
             orderedJobExecNum++
             orderNum = orderedJobExecNum
