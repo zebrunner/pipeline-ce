@@ -53,7 +53,7 @@ public class CronJobFactory extends PipelineFactory {
                         }
                     }
                     editable(true)
-                    description('Environment to test against')
+                    description('Comma separated list of Environment(s) to test')
                 }
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('ci_parent_url', '', '')
