@@ -44,9 +44,7 @@ public class TestNG extends Runner {
 
     //CRON related vars
     protected def listPipelines = []
-    protected Map pipelineLocaleMap = [:]
     protected orderedJobExecNum = 0
-    protected boolean multilingualMode = false
 
     protected static final String JOB_TYPE = "job_type"
 	protected static final String JENKINS_REGRESSION_MATRIX = "jenkinsRegressionMatrix"
@@ -171,7 +169,7 @@ public class TestNG extends Runner {
 			def currentSuitePath = workspace + "/" + suitePath
 			
 			if (!isTestNgSuite(currentSuitePath)) {
-				logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
+				logger.debug("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
 				// not under /src/test/resources or not a TestNG suite file
 				continue
 			}
@@ -901,7 +899,12 @@ public class TestNG extends Runner {
                 def subProject = Paths.get(pomFile).getParent()?Paths.get(pomFile).getParent().toString():"."
                 def subProjectFilter = subProject.equals(".")?"**":subProject
                 generatePipeLineList(subProjectFilter)
-                logger.info "Finished Dynamic Mapping:"
+                logger.debug("Generated Pipelines Mapping:\n" + listPipelines)
+                listPipelines.each { pipeline ->
+                    logger.info(pipeline.toString())
+                }
+                
+                logger.info("Finished Pipelines Sorting:")
                 listPipelines = sortPipelineList(listPipelines)
                 listPipelines.each { pipeline ->
                     logger.info(pipeline.toString())
@@ -917,12 +920,12 @@ public class TestNG extends Runner {
         for (file in files){
             def currentSuitePath = workspace + "/" + file.path
             if (!isTestNgSuite(currentSuitePath)) {
-                logger.info("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
+                logger.debug("Skip from scanner as not a TestNG suite xml file: " + currentSuitePath)
                 // not under /src/test/resources or not a TestNG suite file
                 continue
             }
 
-            logger.info("Current suite path: " + currentSuitePath)
+            logger.debug("Current suite path: " + currentSuitePath)
             XmlSuite currentSuite = parsePipeline(currentSuitePath)
             if (currentSuite == null) {
                 logger.error("Unable to parse suite: " + currentSuitePath)
@@ -942,78 +945,84 @@ public class TestNG extends Runner {
         def regressionPipelines = !isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))?currentSuite.getParameter("jenkinsRegressionPipeline"):""
         def orderNum = getJobExecutionOrderNumber(currentSuite)
         def executionMode = currentSuite.getParameter("jenkinsJobExecutionMode")
-        def supportedEnvs = getSuiteParameter(currentSuite.getParameter("jenkinsEnvironments"), "jenkinsPipelineEnvironments", currentSuite)
-        def currentEnvs = getCronEnv(currentSuite)
+        def currentEnvs = Configuration.get("env")
         def emailList = !isParamEmpty(Configuration.get("email_list"))?Configuration.get("email_list"):currentSuite.getParameter("jenkinsEmail")
         def priorityNum = !isParamEmpty(Configuration.get("BuildPriority"))?Configuration.get("BuildPriority"):"5"
         def currentBrowser = !isParamEmpty(getBrowser())?getBrowser():"NULL"
-        def logLine = "regressionPipelines: ${regressionPipelines};\n	jobName: ${jobName};\n	" +
-                "jobExecutionOrderNumber: ${orderNum};\n	email_list: ${emailList};\n	" +
-                "supportedEnvs: ${supportedEnvs};\n	currentEnv(s): ${currentEnvs};\n	" +
-                "currentBrowser: ${currentBrowser};"
-        logger.info(logLine)
-
+        
+        // that's might be optional param
+        def currentLocales = Configuration.get("locale")
+        
         for (def regressionPipeline : regressionPipelines?.split(",")) {
 			regressionPipeline = regressionPipeline.trim()
             if (!Configuration.get(Configuration.Parameter.JOB_BASE_NAME).equals(regressionPipeline)) {
                 //launch test only if current regressionPipeline exists among regressionPipelines
                 continue
             }
+            
+            def logLine = "jobName: ${jobName};\n" + 
+                    "   regressionPipelines: ${regressionPipelines};\n" +
+                    "   jobExecutionOrderNumber: ${orderNum};\n" + 
+                    "   email_list: ${emailList};\n" +
+                    "   currentBrowser: ${currentBrowser};"
+            logger.info(logLine)
 
             for (def currentEnv : currentEnvs.split(",")) {
                 currentEnv = currentEnv.trim()
-                for (def supportedEnv : supportedEnvs.split(",")) {
-                    supportedEnv = supportedEnv.trim()
-//                  logger.debug("supportedEnv: " + supportedEnv)
-                    if (!currentEnv.equals(supportedEnv) && !isParamEmpty(currentEnv)) {
-                        logger.info("Skip execution for env: ${supportedEnv}; currentEnv: ${currentEnv}")
-                        //launch test only if current suite support cron regression execution for current env
-                        continue
+
+                // organize children pipeline jobs according to the JENKINS_REGRESSION_MATRIX or execute at once with default params
+                def supportedParamsMatrix = ""
+                if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX))) {
+                    supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX)
+                    logger.info("Declared ${JENKINS_REGRESSION_MATRIX} detected!")
+                }
+
+                if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline))) {
+                    // override default parameters matrix using concrete cron params
+                    supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline)
+                    logger.info("Declared ${JENKINS_REGRESSION_MATRIX}_${regressionPipeline} detected!")
+                }
+
+                for (def supportedParams : supportedParamsMatrix.split(";")) {
+                    if (!isParamEmpty(supportedParams)) {
+                        supportedParams = supportedParams.trim()
+                        logger.info("supportedParams: ${supportedParams}")
                     }
 
-
-					// organize children pipeline jobs according to the JENKINS_REGRESSION_MATRIX or execute at once with default params
-					def supportedParamsMatrix = ""
-					if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX))) {
-						supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX)
-						logger.info("Declared ${JENKINS_REGRESSION_MATRIX} detected!")
-					}
-
-					if (!isParamEmpty(currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline))) {
-						// override default parameters matrix using concrete cron params
-						supportedParamsMatrix = currentSuite.getParameter(JENKINS_REGRESSION_MATRIX + "_" + regressionPipeline)
-						logger.info("Declared ${JENKINS_REGRESSION_MATRIX}_${regressionPipeline} detected!")
-					}
-
-					for (def supportedParams : supportedParamsMatrix.split(";")) {
-						if (!isParamEmpty(supportedParams)) {
-							supportedParams = supportedParams.trim()
-							logger.info("supportedParams: ${supportedParams}")
-						}
-
-						Map supportedConfigurations = getSupportedConfigurations(supportedParams)
-						logger.info("supportedConfigurations: ${supportedConfigurations}")
-						def pipelineMap = [:]
-						// put all not NULL args into the pipelineMap for execution
-						putMap(pipelineMap, pipelineLocaleMap)
-						pipelineMap.put("name", regressionPipeline)
-						pipelineMap.put("params_name", supportedParams)
-						pipelineMap.put("branch", Configuration.get("branch"))
-						pipelineMap.put("ci_parent_url", setDefaultIfEmpty("ci_parent_url", Configuration.Parameter.JOB_URL))
-						pipelineMap.put("ci_parent_build", setDefaultIfEmpty("ci_parent_build", Configuration.Parameter.BUILD_NUMBER))
-						putNotNull(pipelineMap, "thread_count", Configuration.get("thread_count"))
-						pipelineMap.put("jobName", jobName)
-						pipelineMap.put("env", supportedEnv)
-						pipelineMap.put("order", orderNum)
-						pipelineMap.put("BuildPriority", priorityNum)
-						putNotNullWithSplit(pipelineMap, "email_list", emailList)
-						putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
-						putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
-						putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
-						// supported config matrix should be applied at the end to be able to override default args like retry_count etc
-						putMap(pipelineMap, supportedConfigurations)
-						registerPipeline(currentSuite, pipelineMap)
-					}
+                    Map supportedConfigurations = getSupportedConfigurations(supportedParams)
+                    logger.info("supportedConfigurations: ${supportedConfigurations}")
+                    def pipelineMap = [:]
+                    // put all not NULL args into the pipelineMap for execution
+                    pipelineMap.put("name", regressionPipeline)
+                    pipelineMap.put("params_name", supportedParams)
+                    pipelineMap.put("branch", Configuration.get("branch"))
+                    pipelineMap.put("ci_parent_url", setDefaultIfEmpty("ci_parent_url", Configuration.Parameter.JOB_URL))
+                    pipelineMap.put("ci_parent_build", setDefaultIfEmpty("ci_parent_build", Configuration.Parameter.BUILD_NUMBER))
+                    putNotNull(pipelineMap, "thread_count", Configuration.get("thread_count"))
+                    pipelineMap.put("jobName", jobName)
+                    pipelineMap.put("env", currentEnv)
+                    pipelineMap.put("order", orderNum)
+                    pipelineMap.put("BuildPriority", priorityNum)
+                    putNotNullWithSplit(pipelineMap, "email_list", emailList)
+                    putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
+                    putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
+                    putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
+                    // supported config matrix should be applied at the end to be able to override default args like retry_count etc
+                    putMap(pipelineMap, supportedConfigurations)
+                    
+                    if (!isParamEmpty(currentLocales)) {
+                        for (def currentLocale : currentLocales.split(",")) {
+                            def pipelineLocaleMap = pipelineMap.clone() 
+                            logger.debug("currentLocale: " + currentLocale)
+                            currentLocale = currentLocale.trim()
+                            pipelineLocaleMap.put("locale", currentLocale)
+                            registerPipeline(currentSuite, pipelineLocaleMap)
+                            // print resulting pipelineMap
+                            logger.debug("pipelineMap: " + pipelineMap)
+                        }
+                    } else {
+                        registerPipeline(currentSuite, pipelineMap)
+                    }
                 }
             }
         }
@@ -1023,7 +1032,7 @@ public class TestNG extends Runner {
         def orderNum = suite.getParameter("jenkinsJobExecutionOrder").toString()
         if (orderNum.equals("null")) {
             orderNum = "0"
-            logger.info("specify by default '0' order - start asap")
+            logger.debug("specify by default '0' order - start asap")
         } else if (orderNum.equals("ordered")) {
             orderedJobExecNum++
             orderNum = orderedJobExecNum.toString()
@@ -1035,7 +1044,7 @@ public class TestNG extends Runner {
         def orderNum = suite.getParameter("jenkinsJobExecutionOrder")
         if (isParamEmpty(orderNum)) {
             orderNum = 0
-            logger.info("specify by default '0' order - start asap")
+            logger.debug("specify by default '0' order - start asap")
         } else if (orderNum.equals("ordered")) {
             orderedJobExecNum++
             orderNum = orderedJobExecNum
@@ -1043,14 +1052,11 @@ public class TestNG extends Runner {
         return orderNum.toString()
     }
 
-    protected def getCronEnv(currentSuite) {
-        //currentSuite is need to override action in private pipelines
-        return Configuration.get("env")
-    }
-
     // do not remove currentSuite from this method! It is available here to be override on customer level.
     protected def registerPipeline(currentSuite, pipelineMap) {
+        logger.debug("registering pipeline: " + pipelineMap)
         listPipelines.add(pipelineMap)
+        logger.debug("registered pipelines: " + listPipelines)
     }
 
     protected getSupportedConfigurations(configDetails){
@@ -1093,6 +1099,7 @@ public class TestNG extends Runner {
         String beginOrder = "0"
         String curOrder = ""
         for (Map jobParams : listPipelines) {
+            logger.info("building stage for jobParams: " + jobParams)
             def stageName = getStageName(jobParams)
             boolean propagateJob = true
             if (!isParamEmpty(jobParams.get("executionMode"))) {
@@ -1152,7 +1159,10 @@ public class TestNG extends Runner {
 		if (!isParamEmpty(paramsName)) {
 			stageName += "Params: ${paramsName} "
 		}
-		//TODO: investigate if we can remove lower param for naming after adding "params_name"
+		// We can't remove lower param for naming even after adding "params_name"
+        if (!isParamEmpty(locale)) {
+            stageName += "Locale: ${locale} "
+        }
         if (!isParamEmpty(browser)) {
             stageName += "Browser: ${browser} "
         }
@@ -1161,9 +1171,6 @@ public class TestNG extends Runner {
         }
         if (!isParamEmpty(custom_capabilities)) {
             stageName += "Custom capabilities: ${custom_capabilities} "
-        }
-        if (!isParamEmpty(locale) && multilingualMode) {
-            stageName += "Locale: ${locale} "
         }
         return stageName
     }
@@ -1187,6 +1194,16 @@ public class TestNG extends Runner {
 					//do not append params_name as it it used only for naming
 					continue
 				}
+                
+                if ("env".equalsIgnoreCase(param.getKey())) {
+                    //env is parsed in different way so don't add it as dedictaed job param
+                    continue
+                }
+                
+                if ("locale".equalsIgnoreCase(param.getKey())) {
+                    //locale is parsed in different way so don't add it as dedictaed job param
+                    continue
+                }
 
                 if (!isParamEmpty(param.getValue())) {
                     if ("false".equalsIgnoreCase(param.getValue().toString()) || "true".equalsIgnoreCase(param.getValue().toString())) {
@@ -1199,7 +1216,8 @@ public class TestNG extends Runner {
             for (param in entry) {
                 jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
             }
-            logger.info(jobParams.dump())
+            
+            logger.info("jobParams: " + jobParams.dump())
 
             try {
                 context.build job: parseFolderName(getWorkspace()) + "/" + entry.get("jobName"),
