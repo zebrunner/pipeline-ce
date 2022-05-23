@@ -532,7 +532,9 @@ public class TestNG extends Runner {
         //TODO: move it to the global jenkins variable
         
         // to fix "Session [9ed2aef1-8bd0-4151-a272-e5e869e0991a] was terminated due to TIMEOUT"
-        Configuration.set("capabilities.newCommandTimeout", "120")
+        if (isParamEmpty("capabilities.newCommandTimeout")) {
+          Configuration.set("capabilities.newCommandTimeout", "120")
+        }
         Configuration.set("java.awt.headless", "true")
     }
 
