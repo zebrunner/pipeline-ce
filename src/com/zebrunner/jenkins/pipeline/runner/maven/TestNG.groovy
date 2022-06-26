@@ -564,15 +564,17 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            context.withEnv(getVariables(Configuration.AGENT_ENV)) {
-                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
-                this.zafiraUpdater = new ZafiraUpdater(context)
-                
-                getAdbKeys()
-                
-                def goals = getMavenGoals()
-                def pomFile = getMavenPomFile()
-                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                context.withEnv(getVariables(Configuration.AGENT_ENV)) { // read values from agent.env
+                    //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                    this.zafiraUpdater = new ZafiraUpdater(context)
+                    
+                    getAdbKeys()
+                    
+                    def goals = getMavenGoals()
+                    def pomFile = getMavenPomFile()
+                    context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+                }
             }
         }
     }

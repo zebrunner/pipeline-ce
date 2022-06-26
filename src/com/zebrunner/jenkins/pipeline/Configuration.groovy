@@ -11,6 +11,7 @@ public class Configuration {
     public final static def CREDS_MAVEN_SETTINGS = "maven"
     
     public final static def AGENT_ENV = "agent.env"
+    public final static def VARIABLES_ENV = "variables.env"
     
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
