@@ -601,28 +601,6 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected def getVariables(configFile) {
-        def vars = []
-        
-        // copy and parse Env Variables from configFile and return as list of env vars
-        try {
-            context.configFileProvider(
-                    [context.configFile(fileId: configFile, variable: 'vars')]) {
-                        def props = context.readProperties file: context.vars
-                        logger.debug(props)
-                        
-                        for (String var : props.keySet()) {
-                            //logger.debug("adding: " + var + "=" + props[var])
-                            vars.add(var + "=" + props[var])
-                        }
-            }
-        } catch (Exception e) {
-            // do nothing as files optional 
-            logger.debug(e.getMessage())
-        }
-        return vars
-    }
-    
     protected void getAdbKeys() {
         try {
             context.configFileProvider(
