@@ -674,7 +674,6 @@ public class TestNG extends Runner {
                 "zafiraFields",
                 "JOB_MAX_RUN_TIME",
                 "ZEBRUNNER_PIPELINE",
-                "ZEBRUNNER_VERSION",
                 "ADMIN_EMAILS",
                 "SELENIUM_URL",
                 "job_type",
