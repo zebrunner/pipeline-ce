@@ -564,7 +564,7 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            context.withEnv(getAgentVars()) {
+            context.withEnv(getVariables()) {
                 //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
                 this.zafiraUpdater = new ZafiraUpdater(context)
                 
@@ -599,22 +599,22 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected def getAgentVars() {
-        def agentVars = []
+    protected def getVariables() {
+        def vars = []
         
-        // copy and parse AGENT_VAR file from config files and return as list of env vars
+        // copy and parse AGENT_ENV file from config files and return as list of env vars
         context.configFileProvider(
-                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
+                [context.configFile(fileId: Configuration.AGENT_ENV, variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
                     logger.debug(props)
                     
-                    for (String agentVar : props.keySet()) {
-                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
-                        agentVars.add(agentVar + "=" + props[agentVar])
+                    for (String var : props.keySet()) {
+                        //logger.debug("adding: " + var + "=" + props[var])
+                        vars.add(var + "=" + props[var])
                     }
                     
         }
-        return agentVars
+        return vars
     }
     
     protected void getAdbKeys() {
