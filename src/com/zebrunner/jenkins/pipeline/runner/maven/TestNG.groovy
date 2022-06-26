@@ -605,15 +605,19 @@ public class TestNG extends Runner {
         def vars = []
         
         // copy and parse Env Variables from configFile and return as list of env vars
-        context.configFileProvider(
-                [context.configFile(fileId: configFile, variable: 'vars')]) {
-                    def props = context.readProperties file: context.vars
-                    logger.debug(props)
-                    
-                    for (String var : props.keySet()) {
-                        //logger.debug("adding: " + var + "=" + props[var])
-                        vars.add(var + "=" + props[var])
-                    }
+        try {
+            context.configFileProvider(
+                    [context.configFile(fileId: configFile, variable: 'vars')]) {
+                        def props = context.readProperties file: context.vars
+                        logger.debug(props)
+                        
+                        for (String var : props.keySet()) {
+                            //logger.debug("adding: " + var + "=" + props[var])
+                            vars.add(var + "=" + props[var])
+                        }
+            }
+        } catch (Exception e) {
+            logger.error("Unable to read variables from ${configFile}", e)
         }
         return vars
     }
