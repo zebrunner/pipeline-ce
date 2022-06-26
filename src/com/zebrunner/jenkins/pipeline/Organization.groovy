@@ -305,7 +305,7 @@ class Organization extends BaseObject {
         // generate agent.env custom file with reporting integration env vars as content  
         def content = 
               "REPORTING_ENABLED=${enabled}\nREPORTING_SERVER_HOSTNAME=${reportingServiceUrl}\nREPORTING_SERVER_ACCESS_TOKEN=${reportingAccessToken}"
-        addCustomConfigFile(orgFolderName, Configuration.AGENT_VAR, Configuration.AGENT_VAR, "", content)
+        addCustomConfigFile(orgFolderName, Configuration.AGENT_ENV, Configuration.AGENT_ENV, "", content)
         
         def callbackURL = Configuration.get("callbackUrl")
         if (!callbackURL.isEmpty()) {

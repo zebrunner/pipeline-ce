@@ -602,7 +602,7 @@ public class TestNG extends Runner {
     protected def getVariables() {
         def vars = []
         
-        // copy and parse AGENT_ENV file from config files and return as list of env vars
+        // copy and parse Env Variables from config file and return as list of env vars
         context.configFileProvider(
                 [context.configFile(fileId: Configuration.AGENT_ENV, variable: 'agent')]) {
                     def props = context.readProperties file: context.agent
