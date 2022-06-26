@@ -1,5 +1,6 @@
 package com.zebrunner.jenkins.pipeline.runner.maven
 
+import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.CronJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
