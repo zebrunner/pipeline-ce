@@ -67,19 +67,21 @@ public class TestNG extends Runner {
         
         context.node("master") {
             context.timestamps {
-                logger.info("TestNG->onPush")
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                    logger.info("TestNG->onPush")
 
-                try {
-                    getScm().clone(true)
-                    if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
-                        scan()
+                    try {
+                        getScm().clone(true)
+                        if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
+                            scan()
+                        }
+
+                        jenkinsFileScan()
+                        isValid = true
+                    } catch (Exception e) {
+                        logger.error("Scan failed.\n" + e.getMessage())
+                        this.currentBuild.result = BuildResult.FAILURE
                     }
-
-                    jenkinsFileScan()
-                    isValid = true
-                } catch (Exception e) {
-                    logger.error("Scan failed.\n" + e.getMessage())
-                    this.currentBuild.result = BuildResult.FAILURE
                 }
             }
         }
