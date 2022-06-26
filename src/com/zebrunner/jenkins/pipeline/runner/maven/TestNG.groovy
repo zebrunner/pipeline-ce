@@ -1,6 +1,5 @@
 package com.zebrunner.jenkins.pipeline.runner.maven
 
-import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.CronJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
@@ -566,9 +565,6 @@ public class TestNG extends Runner {
     protected void buildJob() {
         context.stage('Run Test Suite') {
             context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
-                //re-init logger to override level by local env var
-                this.logger = new Logger(context)
-                
                 context.withEnv(getVariables(Configuration.AGENT_ENV)) { // read values from agent.env
                     //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
                     this.zafiraUpdater = new ZafiraUpdater(context)
