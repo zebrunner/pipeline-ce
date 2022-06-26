@@ -36,8 +36,6 @@ public abstract class BaseObject {
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
     protected final String DISPLAY_NAME_SEPARATOR = "|"
     
-    protected String zebrunnerPipeline // pipeline name and version!
-
     //this is very important line which should be declared only as a class member!
     protected Configuration configuration = new Configuration(context)
     
@@ -58,7 +56,6 @@ public abstract class BaseObject {
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
         
-        this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
         // get scmType from build args otherwise default to github
@@ -121,6 +118,8 @@ public abstract class BaseObject {
     }
     
     protected String getPipelineLibrary(customPipeline) {
+        def zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
+        
         if ("Zebrunner-CE".equals(customPipeline) || customPipeline.isEmpty()) {
             // no custom private pipeline detected!
             return "@Library(\'${zebrunnerPipeline}\')"

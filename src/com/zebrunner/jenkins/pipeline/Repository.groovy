@@ -40,9 +40,11 @@ class Repository extends BaseObject {
         logger.debug("library: " + this.library)
         context.node('master') {
             context.timestamps {
-                prepare()
-                generateCiItems()
-                clean()
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                    prepare()
+                    generateCiItems()
+                    clean()
+                }
             }
         }
 
