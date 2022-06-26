@@ -617,8 +617,8 @@ public class TestNG extends Runner {
                         }
             }
         } catch (Exception e) {
-            logger.error("Unable to read variables from ${configFile}!")
-            e.printStackTrace()
+            // do nothing as files optional 
+            logger.debug(e.getMessage())
         }
         return vars
     }
