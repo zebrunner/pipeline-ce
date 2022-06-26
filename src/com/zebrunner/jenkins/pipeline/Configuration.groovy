@@ -43,7 +43,6 @@ public class Configuration {
     public enum Parameter {
 
         //vars
-        CORE_LOG_LEVEL("CORE_LOG_LEVEL", "INFO"),
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
 
         ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),

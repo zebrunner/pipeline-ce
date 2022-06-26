@@ -656,7 +656,6 @@ public class TestNG extends Runner {
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zafiraGoals} \
-            -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
             -Dmax_screen_history=1 \
             -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
             -Dgit_branch=${Configuration.get("branch")} \
@@ -699,7 +698,6 @@ public class TestNG extends Runner {
         def necessaryMavenParams  = [
                 "capabilities",
                 "zafiraFields",
-                "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",
                 "ZEBRUNNER_PIPELINE",
                 "ZEBRUNNER_VERSION",
