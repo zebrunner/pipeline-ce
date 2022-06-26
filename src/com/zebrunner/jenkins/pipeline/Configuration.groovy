@@ -10,7 +10,8 @@ public class Configuration {
 
     public final static def CREDS_MAVEN_SETTINGS = "maven"
     
-    public final static def AGENT_VAR = "agent.env"
+    public final static def AGENT_ENV = "agent.env"
+    public final static def VARIABLES_ENV = "variables.env"
     
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
@@ -42,7 +43,6 @@ public class Configuration {
     public enum Parameter {
 
         //vars
-        CORE_LOG_LEVEL("CORE_LOG_LEVEL", "INFO"),
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
 
         ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),

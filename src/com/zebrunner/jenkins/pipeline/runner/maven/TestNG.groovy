@@ -1,5 +1,6 @@
 package com.zebrunner.jenkins.pipeline.runner.maven
 
+import com.zebrunner.jenkins.Logger
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.CronJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.pipeline.TestJobFactory
 import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
@@ -564,15 +565,20 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            context.withEnv(getAgentVars()) {
-                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
-                this.zafiraUpdater = new ZafiraUpdater(context)
+            context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                //re-init logger to override level by local env var
+                this.logger = new Logger(context)
                 
-                getAdbKeys()
-                
-                def goals = getMavenGoals()
-                def pomFile = getMavenPomFile()
-                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+                context.withEnv(getVariables(Configuration.AGENT_ENV)) { // read values from agent.env
+                    //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                    this.zafiraUpdater = new ZafiraUpdater(context)
+                    
+                    getAdbKeys()
+                    
+                    def goals = getMavenGoals()
+                    def pomFile = getMavenPomFile()
+                    context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+                }
             }
         }
     }
@@ -599,22 +605,26 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected def getAgentVars() {
-        def agentVars = []
+    protected def getVariables(configFile) {
+        def vars = []
         
-        // copy and parse AGENT_VAR file from config files and return as list of env vars
-        context.configFileProvider(
-                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
-                    def props = context.readProperties file: context.agent
-                    logger.debug(props)
-                    
-                    for (String agentVar : props.keySet()) {
-                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
-                        agentVars.add(agentVar + "=" + props[agentVar])
-                    }
-                    
+        // copy and parse Env Variables from configFile and return as list of env vars
+        try {
+            context.configFileProvider(
+                    [context.configFile(fileId: configFile, variable: 'vars')]) {
+                        def props = context.readProperties file: context.vars
+                        logger.debug(props)
+                        
+                        for (String var : props.keySet()) {
+                            //logger.debug("adding: " + var + "=" + props[var])
+                            vars.add(var + "=" + props[var])
+                        }
+            }
+        } catch (Exception e) {
+            // do nothing as files optional 
+            logger.debug(e.getMessage())
         }
-        return agentVars
+        return vars
     }
     
     protected void getAdbKeys() {
@@ -646,7 +656,6 @@ public class TestNG extends Runner {
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zafiraGoals} \
-            -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
             -Dmax_screen_history=1 \
             -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
             -Dgit_branch=${Configuration.get("branch")} \
@@ -689,7 +698,6 @@ public class TestNG extends Runner {
         def necessaryMavenParams  = [
                 "capabilities",
                 "zafiraFields",
-                "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",
                 "ZEBRUNNER_PIPELINE",
                 "ZEBRUNNER_VERSION",
