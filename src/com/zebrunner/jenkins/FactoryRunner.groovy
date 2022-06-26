@@ -51,7 +51,7 @@ public class FactoryRunner {
     }
 
     public void prepare() {
-        scmClient.clone(Configuration.get(Configuration.Parameter.ZEBRUNNER_PIPELINE), Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION), "pipeline-ce")
+        scmClient.clone(Configuration.get(Configuration.Parameter.ZEBRUNNER_PIPELINE), context.env["ZEBRUNNER_VERSION"], "pipeline-ce")
         this.isPrepared = true
     }
 }
