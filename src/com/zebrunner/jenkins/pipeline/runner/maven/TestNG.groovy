@@ -1059,7 +1059,8 @@ public class TestNG extends Runner {
             logger.info("name: " + name)
             def value = ""
             if (nameValueArray.size() > 1) {
-                value = nameValueArray[1]?.trim()
+                // everything after 1st colon is a value
+                value = config.minus("${nameValueArray[0]}:")
             }
             logger.info("value: " + value)
             valuesMap[name] = value
