@@ -1226,7 +1226,7 @@ public class TestNG extends Runner {
 
     // Possible to override in private pipelines
     protected def getDebugHost() {
-        return context.env.getEnvironment().get("INFRA_HOST")
+        return context.env["INFRA_HOST"]
     }
 
     // Possible to override in private pipelines

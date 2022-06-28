@@ -152,7 +152,7 @@ public abstract class BaseObject {
     
     @NonCPS
     protected def initOrg() {
-        String jobName = context.env.getEnvironment().get("JOB_NAME")
+        String jobName = context.env["JOB_NAME"]
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
         
