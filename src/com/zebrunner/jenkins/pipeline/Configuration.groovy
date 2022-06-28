@@ -21,6 +21,7 @@ public class Configuration {
     private static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
 
     private static final String ADMIN_EMAILS = "ADMIN_EMAILS"
+    private static final String SONAR_URL = "SONAR_URL"
 
     //list of CI job params as a map
     protected static Map params = [:]

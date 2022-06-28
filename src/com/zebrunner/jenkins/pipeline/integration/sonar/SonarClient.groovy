@@ -11,7 +11,7 @@ class SonarClient extends HttpClient {
 
     SonarClient(context) {
         super(context)
-        serviceUrl = context.env.getEnvironment().get("SONAR_URL")
+        serviceUrl = context.env[Configuration.SONAR_URL]
     }
 
     public String getGoals(isPullRequest=false) {
