@@ -22,7 +22,7 @@ class Logger {
 
     Logger(context) {
         this.context = context
-        this.pipelineLogLevel = context.binding.variables.get(ZEBRUNNER_LOG_LEVEL) ? LogLevel.valueOf(context.binding.variables.ZEBRUNNER_LOG_LEVEL) : LogLevel.valueOf(context.env[ZEBRUNNER_LOG_LEVEL]))
+        this.pipelineLogLevel = context.binding.variables.get(ZEBRUNNER_LOG_LEVEL) ? LogLevel.valueOf(context.binding.variables.ZEBRUNNER_LOG_LEVEL) : LogLevel.valueOf(context.env[ZEBRUNNER_LOG_LEVEL])
     }
 
     public debug(message) {
