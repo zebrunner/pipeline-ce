@@ -20,6 +20,8 @@ public class Configuration {
     private static final String ZEBRUNNER_VERSION = "ZEBRUNNER_VERSION"
     private static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
 
+    private static final String ADMIN_EMAILS = "ADMIN_EMAILS"
+
     //list of CI job params as a map
     protected static Map params = [:]
     //list of required goals vars which must present in command line obligatory
@@ -47,8 +49,6 @@ public class Configuration {
 
         //vars
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
-
-        ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 

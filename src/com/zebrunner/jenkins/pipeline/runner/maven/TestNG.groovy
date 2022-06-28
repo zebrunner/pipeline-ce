@@ -675,7 +675,6 @@ public class TestNG extends Runner {
                 "capabilities",
                 "zafiraFields",
                 "JOB_MAX_RUN_TIME",
-                "ADMIN_EMAILS",
                 "SELENIUM_URL",
                 "job_type",
                 "repoUrl",
