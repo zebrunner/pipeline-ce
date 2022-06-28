@@ -36,8 +36,6 @@ public abstract class BaseObject {
     protected String displayNameTemplate = '#${BUILD_NUMBER}|${branch}'
     protected final String DISPLAY_NAME_SEPARATOR = "|"
     
-    protected String zebrunnerPipeline // pipeline name and version!
-
     //this is very important line which should be declared only as a class member!
     protected Configuration configuration = new Configuration(context)
     
@@ -58,7 +56,6 @@ public abstract class BaseObject {
         this.repoUrl = Configuration.get(REPO_URL)
         this.repo = initRepo(this.repoUrl)
         
-        this.zebrunnerPipeline = "Zebrunner-CE@" + Configuration.get(Configuration.Parameter.ZEBRUNNER_VERSION)
         currentBuild = context.currentBuild
         
         // get scmType from build args otherwise default to github
@@ -121,6 +118,8 @@ public abstract class BaseObject {
     }
     
     protected String getPipelineLibrary(customPipeline) {
+        def zebrunnerPipeline = "Zebrunner-CE@" + context.env[Configuration.ZEBRUNNER_VERSION]
+        
         if ("Zebrunner-CE".equals(customPipeline) || customPipeline.isEmpty()) {
             // no custom private pipeline detected!
             return "@Library(\'${zebrunnerPipeline}\')"
@@ -129,9 +128,31 @@ public abstract class BaseObject {
         }
     }
     
+    protected def getVariables(configFile) {
+        def vars = []
+        
+        // copy and parse Env Variables from configFile and return as list of env vars
+        try {
+            context.configFileProvider(
+                    [context.configFile(fileId: configFile, variable: 'vars')]) {
+                        def props = context.readProperties file: context.vars
+                        logger.debug(props)
+                        
+                        for (String var : props.keySet()) {
+                            //logger.debug("adding: " + var + "=" + props[var])
+                            vars.add(var + "=" + props[var])
+                        }
+            }
+        } catch (Exception e) {
+            // do nothing as files optional
+            logger.debug(e.getMessage())
+        }
+        return vars
+    }
+    
     @NonCPS
     protected def initOrg() {
-        String jobName = context.env.getEnvironment().get("JOB_NAME")
+        String jobName = context.env["JOB_NAME"]
         context.println "jobName: ${jobName}"
         def orgFolderName = ""
         

@@ -67,19 +67,21 @@ public class TestNG extends Runner {
         
         context.node("master") {
             context.timestamps {
-                logger.info("TestNG->onPush")
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                    logger.info("TestNG->onPush")
 
-                try {
-                    getScm().clone(true)
-                    if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
-                        scan()
+                    try {
+                        getScm().clone(true)
+                        if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
+                            scan()
+                        }
+
+                        jenkinsFileScan()
+                        isValid = true
+                    } catch (Exception e) {
+                        logger.error("Scan failed.\n" + e.getMessage())
+                        this.currentBuild.result = BuildResult.FAILURE
                     }
-
-                    jenkinsFileScan()
-                    isValid = true
-                } catch (Exception e) {
-                    logger.error("Scan failed.\n" + e.getMessage())
-                    this.currentBuild.result = BuildResult.FAILURE
                 }
             }
         }
@@ -601,28 +603,6 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected def getVariables(configFile) {
-        def vars = []
-        
-        // copy and parse Env Variables from configFile and return as list of env vars
-        try {
-            context.configFileProvider(
-                    [context.configFile(fileId: configFile, variable: 'vars')]) {
-                        def props = context.readProperties file: context.vars
-                        logger.debug(props)
-                        
-                        for (String var : props.keySet()) {
-                            //logger.debug("adding: " + var + "=" + props[var])
-                            vars.add(var + "=" + props[var])
-                        }
-            }
-        } catch (Exception e) {
-            // do nothing as files optional 
-            logger.debug(e.getMessage())
-        }
-        return vars
-    }
-    
     protected void getAdbKeys() {
         try {
             context.configFileProvider(
@@ -695,9 +675,6 @@ public class TestNG extends Runner {
                 "capabilities",
                 "zafiraFields",
                 "JOB_MAX_RUN_TIME",
-                "ZEBRUNNER_PIPELINE",
-                "ZEBRUNNER_VERSION",
-                "ADMIN_EMAILS",
                 "SELENIUM_URL",
                 "job_type",
                 "repoUrl",
@@ -1249,7 +1226,7 @@ public class TestNG extends Runner {
 
     // Possible to override in private pipelines
     protected def getDebugHost() {
-        return context.env.getEnvironment().get("INFRA_HOST")
+        return context.env["INFRA_HOST"]
     }
 
     // Possible to override in private pipelines

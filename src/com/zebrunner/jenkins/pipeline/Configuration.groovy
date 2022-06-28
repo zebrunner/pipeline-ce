@@ -17,6 +17,12 @@ public class Configuration {
 
     private static final String CAPABILITIES = "capabilities"
 
+    private static final String ZEBRUNNER_VERSION = "ZEBRUNNER_VERSION"
+    private static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
+
+    private static final String ADMIN_EMAILS = "ADMIN_EMAILS"
+    private static final String SONAR_URL = "SONAR_URL"
+
     //list of CI job params as a map
     protected static Map params = [:]
     //list of required goals vars which must present in command line obligatory
@@ -44,10 +50,6 @@ public class Configuration {
 
         //vars
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
-
-        ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),
-        ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
-        ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 
@@ -96,7 +98,7 @@ public class Configuration {
     }
 
     public String getGlobalProperty(String name) {
-        return context.env.getEnvironment().get(name)
+        return context.env[name]
     }
 
     @NonCPS

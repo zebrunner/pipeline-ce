@@ -80,7 +80,7 @@ class ZafiraUpdater {
         if (!isParamEmpty(abortedTestRun)) {
             //Sends email to admin if testRun was aborted
             if (abortedTestRun.status.equals(StatusMapper.ZafiraStatus.ABORTED.name())) {
-                sendFailureEmail(uuid, Configuration.get(Configuration.Parameter.ADMIN_EMAILS))
+                sendFailureEmail(uuid, context.env[Configuration.ADMIN_EMAILS])
             } else {
                 sendFailureEmail(uuid, Configuration.get("email_list"))
             }
@@ -89,7 +89,7 @@ class ZafiraUpdater {
             logger.error("Unable to abort testrun! Probably run is not registered in Zafira.")
             //Explicitly send email via Jenkins (emailext) as nothing is registered in Zafira
             def body = "${bodyHeader}\nRebuild: ${jobBuildUrl}/rebuild/parameterized\nZafiraReport: ${jobBuildUrl}/ZafiraReport\n\nConsole: ${jobBuildUrl}/console\n${failureLog}"
-            context.emailext getEmailParams(body, subject, Configuration.get(Configuration.Parameter.ADMIN_EMAILS))
+            context.emailext getEmailParams(body, subject, context.env[Configuration.ADMIN_EMAILS])
         }
         return abortedTestRun
     }
