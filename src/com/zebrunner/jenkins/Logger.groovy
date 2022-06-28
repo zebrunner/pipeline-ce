@@ -2,6 +2,8 @@ package com.zebrunner.jenkins
 
 class Logger {
 
+    private static final String ZEBRUNNER_LOG_LEVEL = "ZEBRUNNER_LOG_LEVEL"
+
     public static enum LogLevel {
         DEBUG(1),
         INFO(2),
@@ -20,7 +22,7 @@ class Logger {
 
     Logger(context) {
         this.context = context
-        this.pipelineLogLevel = context.binding.variables.get("ZEBRUNNER_LOG_LEVEL") ? LogLevel.valueOf(context.binding.variables.ZEBRUNNER_LOG_LEVEL) : LogLevel.valueOf(context.env["ZEBRUNNER_LOG_LEVEL"]))
+        this.pipelineLogLevel = context.binding.variables.get(ZEBRUNNER_LOG_LEVEL) ? LogLevel.valueOf(context.binding.variables.ZEBRUNNER_LOG_LEVEL) : LogLevel.valueOf(context.env[ZEBRUNNER_LOG_LEVEL]))
     }
 
     public debug(message) {
