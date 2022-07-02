@@ -65,7 +65,9 @@ public class TestNG extends Runner {
     public void onPush() {
         boolean isValid = false
         
-        context.node("master") {
+        def node = context.env[Configuration.ZEBRUNNER_NODE_MAIN] ? context.env[Configuration.ZEBRUNNER_NODE_MAIN] : "master"
+        
+        context.node(node) {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPush")
@@ -86,7 +88,8 @@ public class TestNG extends Runner {
             }
         }
         
-        context.node("maven") {
+        node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        context.node(node) {
             context.timestamps {
                 if (isValid) {
                     getScm().clonePush()
@@ -495,7 +498,8 @@ public class TestNG extends Runner {
             return Configuration.get("node")
         }
         
-        Configuration.set("node", "maven")
+        def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        Configuration.set("node", node)
         logger.info("node: " + Configuration.get("node"))
         return Configuration.get("node")
     }

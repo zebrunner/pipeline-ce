@@ -15,13 +15,17 @@ public class Configuration {
     
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
+    public static final String ZEBRUNNER_VERSION = "ZEBRUNNER_VERSION"
+    public static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
+
+    public static final String ADMIN_EMAILS = "ADMIN_EMAILS"
+    public static final String SONAR_URL = "SONAR_URL"
+    
+    public static final String ZEBRUNNER_NODE_MAIN = "ZEBRUNNER_NODE_MAIN"
+    public static final String ZEBRUNNER_NODE_MAVEN = "ZEBRUNNER_NODE_MAVEN"
+    
+    
     private static final String CAPABILITIES = "capabilities"
-
-    private static final String ZEBRUNNER_VERSION = "ZEBRUNNER_VERSION"
-    private static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
-
-    private static final String ADMIN_EMAILS = "ADMIN_EMAILS"
-    private static final String SONAR_URL = "SONAR_URL"
 
     //list of CI job params as a map
     protected static Map params = [:]
