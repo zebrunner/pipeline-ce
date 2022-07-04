@@ -10,11 +10,18 @@ public class Configuration {
 
     public final static def CREDS_MAVEN_SETTINGS = "maven"
     
-    public final static def AGENT_VAR = "agent.env"
+    public final static def AGENT_ENV = "agent.env"
+    public final static def VARIABLES_ENV = "variables.env"
     
     public final static def CREDS_CUSTOM_PIPELINE = "jenkinsfile"
 
     private static final String CAPABILITIES = "capabilities"
+
+    private static final String ZEBRUNNER_VERSION = "ZEBRUNNER_VERSION"
+    private static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
+
+    private static final String ADMIN_EMAILS = "ADMIN_EMAILS"
+    private static final String SONAR_URL = "SONAR_URL"
 
     //list of CI job params as a map
     protected static Map params = [:]
@@ -42,12 +49,7 @@ public class Configuration {
     public enum Parameter {
 
         //vars
-        CORE_LOG_LEVEL("CORE_LOG_LEVEL", "INFO"),
         JOB_MAX_RUN_TIME("JOB_MAX_RUN_TIME", "60"),
-
-        ZEBRUNNER_VERSION("ZEBRUNNER_VERSION", mustOverride),
-        ZEBRUNNER_PIPELINE("ZEBRUNNER_PIPELINE", "https://github.com/zebrunner/pipeline-ce.git"),
-        ADMIN_EMAILS("ADMIN_EMAILS", mustOverride),
 
         INFRA_HOST("INFRA_HOST", "demo.qaprosoft.com"),
 
@@ -96,7 +98,7 @@ public class Configuration {
     }
 
     public String getGlobalProperty(String name) {
-        return context.env.getEnvironment().get(name)
+        return context.env[name]
     }
 
     @NonCPS

@@ -67,19 +67,21 @@ public class TestNG extends Runner {
         
         context.node("master") {
             context.timestamps {
-                logger.info("TestNG->onPush")
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                    logger.info("TestNG->onPush")
 
-                try {
-                    getScm().clone(true)
-                    if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
-                        scan()
+                    try {
+                        getScm().clone(true)
+                        if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
+                            scan()
+                        }
+
+                        jenkinsFileScan()
+                        isValid = true
+                    } catch (Exception e) {
+                        logger.error("Scan failed.\n" + e.getMessage())
+                        this.currentBuild.result = BuildResult.FAILURE
                     }
-
-                    jenkinsFileScan()
-                    isValid = true
-                } catch (Exception e) {
-                    logger.error("Scan failed.\n" + e.getMessage())
-                    this.currentBuild.result = BuildResult.FAILURE
                 }
             }
         }
@@ -564,15 +566,17 @@ public class TestNG extends Runner {
 
     protected void buildJob() {
         context.stage('Run Test Suite') {
-            context.withEnv(getAgentVars()) {
-                //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
-                this.zafiraUpdater = new ZafiraUpdater(context)
-                
-                getAdbKeys()
-                
-                def goals = getMavenGoals()
-                def pomFile = getMavenPomFile()
-                context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+            context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                context.withEnv(getVariables(Configuration.AGENT_ENV)) { // read values from agent.env
+                    //TODO" completely remove zafiraUpdater if possible to keep integration on project level only!
+                    this.zafiraUpdater = new ZafiraUpdater(context)
+                    
+                    getAdbKeys()
+                    
+                    def goals = getMavenGoals()
+                    def pomFile = getMavenPomFile()
+                    context.mavenBuild("-U ${goals} -f ${pomFile}", getMavenSettings())
+                }
             }
         }
     }
@@ -599,24 +603,6 @@ public class TestNG extends Runner {
         logger.info("seleniumUrl: ${seleniumUrl}")
     }
 
-    protected def getAgentVars() {
-        def agentVars = []
-        
-        // copy and parse AGENT_VAR file from config files and return as list of env vars
-        context.configFileProvider(
-                [context.configFile(fileId: Configuration.AGENT_VAR, variable: 'agent')]) {
-                    def props = context.readProperties file: context.agent
-                    logger.debug(props)
-                    
-                    for (String agentVar : props.keySet()) {
-                        //logger.debug("adding: " + agentVar + "=" + props[agentVar])
-                        agentVars.add(agentVar + "=" + props[agentVar])
-                    }
-                    
-        }
-        return agentVars
-    }
-    
     protected void getAdbKeys() {
         try {
             context.configFileProvider(
@@ -646,7 +632,6 @@ public class TestNG extends Runner {
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zafiraGoals} \
-            -Dcore_log_level=${Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL)} \
             -Dmax_screen_history=1 \
             -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
             -Dgit_branch=${Configuration.get("branch")} \
@@ -689,11 +674,7 @@ public class TestNG extends Runner {
         def necessaryMavenParams  = [
                 "capabilities",
                 "zafiraFields",
-                "CORE_LOG_LEVEL",
                 "JOB_MAX_RUN_TIME",
-                "ZEBRUNNER_PIPELINE",
-                "ZEBRUNNER_VERSION",
-                "ADMIN_EMAILS",
                 "SELENIUM_URL",
                 "job_type",
                 "repoUrl",
@@ -1078,7 +1059,8 @@ public class TestNG extends Runner {
             logger.info("name: " + name)
             def value = ""
             if (nameValueArray.size() > 1) {
-                value = nameValueArray[1]?.trim()
+                // everything after 1st colon is a value
+                value = config.minus("${nameValueArray[0]}:")
             }
             logger.info("value: " + value)
             valuesMap[name] = value
@@ -1245,7 +1227,7 @@ public class TestNG extends Runner {
 
     // Possible to override in private pipelines
     protected def getDebugHost() {
-        return context.env.getEnvironment().get("INFRA_HOST")
+        return context.env["INFRA_HOST"]
     }
 
     // Possible to override in private pipelines
