@@ -92,6 +92,7 @@ public class TestNG extends Runner {
         
         
         context.node(nodeMaven) {
+            setSeleniumUrl() //override selenium url based on provider to support UI tests execution
             context.timestamps {
                 if (isValid) {
                     getScm().clonePush()
