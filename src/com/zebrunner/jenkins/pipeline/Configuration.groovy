@@ -21,7 +21,6 @@ public class Configuration {
     public static final String ADMIN_EMAILS = "ADMIN_EMAILS"
     public static final String SONAR_URL = "SONAR_URL"
     
-    public static final String ZEBRUNNER_NODE_MAIN = "ZEBRUNNER_NODE_MAIN"
     public static final String ZEBRUNNER_NODE_MAVEN = "ZEBRUNNER_NODE_MAVEN"
     
     

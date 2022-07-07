@@ -65,20 +65,21 @@ public class TestNG extends Runner {
     public void onPush() {
         boolean isValid = false
         
-        context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+        def nodeMaven = "maven"
         
-            def node = context.env[Configuration.ZEBRUNNER_NODE_MAIN] ? context.env[Configuration.ZEBRUNNER_NODE_MAIN] : "master"
-            
-            context.node(node) {
-                context.timestamps {
+        context.node("master") {
+            context.timestamps {
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPush")
-    
+                    
+                    nodeMaven = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+
                     try {
                         getScm().clone(true)
                         if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
                             scan()
                         }
-    
+
                         jenkinsFileScan()
                         isValid = true
                     } catch (Exception e) {
@@ -87,17 +88,17 @@ public class TestNG extends Runner {
                     }
                 }
             }
+        }
         
-            node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
-            context.node(node) {
-                context.timestamps {
-                    if (isValid) {
-                        getScm().clonePush()
-                        compile("-U clean compile test")
-                    }
-                    
-                    clean()
+        
+        context.node(nodeMaven) {
+            context.timestamps {
+                if (isValid) {
+                    getScm().clonePush()
+                    compile("-U clean compile test")
                 }
+                
+                clean()
             }
         }
     }
