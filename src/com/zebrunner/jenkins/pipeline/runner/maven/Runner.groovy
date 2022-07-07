@@ -18,7 +18,8 @@ public class Runner extends AbstractRunner {
 
     //Events
     public void onPush() {
-        context.node("maven") {
+        def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        context.node(node) {
             logger.info("Runner->onPush")
             getScm().clonePush()
             // [VD] don't remove -U otherwise latest dependencies are not downloaded
@@ -30,7 +31,8 @@ public class Runner extends AbstractRunner {
     }
 
     public void onPullRequest() {
-        context.node("maven") {
+        def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        context.node(node) {
             logger.info("Runner->onPullRequest")
             getScm().clonePR()
             compile("-U clean compile test", true)
@@ -40,7 +42,8 @@ public class Runner extends AbstractRunner {
     //Methods
     public void build() {
         //TODO: verify if any maven nodes are available
-        context.node("maven") {
+        def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        context.node(node) {
             logger.info("Runner->build")
             scmClient.clone()
             context.stage("Maven Build") {
