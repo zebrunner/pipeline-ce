@@ -493,7 +493,6 @@ public class TestNG extends Runner {
     }
 
     protected String chooseNode() {
-        
         // reuse overriden node label assignment and return 
         def nodeLabel = Configuration.get("node_label")
         if (!isParamEmpty(nodeLabel)) {
@@ -502,8 +501,12 @@ public class TestNG extends Runner {
             return Configuration.get("node")
         }
         
-        def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
-        Configuration.set("node", node)
+        def nodeMaven = "maven"
+        context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+            nodeMaven = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+        }
+        
+        Configuration.set("node", nodeMaven)
         logger.info("node: " + Configuration.get("node"))
         return Configuration.get("node")
     }
