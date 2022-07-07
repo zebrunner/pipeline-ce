@@ -92,14 +92,15 @@ public class TestNG extends Runner {
         
         
         context.node(nodeMaven) {
-            setSeleniumUrl() //override selenium url based on provider to support UI tests execution
             context.timestamps {
-                if (isValid) {
-                    getScm().clonePush()
-                    compile("-U clean compile test")
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // re-read values from variables.env for maven runner
+                    if (isValid) {
+                        getScm().clonePush()
+                        compile("-U clean compile test")
+                    }
+                    
+                    clean()
                 }
-                
-                clean()
             }
         }
     }
