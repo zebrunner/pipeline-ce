@@ -57,7 +57,7 @@ class SonarClient extends HttpClient {
                     -Dsonar.pullrequest.branch=${Configuration.get("pr_source_branch")} \
                     -Dsonar.pullrequest.base=${Configuration.get("pr_target_branch")}"
         } else {
-            goals += " -Dsonar.projectVersion=${Configuration.get("BUILD_NUMBER")} -Dsonar.branch.name=${Configuration.get("branch")}"
+            goals += " -Dsonar.projectVersion=${Configuration.get("BUILD_NUMBER")}"
         }
         
         // Determine at run-time if we use maven or gradle.
