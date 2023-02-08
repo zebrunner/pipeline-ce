@@ -62,6 +62,18 @@ public class TestNG extends Runner {
 
     //Events
     @Override
+    public void onPullRequest() {
+        context.node("master") {
+            context.timestamps {
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
+                    logger.info("TestNG->onPullRequest")
+                    super.onPullRequest()
+                }
+            }
+        }
+    }
+    
+    @Override
     public void onPush() {
         boolean isValid = false
         
