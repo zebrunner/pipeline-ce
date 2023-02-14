@@ -873,12 +873,6 @@ public class TestNG extends Runner {
                     continue
                 }
 
-                // TODO: remove below hotfix after resolving: https://github.com/qaprosoft/carina/issues/816
-                if (reportName.equals("Artifacts") && reports[i].path.contains("CucumberReport")) {
-                    // do not publish artifact as it is cucumber system item
-                    continue
-                }
-
                 context.publishHTML getReportParameters(reportDir, reports[i].name, name)
             }
         } catch (Exception e) {
