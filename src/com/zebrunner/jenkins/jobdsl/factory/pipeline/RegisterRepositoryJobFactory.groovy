@@ -26,7 +26,6 @@ public class RegisterRepositoryJobFactory extends PipelineFactory {
                 configure stringParam('scmToken', '', 'CSM token with read permissions')
                 configure addExtensibleChoice('pipelineLibrary', "gc_PIPELINE_LIBRARY", "Groovy JobDSL/Pipeline library, for example: https://github.com/zebrunner/pipeline-ce/releases", "Zebrunner-CE")
                 configure addExtensibleChoice('runnerClass', "gc_RUNNER_CLASS", "Pipeline runner class", "com.zebrunner.jenkins.pipeline.runner.maven.TestNG")
-                configure addHiddenParameter('zafiraFields', '', '')
                 configure addHiddenParameter('userId', '', '2')
             }
         }
