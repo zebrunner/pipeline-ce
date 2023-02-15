@@ -844,7 +844,7 @@ public class TestNG extends Runner {
     protected void publishJenkinsReports() {
         context.stage('Results') {
             //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
-            publishReport('**/zafira/report.html', "ZafiraReport")
+            publishReport('**/zafira/report.html', "ZebrunnerReport")
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
