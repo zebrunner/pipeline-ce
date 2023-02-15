@@ -128,12 +128,12 @@ class ZafiraClient extends HttpClient {
     /** Verify if ZafiraConnected and refresh authToken if needed. Return false if connection can't be established or disabled **/
     protected boolean isZafiraConnected() {
         if (!isTokenExpired()) {
-            logger.debug("zafira connected")
+            logger.debug("Zebrunner Testing Platform connected")
             return true
         }
 
         if (isParamEmpty(this.refreshToken) || isParamEmpty(this.serviceURL) || Configuration.mustOverride.equals(this.serviceURL)) {
-            logger.debug("zafira is not connected!")
+            logger.debug("Zebrunner Testing Platform is not connected!")
             logger.debug("refreshToken: ${this.refreshToken}; serviceURL: ${this.serviceURL};")
             return false
         }
@@ -155,9 +155,9 @@ class ZafiraClient extends HttpClient {
         Map properties = (Map) sendRequestFormatted(parameters)
         logger.debug("properties: " + properties)
         if (isParamEmpty(properties)) {
-            // #669: no sense to start tests if zafira is configured and not available! 
+            // #669: no sense to start tests if Zebrunner Testing Platform is configured and not available!
             logger.info("properties: " + properties)
-            throw new RuntimeException("Unable to get auth token, check Zafira integration!")
+            throw new RuntimeException("Unable to get auth token, check Zebrunner Testing Platform integration!")
         }
         this.authToken = properties.authTokenType + " " + properties.authToken
         logger.debug("authToken: " + authToken)
