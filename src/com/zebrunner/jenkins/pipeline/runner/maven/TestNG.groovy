@@ -656,7 +656,7 @@ public class TestNG extends Runner {
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zafiraGoals} \
             -Dmax_screen_history=1 \
-            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
+            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZebrunnerReport\" \
             -Dgit_branch=${Configuration.get("branch")} \
             -Dgit_commit=${Configuration.get("scm_commit")} \
             -Dgit_url=${Configuration.get("scm_url")} \

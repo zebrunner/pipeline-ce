@@ -88,7 +88,7 @@ class ZafiraUpdater {
             //If testRun is not available in Zafira, sends email to admins by means of Jenkins
             logger.error("Unable to abort testrun! Probably run is not registered in Zafira.")
             //Explicitly send email via Jenkins (emailext) as nothing is registered in Zafira
-            def body = "${bodyHeader}\nRebuild: ${jobBuildUrl}/rebuild/parameterized\nZafiraReport: ${jobBuildUrl}/ZafiraReport\n\nConsole: ${jobBuildUrl}/console\n${failureLog}"
+            def body = "${bodyHeader}\nRebuild: ${jobBuildUrl}/rebuild/parameterized\nZebrunnerReport: ${jobBuildUrl}/ZebrunnerReport\n\nConsole: ${jobBuildUrl}/console\n${failureLog}"
             context.emailext getEmailParams(body, subject, context.env[Configuration.ADMIN_EMAILS])
         }
         return abortedTestRun
