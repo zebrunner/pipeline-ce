@@ -12,11 +12,10 @@ public class PushJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def userId
-    def zafiraFields
     def isTestNgRunner
     def webHookArgs
 
-    public PushJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, userId, isTestNgRunner, zafiraFields, webHookArgs) {
+    public PushJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, userId, isTestNgRunner, webHookArgs) {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
@@ -26,7 +25,6 @@ public class PushJobFactory extends PipelineFactory {
         this.branch = branch
         this.userId = userId
         this.isTestNgRunner = isTestNgRunner
-        this.zafiraFields = zafiraFields
         this.webHookArgs = webHookArgs
     }
 
@@ -45,7 +43,6 @@ public class PushJobFactory extends PipelineFactory {
                 choiceParam('removedJobAction', ['IGNORE', 'DELETE'], '')
                 choiceParam('removedViewAction', ['IGNORE', 'DELETE'], '')
                 configure addHiddenParameter('userId', 'Identifier of the user who triggered the process', userId)
-                configure addHiddenParameter('zafiraFields', '', zafiraFields)
                 configure addHiddenParameter('ref', '', '')
                 configure addHiddenParameter('http_url', '', '')
                 configure addHiddenParameter('ssh_url', '', '')

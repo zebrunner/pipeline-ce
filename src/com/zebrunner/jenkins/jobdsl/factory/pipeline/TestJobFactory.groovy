@@ -182,7 +182,6 @@ public class TestJobFactory extends PipelineFactory {
                 choiceParam('retry_count', getRetryCountArray(currentSuite), 'Number of Times to Retry a Failed Test')
                 booleanParam('rerun_failures', false, 'During \"Rebuild\" pick it to execute only failed cases')
                 configure addHiddenParameter('overrideFields', '', getSuiteParameter("", "overrideFields", currentSuite))
-                configure addHiddenParameter('zafiraFields', '', getSuiteParameter("", "zafiraFields", currentSuite))
 
                 Map paramsMap = currentSuite.getAllParameters()
                 logger.info("ParametersMap: ${paramsMap}")
