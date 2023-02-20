@@ -148,9 +148,7 @@ public class Configuration {
             }
         }
 
-        //4. Replace vars and/or params with zafiraFields values
-        parseValues(params.get("zafiraFields"))
-        //5. Replace vars and/or params with overrideFields values
+        //4. Replace vars and/or params with overrideFields values
         parseValues(params.get("overrideFields"))
 
         def securedParameters = []

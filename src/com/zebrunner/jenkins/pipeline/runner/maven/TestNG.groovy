@@ -644,9 +644,9 @@ public class TestNG extends Runner {
         //TODO: remove completely zebrunner/zafira goals from maven integration!
         
         // When Zebrunner is disabled use Maven TestNG build status as job status. RetryCount can't be supported correctly!
-        def zafiraGoals = "-Dmaven.test.failure.ignore=false"
+        def zebrunnerGoals = "-Dmaven.test.failure.ignore=false"
         if ("true".equalsIgnoreCase(context.env.REPORTING_ENABLED)) {
-            zafiraGoals = "-Dmaven.test.failure.ignore=true \
+            zebrunnerGoals = "-Dmaven.test.failure.ignore=true \
                             -Dreporting.run.build=${Configuration.get('app_version')} \
                             -Dreporting.run.environment=\"${Configuration.get('env')}\""
         }
@@ -654,9 +654,9 @@ public class TestNG extends Runner {
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
-            ${zafiraGoals} \
+            ${zebrunnerGoals} \
             -Dmax_screen_history=1 \
-            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZafiraReport\" \
+            -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZebrunnerReport\" \
             -Dgit_branch=${Configuration.get("branch")} \
             -Dgit_commit=${Configuration.get("scm_commit")} \
             -Dgit_url=${Configuration.get("scm_url")} \
@@ -696,7 +696,6 @@ public class TestNG extends Runner {
         // This is an array of parameters, that we need to exclude from list of transmitted parameters to maven
         def necessaryMavenParams  = [
                 "capabilities",
-                "zafiraFields",
                 "JOB_MAX_RUN_TIME",
                 "SELENIUM_URL",
                 "job_type",
@@ -844,7 +843,7 @@ public class TestNG extends Runner {
     protected void publishJenkinsReports() {
         context.stage('Results') {
             //publishReport('**/reports/qa/emailable-report.html', "CarinaReport")
-            publishReport('**/zafira/report.html', "ZafiraReport")
+            publishReport('**/zebrunner/report.html', "ZebrunnerReport")
             publishReport('**/cucumber-html-reports/overview-features.html', "CucumberReport")
             publishReport('**/target/surefire-reports/index.html', 'Full TestNG HTML Report')
             publishReport('**/target/surefire-reports/emailable-report.html', 'TestNG Summary HTML Report')
@@ -883,6 +882,7 @@ public class TestNG extends Runner {
                             sortingMethod: 'ALPHABETICAL',
                             undefinedStepsNumber: -1
                 }
+              
                 context.publishHTML getReportParameters(reportDir, reports[i].name, name)
             }
         } catch (Exception e) {
@@ -1016,7 +1016,6 @@ public class TestNG extends Runner {
                     putNotNullWithSplit(pipelineMap, "email_list", emailList)
                     putNotNullWithSplit(pipelineMap, "executionMode", executionMode)
                     putNotNull(pipelineMap, "overrideFields", Configuration.get("overrideFields"))
-                    putNotNull(pipelineMap, "zafiraFields", Configuration.get("zafiraFields"))
                     // supported config matrix should be applied at the end to be able to override default args like retry_count etc
                     putMap(pipelineMap, supportedConfigurations)
                     

@@ -101,17 +101,8 @@ class Repository extends BaseObject {
             //Job build display name
             context.currentBuild.displayName = "#${buildNumber}|${this.repo}|${this.branch}"
 
-            //TODO: refactor removing zafira naming
-            def zafiraFields = isParamEmpty(Configuration.get("zafiraFields")) ? '' : Configuration.get("zafiraFields")
             def reportingServiceUrl = ""
             def reportingRefreshToken = "'"
-            logger.debug("zafiraFields: " + zafiraFields)
-            if (!isParamEmpty(zafiraFields) && zafiraFields.contains("zafira_service_url") && zafiraFields.contains("zafira_access_token")) {
-                reportingServiceUrl = Configuration.get("zafira_service_url")
-                reportingRefreshToken = Configuration.get("zafira_access_token")
-                logger.debug("reportingServiceUrl: " + reportingServiceUrl)
-                logger.debug("reportingRefreshToken: " + reportingRefreshToken)
-            }
 
             logger.debug("organization: ${this.organization}")
 
@@ -136,7 +127,7 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, zafiraFields, scmClient.webHookArgs()))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, scmClient.webHookArgs()))
             registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs()))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
