@@ -873,12 +873,16 @@ public class TestNG extends Runner {
                     continue
                 }
 
-                // TODO: remove below hotfix after resolving: https://github.com/qaprosoft/carina/issues/816
-                if (reportName.equals("Artifacts") && reports[i].path.contains("CucumberReport")) {
-                    // do not publish artifact as it is cucumber system item
-                    continue
+                if (name == "CucumberReport" && Jenkins.instance.pluginManager.plugins.find { it -> it.getShortName() == "cucumber-reports" }) {
+                    context.cucumber failedFeaturesNumber: -1,
+                            failedScenariosNumber: -1,
+                            failedStepsNumber: -1,
+                            fileIncludePattern: '**/*.json',
+                            pendingStepsNumber: -1,
+                            skippedStepsNumber: -1,
+                            sortingMethod: 'ALPHABETICAL',
+                            undefinedStepsNumber: -1
                 }
-
                 context.publishHTML getReportParameters(reportDir, reports[i].name, name)
             }
         } catch (Exception e) {
