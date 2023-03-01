@@ -876,7 +876,7 @@ public class TestNG extends Runner {
                     context.cucumber failedFeaturesNumber: -1,
                             failedScenariosNumber: -1,
                             failedStepsNumber: -1,
-                            fileIncludePattern: '**/*.json',
+                            fileIncludePattern: '**/cucumber-core-test-report.json',
                             pendingStepsNumber: -1,
                             skippedStepsNumber: -1,
                             sortingMethod: 'ALPHABETICAL',
