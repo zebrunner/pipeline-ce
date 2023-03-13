@@ -872,17 +872,6 @@ public class TestNG extends Runner {
                     continue
                 }
 
-                if (name == "CucumberReport" && Jenkins.instance.pluginManager.plugins.find { it -> it.getShortName() == "cucumber-reports" }) {
-                    context.cucumber failedFeaturesNumber: -1,
-                            failedScenariosNumber: -1,
-                            failedStepsNumber: -1,
-                            fileIncludePattern: '**/*.json',
-                            pendingStepsNumber: -1,
-                            skippedStepsNumber: -1,
-                            sortingMethod: 'ALPHABETICAL',
-                            undefinedStepsNumber: -1
-                }
-              
                 context.publishHTML getReportParameters(reportDir, reports[i].name, name)
             }
         } catch (Exception e) {
