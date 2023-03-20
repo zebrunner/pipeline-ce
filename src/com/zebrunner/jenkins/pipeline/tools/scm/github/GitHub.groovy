@@ -32,7 +32,7 @@ class GitHub extends Scm {
 
         
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event %s"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush\\s%s)*?\$"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/\$.repository.default_branch\\spush\\s%s)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key
