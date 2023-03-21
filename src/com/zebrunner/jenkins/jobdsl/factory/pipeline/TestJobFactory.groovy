@@ -51,20 +51,27 @@ public class TestJobFactory extends PipelineFactory {
             
             authenticationToken('ciStart')
 
-            //** Triggers **//*
-            def scheduling = currentSuite.getParameter("scheduling")
-            if (scheduling != null && orgRepoScheduling) {
-                triggers {
-                    cron(parseSheduling(scheduling))
+            //** Properties & Triggers**//*
+            properties {
+                if (getSuiteParameter(false, "jenkinsConcurrentBuild", currentSuite)) {
+                    //disable concurrent build only if suite xml param jenkinsConcurrentBuild=false
+                    disableConcurrentBuilds()
+                }
+
+                def scheduling = currentSuite.getParameter("scheduling")
+                if (scheduling != null && orgRepoScheduling) {
+                    pipelineTriggers {
+                        triggers {
+                            cron {
+                                spec(parseSheduling(scheduling))
+                            }
+                        }
+                    }
                 }
             }
 
-            //** Properties & Parameters Area **//*
+            //** Parameters Area **//*
             parameters {
-                //disable concurrent build only if suite xml param jenkinsConcurrentBuild=false
-                if (getSuiteParameter(false, "jenkinsConcurrentBuild", currentSuite)) {
-                    disableConcurrentBuilds()
-                }
                 extensibleChoiceParameterDefinition {
                     name('env')
                     choiceListProvider {
