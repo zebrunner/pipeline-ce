@@ -61,7 +61,10 @@ public class TestJobFactory extends PipelineFactory {
 
             //** Properties & Parameters Area **//*
             parameters {
-                concurrentBuild(getSuiteParameter(true, "jenkinsConcurrentBuild", currentSuite).toBoolean())
+                //disable concurrent build only if suite xml param jenkinsConcurrentBuild=false
+                if (getSuiteParameter(false, "jenkinsConcurrentBuild", currentSuite)) {
+                    disableConcurrentBuilds()
+                }
                 extensibleChoiceParameterDefinition {
                     name('env')
                     choiceListProvider {
