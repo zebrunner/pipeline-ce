@@ -35,12 +35,21 @@ public class CronJobFactory extends PipelineFactory {
         pipelineJob.with {
             authenticationToken('ciStart')
             
-            //** Properties & Parameters Area **//*
-            if (scheduling != null && orgRepoScheduling) {
-                triggers {
-                    cron(parseSheduling(scheduling))
+            //** Properties & Triggers**//*
+            properties {
+                def scheduling = currentSuite.getParameter("scheduling")
+                if (scheduling != null && orgRepoScheduling) {
+                    pipelineTriggers {
+                        triggers {
+                            cron {
+                                spec(parseSheduling(scheduling))
+                            }
+                        }
+                    }
                 }
             }
+
+            //** Parameters Area **//*
             parameters {
                 extensibleChoiceParameterDefinition {
                     name('env')
