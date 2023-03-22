@@ -37,7 +37,6 @@ public class CronJobFactory extends PipelineFactory {
             
             //** Properties & Triggers**//*
             properties {
-                def scheduling = currentSuite.getParameter("scheduling")
                 if (scheduling != null && orgRepoScheduling) {
                     pipelineTriggers {
                         triggers {
