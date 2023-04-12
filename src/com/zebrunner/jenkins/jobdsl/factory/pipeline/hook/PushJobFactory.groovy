@@ -36,6 +36,7 @@ public class PushJobFactory extends PipelineFactory {
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 stringParam('branch', this.branch, "repository branch to run against")
+                booleanParam('cloneTags', false, 'allow tags cloning')
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }

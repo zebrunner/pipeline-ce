@@ -60,6 +60,7 @@ class Repository extends BaseObject {
             parameters: [
                     context.string(name: 'repoUrl', value: this.repoUrl),
                     context.string(name: 'branch', value: Configuration.get(BRANCH)),
+                    context.booleanParam(name: 'cloneTags', value: Configuration.get('cloneTags').toBoolean()),
                     context.booleanParam(name: 'onlyUpdated', value: false),
                     context.string(name: 'removedConfigFilesAction', value: 'DELETE'),
                     context.string(name: 'removedJobAction', value: 'DELETE'),
