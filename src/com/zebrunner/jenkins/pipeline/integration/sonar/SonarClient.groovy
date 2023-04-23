@@ -22,6 +22,11 @@ class SonarClient extends HttpClient {
             logger.warn("The url for the sonarqube server is not configured, sonarqube scan will be skipped!")
             return goals
         }
+        
+        if (isParamEmpty(this.token)) {
+            logger.warn("Sonarqube token is not configured, sonarqube scan will be skipped!")
+            return goals
+        }
 
         if (!isAvailable()) {
             logger.warn("The sonarqube ${this.serviceUrl} server is not available, sonarqube scan will be skipped!")
