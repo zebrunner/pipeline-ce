@@ -67,7 +67,12 @@ public class TestNG extends Runner {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPullRequest")
-                    super.onPullRequest()
+                    
+                    def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+                    context.node(node) {
+                        getScm().clonePR()
+                        compile("-U clean compile test", true)
+                    }
                 }
             }
         }
@@ -565,9 +570,17 @@ public class TestNG extends Runner {
 
     protected void prepareForAndroid() {
         logger.info("Runner->prepareForAndroid")
-        Configuration.set("mobile_app_clear_cache", "true")
-        Configuration.set("capabilities.autoGrantPermissions", "true")
-        Configuration.set("capabilities.noSign", "true")
+        
+        // #249: review pre-defined default caps and parameters and make sure user can override them
+        if (isParamEmpty("mobile_app_clear_cache")) {
+            Configuration.set("mobile_app_clear_cache", "true")
+        }
+        if (isParamEmpty("capabilities.autoGrantPermissions")) {
+            Configuration.set("capabilities.autoGrantPermissions", "true")
+        }
+        if (isParamEmpty("capabilities.noSign")) {
+            Configuration.set("capabilities.noSign", "true")
+        }
         
         /* https://issuetracker.google.com/issues/170867658?pli=1
          * Multiple application reinstalls cause INSTALL_FAILED_INSUFFICIENT_STORAGE exception, which could only be fixed by device reboot 

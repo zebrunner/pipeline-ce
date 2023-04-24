@@ -35,7 +35,7 @@ public class PushJobFactory extends PipelineFactory {
 
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
-                stringParam('branch', this.branch, "repository branch to run against")
+                stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }
@@ -85,8 +85,7 @@ public class PushJobFactory extends PipelineFactory {
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)
                            regexpFilterText(String.format(webHookArgs.pushFilterText, resolveUrl(this.repoUrl)))
-                           regexpFilterExpression("bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.pushFilterExpression, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.pushFilterExpression, this.repoUrl)
-)
+                           regexpFilterExpression("bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.pushFilterExpression, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.pushFilterExpression, this.branch, this.repoUrl))
                         }
                     }
                 }
