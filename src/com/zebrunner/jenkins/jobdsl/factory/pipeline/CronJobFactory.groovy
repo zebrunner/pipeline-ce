@@ -67,7 +67,7 @@ public class CronJobFactory extends PipelineFactory {
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
 
-                configure stringParam('branch', this.branch, "SCM repository branch to run against")
+                configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 stringParam('email_list', '', 'List of Users to be emailed after the test. If empty then populate from jenkinsEmail suite property')
                 configure addExtensibleChoice('BuildPriority', "gc_BUILD_PRIORITY", "Priority of execution. Lower number means higher priority", "5")
             }
