@@ -23,7 +23,7 @@ abstract class Scm implements ISCM {
     protected abstract String branchSpec()
     public abstract def webHookArgs()
     
-    protected boolean noTags
+    protected boolean isFullRefSpec
 
     Scm(context) {
         this.context = context
@@ -32,7 +32,7 @@ abstract class Scm implements ISCM {
         this.repoUrl = Configuration.get("repoUrl")
         this.branch = Configuration.get("branch")
         
-        this.noTags = !this.branch.contains("/tags/")
+        this.isFullRefSpec = this.branch.contains("/tags/") || this.branch.contains("/heads/") || this.branch.contains("+refs/")
 
     }
 
@@ -130,7 +130,7 @@ abstract class Scm implements ISCM {
         def checkoutParams = [scm      : [$class                           : 'GitSCM',
                 branches                         : [[name: branch]],
                 doGenerateSubmoduleConfigurations: false,
-                extensions                       : [[$class: 'CheckoutOption', timeout: 15], [$class: 'CloneOption', noTags: this.noTags, reference: '', shallow: shallow, timeout: 15]],
+                extensions                       : [[$class: 'CheckoutOption', timeout: 15], [$class: 'CloneOption', noTags: false, reference: '', shallow: shallow, timeout: 15]],
                 submoduleCfg                     : [],
                 userRemoteConfigs                : [[url: gitUrl, refspec: refspecValue, credentialsId: credentialsIdValue]]],
             changelog: changelog,
@@ -145,10 +145,12 @@ abstract class Scm implements ISCM {
     }
     
     protected def getRefSpec(branch) {
-        if (this.noTags) {
-            return "+refs/heads/${branch}:refs/remotes/origin/${branch}"
+        if (this.isFullRefSpec) {
+            // full spec is already provided as branch, for exmple: 'refs/tags/1.0' or 'refs/heads/master' 
+            return "+${branch}:${branch}"
         } else {
-            return "+refs/tags/${branch}:refs/remotes/origin/${branch}"
+            // default when only branch is provided
+            return "+refs/heads/${branch}:refs/remotes/origin/${branch}"
         }
     }
 
