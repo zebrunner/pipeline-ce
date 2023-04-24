@@ -146,10 +146,10 @@ abstract class Scm implements ISCM {
     
     protected def getRefSpec(branch) {
         if (this.isFullRefSpec) {
-            // full spec is already provided as branch, for exmple: 'refs/tags/1.0' or 'refs/heads/master' 
+            // full spec is already provided as branch, for example: 'refs/tags/1.0' or 'refs/heads/master' 
             return "+${branch}:${branch}"
         } else {
-            // default when only branch is provided
+            // default when only branch name is provided
             return "+refs/heads/${branch}:refs/remotes/origin/${branch}"
         }
     }
