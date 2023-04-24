@@ -172,7 +172,7 @@ public class TestJobFactory extends PipelineFactory {
                 if (!isParamEmpty(nodeLabel)) {
                     configure addHiddenParameter('node_label', 'customized node label', nodeLabel)
                 }
-                configure stringParam('branch', this.branch, "repository branch to run against")
+                configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
                 if (!isParamEmpty(suiteName)) {

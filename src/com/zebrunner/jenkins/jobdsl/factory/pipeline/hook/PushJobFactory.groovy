@@ -35,7 +35,7 @@ public class PushJobFactory extends PipelineFactory {
 
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
-                stringParam('branch', this.branch, "repository branch to run against")
+                stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }
