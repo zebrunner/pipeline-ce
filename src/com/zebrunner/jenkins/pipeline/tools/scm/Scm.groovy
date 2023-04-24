@@ -32,7 +32,7 @@ abstract class Scm implements ISCM {
         this.repoUrl = Configuration.get("repoUrl")
         this.branch = Configuration.get("branch")
         
-        this.isFullRefSpec = this.branch.contains("/tags/") || this.branch.contains("/heads/") || this.branch.contains("+refs/")
+        this.isFullRefSpec = this.branch.contains("/tags/") || this.branch.contains("/heads/") || this.branch.contains("refs/")
 
     }
 
