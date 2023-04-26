@@ -38,7 +38,7 @@ class Repository extends BaseObject {
         logger.debug("repoUrl: ${this.repoUrl}; repo: ${this.repo}; branch: ${this.branch}")
 
         logger.debug("library: " + this.library)
-        context.node('master') {
+        context.node('built-in') {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     prepare()
