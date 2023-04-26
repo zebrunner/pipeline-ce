@@ -63,7 +63,7 @@ public class TestNG extends Runner {
     //Events
     @Override
     public void onPullRequest() {
-        context.node("master") {
+        context.node("built-in") {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPullRequest")
@@ -84,7 +84,7 @@ public class TestNG extends Runner {
         
         def nodeMaven = "maven"
         
-        context.node("master") {
+        context.node("built-in") {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPush")
@@ -434,7 +434,7 @@ public class TestNG extends Runner {
         uuid = getUUID()
         logger.info("UUID: " + uuid)
         def testRun
-        String nodeName = "master"
+        String nodeName = "built-in"
         context.node(nodeName) {
             nodeName = chooseNode()
         }
@@ -895,7 +895,7 @@ public class TestNG extends Runner {
 
     public void runCron() {
         logger.info("TestNG->runCron")
-        context.node("master") {
+        context.node("built-in") {
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
