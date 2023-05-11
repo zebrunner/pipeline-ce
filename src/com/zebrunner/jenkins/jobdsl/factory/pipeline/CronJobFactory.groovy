@@ -50,18 +50,20 @@ public class CronJobFactory extends PipelineFactory {
 
             //** Parameters Area **//*
             parameters {
-                extensibleChoiceParameterDefinition {
-                    name('env')
-                    choiceListProvider {
-                        textareaChoiceListProvider {
-                            choiceListText(getEnvironments(currentSuite))
-                            defaultChoice(getDefaultChoiceValue(currentSuite))
-                            addEditedValue(false)
-                            whenToAdd('Triggered')
+                if (isEnvDeclared(currentSuite)) {
+                    extensibleChoiceParameterDefinition {
+                        name('env')
+                        choiceListProvider {
+                            textareaChoiceListProvider {
+                                choiceListText(getEnvironments(currentSuite))
+                                defaultChoice(getDefaultChoiceValue(currentSuite))
+                                addEditedValue(false)
+                                whenToAdd('Triggered')
+                            }
                         }
+                        editable(true)
+                        description('Comma separated list of Environment(s) to test')
                     }
-                    editable(true)
-                    description('Comma separated list of Environment(s) to test')
                 }
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('ci_parent_url', '', '')

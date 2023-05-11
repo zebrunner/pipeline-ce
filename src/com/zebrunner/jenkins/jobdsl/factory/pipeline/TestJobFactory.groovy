@@ -72,18 +72,20 @@ public class TestJobFactory extends PipelineFactory {
 
             //** Parameters Area **//*
             parameters {
-                extensibleChoiceParameterDefinition {
-                    name('env')
-                    choiceListProvider {
-                        textareaChoiceListProvider {
-                            choiceListText(getEnvironments(currentSuite))
-                            defaultChoice(getDefaultChoiceValue(currentSuite))
-                            addEditedValue(false)
-                            whenToAdd('Triggered')
+                if (isEnvDeclared(currentSuite)) {
+                    extensibleChoiceParameterDefinition {
+                        name('env')
+                        choiceListProvider {
+                            textareaChoiceListProvider {
+                                choiceListText(getEnvironments(currentSuite))
+                                defaultChoice(getDefaultChoiceValue(currentSuite))
+                                addEditedValue(false)
+                                whenToAdd('Triggered')
+                            }
                         }
+                        editable(true)
+                        description('Environment to test against')
                     }
-                    editable(true)
-                    description('Environment to test against')
                 }
 
                 booleanParam('fork', false, "Reuse forked repository.")
