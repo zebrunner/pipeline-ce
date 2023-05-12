@@ -665,11 +665,14 @@ public class TestNG extends Runner {
         }
         
         def buildUserEmail = Configuration.get("BUILD_USER_EMAIL") ? Configuration.get("BUILD_USER_EMAIL") : ""
+        
+        //TODO: remove report_url as only it is removed from carina: https://github.com/zebrunner/carina-utils/issues/58
         def defaultBaseMavenGoals = "--no-transfer-progress \
             -Dselenium_url=${Configuration.get(Configuration.Parameter.SELENIUM_URL)} \
             ${zebrunnerGoals} \
             -Dmax_screen_history=1 \
             -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZebrunnerReport\" \
+            -Dci_build_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}\" \
             -Dgit_branch=${Configuration.get("branch")} \
             -Dgit_commit=${Configuration.get("scm_commit")} \
             -Dgit_url=${Configuration.get("scm_url")} \
