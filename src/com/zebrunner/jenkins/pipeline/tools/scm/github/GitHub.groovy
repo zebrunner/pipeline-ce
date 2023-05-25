@@ -17,7 +17,7 @@ class GitHub extends Scm {
 
     enum HookArgs {
         GIT_TYPE("scmType", "github"),
-        SSH_RUL("sshUrl", "\$.repository.ssh_url"),
+        SSH_URL("sshUrl", "\$.repository.ssh_url"),
         HTTP_URL("httpUrl", "\$.repository.clone_url"),
         HEADER_EVENT_NAME("eventName", "x-github-event"),
 

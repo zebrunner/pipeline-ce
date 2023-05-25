@@ -13,7 +13,7 @@ class Gitlab extends Scm {
 
     enum HookArgs {
         GIT_TYPE("scmType", "gitlab"),
-        SSH_RUL("sshUrl", "\$.project.ssh_url"),
+        SSH_URL("sshUrl", "\$.project.ssh_url"),
         HTTP_URL("httpUrl", "\$.project.http_url"),
         HEADER_EVENT_NAME("eventName", "x-gitlab-event"),
 
