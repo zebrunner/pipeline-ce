@@ -19,7 +19,7 @@ class GitHubClient extends HttpClient {
         this.authToken = authToken
     }
     /**
-     * commentSha
+     * Create commit status for a given SHA.
      * @param context A string label to differentiate this status from the status of other systems. By default 'build'.
      * @param repo owner/repo_name, e.g. 'octocat/Hello-World'. Required parameter.
      * @param sha1 full sha1 of commit. Required parameter.
