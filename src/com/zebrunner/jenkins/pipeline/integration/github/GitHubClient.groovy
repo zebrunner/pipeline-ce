@@ -9,8 +9,8 @@ class GitHubClient extends HttpClient {
 
     /**
      * GitHubClient
-     * @param context current context object.
-     * @param serviceURL GitHub service URL e.g. 'https://api.github.com'.
+     * @param context current pipeline object.
+     * @param serviceURL GitHub REST API Url e.g. 'https://api.github.com'.
      * @param authToken GitHub access token in format 'Bearer ghp_...'.
      */
     public GitHubClient(context, serviceURL, authToken) {
