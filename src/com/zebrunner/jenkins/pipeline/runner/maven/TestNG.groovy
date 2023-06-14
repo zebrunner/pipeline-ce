@@ -657,6 +657,7 @@ public class TestNG extends Runner {
             ${zebrunnerGoals} \
             -Dmax_screen_history=1 \
             -Dreport_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}/ZebrunnerReport\" \
+            -Dci_build_url=\"${Configuration.get(Configuration.Parameter.JOB_URL)}${Configuration.get(Configuration.Parameter.BUILD_NUMBER)}\" \
             -Dgit_branch=${Configuration.get("branch")} \
             -Dgit_commit=${Configuration.get("scm_commit")} \
             -Dgit_url=${Configuration.get("scm_url")} \
