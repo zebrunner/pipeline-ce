@@ -19,7 +19,7 @@ public class Configuration {
     public static final String ZEBRUNNER_PIPELINE = "ZEBRUNNER_PIPELINE"
 
     public static final String ADMIN_EMAILS = "ADMIN_EMAILS"
-    public static final String SONAR_URL = "SONAR_URL"
+    public static final String SONAR_URL2 = "SONAR_URL2"
     
     public static final String ZEBRUNNER_NODE_MAVEN = "ZEBRUNNER_NODE_MAVEN"
     
