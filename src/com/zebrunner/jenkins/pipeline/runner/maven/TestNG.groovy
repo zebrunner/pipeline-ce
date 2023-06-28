@@ -61,12 +61,18 @@ public class TestNG extends Runner {
     }
 
     //Events
+    @Override
     public void onPullRequest() {
         context.node("master") {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPullRequest")
-                    super.onPullRequest()
+                    
+                    def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+                    context.node(node) {
+                        getScm().clonePR()
+                        compile("-U clean compile test", true)
+                    }
                 }
             }
         }
