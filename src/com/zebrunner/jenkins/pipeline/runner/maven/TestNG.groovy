@@ -61,7 +61,6 @@ public class TestNG extends Runner {
     }
 
     //Events
-    @Override
     public void onPullRequest() {
         context.node("master") {
             context.timestamps {
