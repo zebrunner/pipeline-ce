@@ -51,29 +51,41 @@ public class TestJobFactory extends PipelineFactory {
             
             authenticationToken('ciStart')
 
-            //** Triggers **//*
-            def scheduling = currentSuite.getParameter("scheduling")
-            if (scheduling != null && orgRepoScheduling) {
-                triggers {
-                    cron(parseSheduling(scheduling))
+            //** Properties & Triggers**//*
+            properties {
+                if (getSuiteParameter(false, "jenkinsConcurrentBuild", currentSuite)) {
+                    //disable concurrent build only if suite xml param jenkinsConcurrentBuild=false
+                    disableConcurrentBuilds()
+                }
+
+                def scheduling = currentSuite.getParameter("scheduling")
+                if (scheduling != null && orgRepoScheduling) {
+                    pipelineTriggers {
+                        triggers {
+                            cron {
+                                spec(parseSheduling(scheduling))
+                            }
+                        }
+                    }
                 }
             }
 
-            //** Properties & Parameters Area **//*
+            //** Parameters Area **//*
             parameters {
-                concurrentBuild(getSuiteParameter(true, "jenkinsConcurrentBuild", currentSuite).toBoolean())
-                extensibleChoiceParameterDefinition {
-                    name('env')
-                    choiceListProvider {
-                        textareaChoiceListProvider {
-                            choiceListText(getEnvironments(currentSuite))
-                            defaultChoice(getDefaultChoiceValue(currentSuite))
-                            addEditedValue(false)
-                            whenToAdd('Triggered')
+                if (isEnvDeclared(currentSuite)) {
+                    extensibleChoiceParameterDefinition {
+                        name('env')
+                        choiceListProvider {
+                            textareaChoiceListProvider {
+                                choiceListText(getEnvironments(currentSuite))
+                                defaultChoice(getDefaultChoiceValue(currentSuite))
+                                addEditedValue(false)
+                                whenToAdd('Triggered')
+                            }
                         }
+                        editable(true)
+                        description('Environment to test against')
                     }
-                    editable(true)
-                    description('Environment to test against')
                 }
 
                 booleanParam('fork', false, "Reuse forked repository.")
@@ -162,7 +174,7 @@ public class TestJobFactory extends PipelineFactory {
                 if (!isParamEmpty(nodeLabel)) {
                     configure addHiddenParameter('node_label', 'customized node label', nodeLabel)
                 }
-                configure stringParam('branch', this.branch, "repository branch to run against")
+                configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('sub_project', '', sub_project)
                 if (!isParamEmpty(suiteName)) {

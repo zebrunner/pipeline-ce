@@ -17,7 +17,7 @@ class GitHub extends Scm {
 
     enum HookArgs {
         GIT_TYPE("scmType", "github"),
-        SSH_RUL("sshUrl", "\$.repository.ssh_url"),
+        SSH_URL("sshUrl", "\$.repository.ssh_url"),
         HTTP_URL("httpUrl", "\$.repository.clone_url"),
         HEADER_EVENT_NAME("eventName", "x-github-event"),
 
@@ -32,7 +32,7 @@ class GitHub extends Scm {
 
         
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_github_event %s"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(refs/heads/master\\spush\\s%s)*?\$"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(\\Qrefs/heads/%s\\E\\spush\\s\\Q%s\\E)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.ref")
 
         private final String key

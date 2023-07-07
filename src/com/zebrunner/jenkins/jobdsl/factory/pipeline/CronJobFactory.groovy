@@ -35,31 +35,41 @@ public class CronJobFactory extends PipelineFactory {
         pipelineJob.with {
             authenticationToken('ciStart')
             
-            //** Properties & Parameters Area **//*
-            if (scheduling != null && orgRepoScheduling) {
-                triggers {
-                    cron(parseSheduling(scheduling))
-                }
-            }
-            parameters {
-                extensibleChoiceParameterDefinition {
-                    name('env')
-                    choiceListProvider {
-                        textareaChoiceListProvider {
-                            choiceListText(getEnvironments(currentSuite))
-                            defaultChoice(getDefaultChoiceValue(currentSuite))
-                            addEditedValue(false)
-                            whenToAdd('Triggered')
+            //** Properties & Triggers**//*
+            properties {
+                if (scheduling != null && orgRepoScheduling) {
+                    pipelineTriggers {
+                        triggers {
+                            cron {
+                                spec(parseSheduling(scheduling))
+                            }
                         }
                     }
-                    editable(true)
-                    description('Comma separated list of Environment(s) to test')
+                }
+            }
+
+            //** Parameters Area **//*
+            parameters {
+                if (isEnvDeclared(currentSuite)) {
+                    extensibleChoiceParameterDefinition {
+                        name('env')
+                        choiceListProvider {
+                            textareaChoiceListProvider {
+                                choiceListText(getEnvironments(currentSuite))
+                                defaultChoice(getDefaultChoiceValue(currentSuite))
+                                addEditedValue(false)
+                                whenToAdd('Triggered')
+                            }
+                        }
+                        editable(true)
+                        description('Comma separated list of Environment(s) to test')
+                    }
                 }
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
 
-                configure stringParam('branch', this.branch, "SCM repository branch to run against")
+                configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 stringParam('email_list', '', 'List of Users to be emailed after the test. If empty then populate from jenkinsEmail suite property')
                 configure addExtensibleChoice('BuildPriority', "gc_BUILD_PRIORITY", "Priority of execution. Lower number means higher priority", "5")
             }

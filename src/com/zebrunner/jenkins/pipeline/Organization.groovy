@@ -37,7 +37,7 @@ class Organization extends BaseObject {
         logger.info("Organization->register")
         setDisplayNameTemplate('#${BUILD_NUMBER}|${folderName}')
         currentBuild.displayName = getDisplayName()
-        context.node('master') {
+        context.node('built-in') {
             context.timestamps {
                 generateCreds()
                 generateCiItems()
@@ -53,7 +53,7 @@ class Organization extends BaseObject {
 
     public def delete() {
         logger.info("Organization->delete")
-        context.node('master') {
+        context.node('built-in') {
             context.timestamps {
                 def folder = Configuration.get("folderName")
                 def userName = folder + "-user"

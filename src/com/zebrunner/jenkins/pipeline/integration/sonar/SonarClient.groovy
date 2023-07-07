@@ -8,16 +8,23 @@ import static com.zebrunner.jenkins.Utils.*
 class SonarClient extends HttpClient {
 
     private String serviceUrl
+    private String token
 
     SonarClient(context) {
         super(context)
-        serviceUrl = context.env[Configuration.SONAR_URL]
+        this.serviceUrl = context.env[Configuration.SONAR_URL]
+        this.token = context.env[Configuration.SONAR_TOKEN]
     }
 
     public String getGoals(isPullRequest=false) {
         def goals = ""
-        if (isParamEmpty(serviceUrl)) {
+        if (isParamEmpty(this.serviceUrl)) {
             logger.warn("The url for the sonarqube server is not configured, sonarqube scan will be skipped!")
+            return goals
+        }
+        
+        if (isParamEmpty(this.token)) {
+            logger.warn("Sonarqube token is not configured, sonarqube scan will be skipped!")
             return goals
         }
 
@@ -25,9 +32,10 @@ class SonarClient extends HttpClient {
             logger.warn("The sonarqube ${this.serviceUrl} server is not available, sonarqube scan will be skipped!")
             return goals
         }
-        goals = " -Dsonar.host.url=${this.serviceUrl} \
+        goals = " \
+                  -Dsonar.host.url=${this.serviceUrl} \
+                  -Dsonar.login=${this.token} \
                   -Dsonar.log.level=${this.logger.pipelineLogLevel} \
-                  -Dsonar.jacoco.reportPaths=target/site/jacoco/jacoco.xml \
                   -Dsonar.junit.reportPaths=target/surefire-reports "
 
         if (isPullRequest) {
@@ -78,7 +86,7 @@ class SonarClient extends HttpClient {
         def parameters = [contentType        : 'APPLICATION_JSON',
                           httpMode           : 'GET',
                           validResponseCodes : '200',
-                          url                : serviceUrl + '/api/system/status']
+                          url                : this.serviceUrl + '/api/system/status']
         return "UP".equals(sendRequestFormatted(parameters)?.get("status"))
     }
 

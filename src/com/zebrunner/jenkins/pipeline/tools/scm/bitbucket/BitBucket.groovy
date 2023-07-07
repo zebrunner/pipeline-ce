@@ -14,7 +14,7 @@ class BitBucket extends Scm {
     enum HookArgs {
         GIT_TYPE("scmType", "bitbucket"),
         HEADER_EVENT_NAME("eventName", "x-event-key"),
-        SSH_RUL("sshUrl", ""),
+        SSH_URL("sshUrl", ""),
         HTTP_URL("httpUrl", "\$.repository.full_name"),
 
         PR_ACTION("prAction", ""),
@@ -27,7 +27,7 @@ class BitBucket extends Scm {
         PR_FILTER_REGEX("prFilterExpression", "^(pullrequest:(created|updated)\\s%s)*?\$"),
 
         PUSH_FILTER_TEXT("pushFilterText", "\$ref \$x_event_key %s"),
-        PUSH_FILTER_REGEX("pushFilterExpression", "^(master\\srepo:push\\s%s)*?\$"),
+        PUSH_FILTER_REGEX("pushFilterExpression", "^(\\Q%s\\E\\srepo:push\\s\\Q%s\\E)*?\$"),
         REF_JSON_PATH("refJsonPath", "\$.push.changes[0].new.name")
 
         private final String key
