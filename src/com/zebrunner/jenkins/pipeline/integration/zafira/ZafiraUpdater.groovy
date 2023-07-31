@@ -176,8 +176,7 @@ class ZafiraUpdater {
     }
     
     public void getResultSummary(key, value) {
-        def response = zc.getResultSummary(key, value)
-        logger.info("response: " + response)
+        return zc.getResultSummary(key, value)
     }
 
     protected boolean isFailure(testRunStatus) {
