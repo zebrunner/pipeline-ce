@@ -121,7 +121,7 @@ class ZafiraClient extends HttpClient {
         return sendRequestFormatted(parameters)
     }
     
-    //TODO: what about projectId?
+    // we don't provide projectId to collect consolidated results from all projects. reporting supports it correctly
     public def getResultSummary(key, value) {
         //TODO: raise exception if key or value is empty
         if (!isZafiraConnected()) {
@@ -130,7 +130,7 @@ class ZafiraClient extends HttpClient {
         def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
                           contentType       : 'APPLICATION_JSON',
                           httpMode          : 'GET',
-                          validResponseCodes: "200:500",
+                          validResponseCodes: "200:401",
                           url               : this.serviceURL + "/api/reporting/v1/test-run-summaries?labelKey=${key}&labelValue=${value}"]
 
         return sendRequest(parameters)
