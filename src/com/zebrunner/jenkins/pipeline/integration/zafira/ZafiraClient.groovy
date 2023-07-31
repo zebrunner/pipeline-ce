@@ -122,7 +122,7 @@ class ZafiraClient extends HttpClient {
     }
     
     //TODO: what about projectId?
-    public def getResultSummary(projectId, key, value) {
+    public def getResultSummary(key, value) {
         //TODO: raise exception if key or value is empty
         if (!isZafiraConnected()) {
             return
@@ -131,7 +131,7 @@ class ZafiraClient extends HttpClient {
                           contentType       : 'APPLICATION_JSON',
                           httpMode          : 'GET',
                           validResponseCodes: "200:500",
-                          url               : this.serviceURL + "/api/reporting/v1/test-run-summaries?projectId=${projectId}&labelKey=${key}&labelValue=${value}"]
+                          url               : this.serviceURL + "/api/reporting/v1/test-run-summaries?labelKey=${key}&labelValue=${value}"]
 
         return sendRequest(parameters)
     }

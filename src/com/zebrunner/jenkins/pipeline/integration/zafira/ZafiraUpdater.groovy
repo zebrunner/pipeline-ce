@@ -175,8 +175,8 @@ class ZafiraUpdater {
         }
     }
     
-    public void getResultSummary(projectId, key, value) {
-        def response = zc.getResultSummary(projectId, key, value)
+    public void getResultSummary(key, value) {
+        def response = zc.getResultSummary(key, value)
         logger.info("response: " + response)
     }
 
