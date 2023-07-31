@@ -133,7 +133,7 @@ class ZafiraClient extends HttpClient {
                           validResponseCodes: "200:401",
                           url               : this.serviceURL + "/api/reporting/v1/test-run-summaries?labelKey=${key}&labelValue=${value}"]
 
-        return sendRequest(parameters)
+        return sendRequestFormatted(parameters)
     }
 
     protected boolean isTokenExpired() {
