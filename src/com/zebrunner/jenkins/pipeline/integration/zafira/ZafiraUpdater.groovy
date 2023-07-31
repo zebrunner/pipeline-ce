@@ -174,6 +174,11 @@ class ZafiraUpdater {
             }
         }
     }
+    
+    public void getResultSummary(key, value) {
+        def response = zc.getResultSummary(key, value)
+        logger.info("response: " + response)
+    }
 
     protected boolean isFailure(testRunStatus) {
         return !"PASSED".equals(testRunStatus)

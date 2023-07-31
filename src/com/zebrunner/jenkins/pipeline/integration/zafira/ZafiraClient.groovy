@@ -120,6 +120,21 @@ class ZafiraClient extends HttpClient {
 
         return sendRequestFormatted(parameters)
     }
+    
+    //TODO: what about projectId?
+    public def getResultSummary(key, value) {
+        //TODO: raise exception if key or value is empty
+        if (!isZafiraConnected()) {
+            return
+        }
+        def parameters = [customHeaders     : [[name: 'Authorization', value: "${authToken}"]],
+                          contentType       : 'APPLICATION_JSON',
+                          httpMode          : 'GET',
+                          validResponseCodes: "200:500",
+                          url               : this.serviceURL + "/api/reporting/v1/test-run-summaries?labelKey=${key}&labelValue=${value}"]
+
+        return sendRequest(parameters)
+    }
 
     protected boolean isTokenExpired() {
         return authToken == null || System.currentTimeMillis() > tokenExpTime
