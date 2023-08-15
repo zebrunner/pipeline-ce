@@ -641,17 +641,26 @@ public class TestNG extends Runner {
 
     protected void getAdbKeys() {
         try {
-            //TODO: any way to get $HOME automatically to supportr any kind of jenkins agents including self provisioned
             context.configFileProvider(
                 [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android/adbkey'), 
-                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub'),
-                context.configFile(fileId: 'adbkey', targetLocation: '/home/jenkins/.android/adbkey'), 
-                context.configFile(fileId: 'adbkey.pub', targetLocation: '/home/jenkins/.android/adbkey'), ]
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub')) ]
             ) {
-                context.sh 'pwd && ls -la /root/.android/ && /home/jenkins/'
+                context.sh 'ls -la /root/.android/'
             }
         } catch (Exception e) {
             // do nothing as files optional 
+            logger.debug(e.getMessage())
+        }
+        
+        try {
+            context.configFileProvider(
+                [context.configFile(fileId: 'adbkey', targetLocation: '/home/jenkins/.android/adbkey'),
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/home/jenkins/.android/adbkey.pub') ]
+            ) {
+                context.sh 'ls -la /home/jenkins/'
+            }
+        } catch (Exception e) {
+            // do nothing as files optional
             logger.debug(e.getMessage())
         }
     }
