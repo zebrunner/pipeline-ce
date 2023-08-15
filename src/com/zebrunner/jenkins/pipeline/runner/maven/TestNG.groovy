@@ -651,6 +651,18 @@ public class TestNG extends Runner {
             // do nothing as files optional 
             logger.debug(e.getMessage())
         }
+        
+        try {
+            context.configFileProvider(
+                [context.configFile(fileId: 'adbkey', targetLocation: '/home/jenkins/.android/adbkey'),
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/home/jenkins/.android/adbkey.pub') ]
+            ) {
+                context.sh 'ls -la /home/jenkins/'
+            }
+        } catch (Exception e) {
+            // do nothing as files optional
+            logger.debug(e.getMessage())
+        }
     }
 
     protected String getMavenGoals() {
