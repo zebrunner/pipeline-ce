@@ -649,7 +649,7 @@ public class TestNG extends Runner {
             }
         } catch (Exception e) {
             // do nothing as files optional 
-            logger.debug(e.getMessage())
+            logger.error(e.getMessage())
         }
         
         try {
@@ -661,7 +661,7 @@ public class TestNG extends Runner {
             }
         } catch (Exception e) {
             // do nothing as files optional
-            logger.debug(e.getMessage())
+            logger.error(e.getMessage())
         }
     }
 
