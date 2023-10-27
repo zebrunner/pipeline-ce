@@ -718,7 +718,6 @@ public class TestNG extends Runner {
                 "repoUrl",
                 "sub_project",
                 "BuildPriority",
-                "queue_registration",
                 "overrideFields",
                 "fork"
         ]
