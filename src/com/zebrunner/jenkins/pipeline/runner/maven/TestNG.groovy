@@ -642,26 +642,14 @@ public class TestNG extends Runner {
     protected void getAdbKeys() {
         try {
             context.configFileProvider(
-                [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android/adbkey'), 
-                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub')]
+                [context.configFile(fileId: 'adbkey', targetLocation: '/root/.android/adbkey'),
+                context.configFile(fileId: 'adbkey.pub', targetLocation: '/root/.android/adbkey.pub') ]
             ) {
                 context.sh 'ls -la /root/.android/'
             }
         } catch (Exception e) {
-            // do nothing as files optional 
-            logger.debug(e.getMessage())
-        }
-        
-        try {
-            context.configFileProvider(
-                [context.configFile(fileId: 'adbkey', targetLocation: '/home/jenkins/.android/adbkey'),
-                context.configFile(fileId: 'adbkey.pub', targetLocation: '/home/jenkins/.android/adbkey.pub') ]
-            ) {
-                context.sh 'ls -la /home/jenkins/'
-            }
-        } catch (Exception e) {
             // do nothing as files optional
-            logger.debug(e.getMessage())
+            logger.error(e.getMessage())
         }
     }
 
@@ -730,7 +718,6 @@ public class TestNG extends Runner {
                 "repoUrl",
                 "sub_project",
                 "BuildPriority",
-                "queue_registration",
                 "overrideFields",
                 "fork"
         ]
