@@ -695,7 +695,6 @@ public class TestNG extends Runner {
                 "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE")
         
         addBrowserStackCapabilities()
-        addProviderCapabilities()
 
         def goals = Configuration.resolveVars(defaultBaseMavenGoals)
 
@@ -766,18 +765,9 @@ public class TestNG extends Runner {
         return Configuration.get(parameterName)?.toBoolean() ? capabilityName : ""
     }
     
-    protected addProviderCapabilities() {
+    protected addProviderCapability(capabilityName, capabilityValue) {
         def provider = getProvider().toLowerCase()
-        def platform = Configuration.get("job_type")
-        if ("selenium".equalsIgnoreCase(provider) || "zebrunner".equalsIgnoreCase(provider) || "mcloud".equalsIgnoreCase(provider)) {
-            // #190: setup default settings only if no explicit disabler via overrideFields!
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableVideo"))) {
-                Configuration.set("capabilities.enableVideo", "true")
-            }
-            if (!"false".equalsIgnoreCase(Configuration.get("capabilities.enableLog"))) {
-                Configuration.set("capabilities.enableLog", "true")
-            }
-        }
+        Configuration.set("capabilities" + "." + provider + ":" + capabilityName, capabilityValue)
     }
     
     protected def addBrowserStackCapabilities() {
@@ -1270,9 +1260,6 @@ public class TestNG extends Runner {
         if (isParamEmpty(Configuration.get("provider"))) {
             // #177: setup default provider=zebrunner by default
             Configuration.set("provider", "zebrunner")
-            Configuration.set("capabilities.provider", "zebrunner")
-        } else {
-            Configuration.set("capabilities.provider", Configuration.get("provider"))
         }
         
         return Configuration.get("provider")
