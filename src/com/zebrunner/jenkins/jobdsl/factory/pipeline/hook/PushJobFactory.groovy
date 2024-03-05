@@ -74,19 +74,18 @@ public class PushJobFactory extends PipelineFactory {
                              regexpFilter("")
                             }
                            }
-                           
+
                            def webhookTokenCreds = "${this.webHookArgs.scmType}-webhook-token"
                            if (this.organization != null && !this.organization.isEmpty()) {
                                webhookTokenCreds = "${this.organization}-${this.webHookArgs.scmType}-webhook-token"
                            }
-                           
+
                            tokenCredentialId(webhookTokenCreds)
                            printContributedVariables(isLogLevelActive(Logger.LogLevel.DEBUG))
                            printPostContent(isLogLevelActive(Logger.LogLevel.DEBUG))
                            silentResponse(false)
                            regexpFilterText(String.format(webHookArgs.pushFilterText, resolveUrl(this.repoUrl)))
-                           regexpFilterExpression("bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.pushFilterExpression, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.pushFilterExpression, this.branch, this.repoUrl))
-                        }
+                           regexpFilterExpression("bitbucket".equals(webHookArgs.scmType) ? String.format(webHookArgs.pushFilterExpression, this.branch, repoUrl.split("/")[3] + "/" + repoUrl.split("/")[4].replace(".git", "")) : String.format(webHookArgs.pushFilterExpression, this.branch, this.repoUrl))                        }
                     }
                 }
             }

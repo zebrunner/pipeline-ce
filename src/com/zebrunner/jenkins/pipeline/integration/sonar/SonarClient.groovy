@@ -36,7 +36,6 @@ class SonarClient extends HttpClient {
                   -Dsonar.host.url=${this.serviceUrl} \
                   -Dsonar.login=${this.token} \
                   -Dsonar.log.level=${this.logger.pipelineLogLevel} \
-                  -Dsonar.jacoco.reportPaths=target/site/jacoco/jacoco.xml \
                   -Dsonar.junit.reportPaths=target/surefire-reports "
 
         if (isPullRequest) {
