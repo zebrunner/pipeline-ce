@@ -43,23 +43,19 @@ public class CronJobFactory extends PipelineFactory {
                     
                     pipelineTriggers {
                         triggers {
-                            cron {
-                                spec(parseSheduling(scheduling))
-                            }
+                            parameterizedTimerTrigger {
+                                parameterizedSpecification('''
+H 18 * * * %MYVAR=1; MYCHOICE=A;
+H 18 * * * %MYVAR=2; MYCHOICE=B;
+''')
+//                            cron {
+//                                spec(parseSheduling(scheduling))
+//                            }
                         }
                     }
                 }
             }
             
-            triggers {
-                parameterizedCron('''
-            # leave spaces where you want them around the parameters. They'll be trimmed.
-            # we let the build run with the default name
-            */2 * * * * %GREETING=Hola;PLANET=Pluto
-            */3 * * * * %PLANET=Mars
-        ''')
-            }
-
             //** Parameters Area **//*
             parameters {
                 if (isEnvDeclared(currentSuite)) {
