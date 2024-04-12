@@ -44,7 +44,7 @@ public class CronJobFactory extends PipelineFactory {
                     pipelineTriggers {
                         triggers {
                             parameterizedTimerTrigger {
-                                parameterizedSpecification('''H 18 * * * %MYVAR=1; MYCHOICE=A;''')
+                                parameterizedSpecification("* * * * *%foo=bar\n*/1 * * * *%foo=boo")
                             }
 //                            cron {
 //                                spec(parseSheduling(scheduling))
