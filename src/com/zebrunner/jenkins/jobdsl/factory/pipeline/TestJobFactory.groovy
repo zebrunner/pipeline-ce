@@ -41,7 +41,7 @@ public class TestJobFactory extends PipelineFactory {
         this.name = !isParamEmpty(currentSuite.getParameter("jenkinsJobName")) ? currentSuite.getParameter("jenkinsJobName") : currentSuite.getName()
         name = replaceSpecialSymbols(name)
         logger.info("JenkinsJobName: ${name}")
-
+        
         def pipelineJob = super.create()
         pipelineJob.with {
             def maxNumberKeepBuilds = getSuiteParameter("30", "maxNumberKeepBuilds", currentSuite).toInteger()
@@ -60,6 +60,9 @@ public class TestJobFactory extends PipelineFactory {
 
                 def scheduling = currentSuite.getParameter("scheduling")
                 if (scheduling != null && orgRepoScheduling) {
+                    logger.info("scheduling:")
+                    logger.info(parseSheduling(scheduling))
+            
                     pipelineTriggers {
                         triggers {
                             parameterizedCron(parseSheduling(scheduling))

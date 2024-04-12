@@ -38,6 +38,9 @@ public class CronJobFactory extends PipelineFactory {
             //** Properties & Triggers**//*
             properties {
                 if (scheduling != null && orgRepoScheduling) {
+                    logger.info("scheduling:")
+                    logger.info(parseSheduling(scheduling))
+                    
                     pipelineTriggers {
                         triggers {
                             parameterizedCron(parseSheduling(scheduling))

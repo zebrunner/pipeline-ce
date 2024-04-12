@@ -131,6 +131,7 @@ public class PipelineFactory extends JobFactory {
     }
 
     protected def parseSheduling(scheduling) {
+        multilineValue = "'''"
         if (scheduling.contains("::")) {
             def multilineArray = scheduling.split("::")
             def multilineValue = ""
@@ -139,6 +140,7 @@ public class PipelineFactory extends JobFactory {
             }
             scheduling = multilineValue
         }
+        multilineValue = multilineValue + "'''"
         return scheduling
     }
 
