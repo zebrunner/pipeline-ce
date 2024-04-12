@@ -40,9 +40,10 @@ public class CronJobFactory extends PipelineFactory {
                 if (scheduling != null && orgRepoScheduling) {
                     pipelineTriggers {
                         triggers {
-                            cron {
-                                spec(parseSheduling(scheduling))
-                            }
+                            parameterizedCron(parseSheduling(scheduling))
+//                            cron {
+//                                spec(parseSheduling(scheduling))
+//                            }
                         }
                     }
                 }
