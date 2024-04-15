@@ -60,9 +60,6 @@ public class TestJobFactory extends PipelineFactory {
 
                 def scheduling = currentSuite.getParameter("scheduling")
                 if (scheduling != null && orgRepoScheduling) {
-                    logger.info("scheduling:")
-                    logger.info(parseSheduling(scheduling))
-            
                     pipelineTriggers {
                         triggers {
                             cron {
@@ -71,15 +68,6 @@ public class TestJobFactory extends PipelineFactory {
                         }
                     }
                 }
-            }
-            
-            triggers {
-                parameterizedCron('''
-            # leave spaces where you want them around the parameters. They'll be trimmed.
-            # we let the build run with the default name
-            */2 * * * * %GREETING=Hola;PLANET=Pluto
-            */3 * * * * %PLANET=Mars
-        ''')
             }
 
             //** Parameters Area **//*
