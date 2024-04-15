@@ -44,8 +44,8 @@ public class CronJobFactory extends PipelineFactory {
                     pipelineTriggers {
                         triggers {
                             org.jenkinsci.plugins.parameterizedscheduler.ParameterizedTimerTrigger {
-                                spec("* * * * *%foo=bar\n*/1 * * * *%foo=boo")
-                                //parameterizedSpecification("* * * * *%foo=bar\n*/1 * * * *%foo=boo")
+                                //spec("* * * * *%foo=bar\n*/1 * * * *%foo=boo")
+                                parameterizedSpecification("* * * * *%foo=bar\n*/1 * * * *%foo=boo")
                             }
 //                            cron {
 //                                spec(parseSheduling(scheduling))
