@@ -150,8 +150,11 @@ public class Executor {
     
     static def getCredentials(id) {
         return SystemCredentialsProvider.getInstance().getStore().getCredentials(Domain.global()).find {
-            it.id.equals(id.toString())
+            if (it != null) { 
+                it.id.equals(id.toString())
+            }
         }
+        return false
     }
 
     static def getCredentialsRegEx(regex) {
