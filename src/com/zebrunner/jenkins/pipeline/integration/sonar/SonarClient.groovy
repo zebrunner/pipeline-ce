@@ -68,29 +68,16 @@ class SonarClient extends HttpClient {
             goals += " -Dsonar.projectVersion=${Configuration.get("BUILD_NUMBER")} -Dsonar.branch.name=${Configuration.get("branch")}"
         }
 
-        // Configure JVM memory settings for Sonar analysis
-        // These can be overridden via environment variables to prevent OOM errors on large projects
-        def sonarJvmOpts = context.env['SONAR_JVM_OPTS'] ?: "-Xms1g -Xmx4g -XX:+UseG1GC"
-        def sonarScannerOpts = context.env['SONAR_SCANNER_JVM_OPTS'] ?: "-Xms1g -Xmx4g -XX:+UseG1GC"
-
         // Determine at run-time if we use maven or gradle.
         def extraGoals = ""
-        def envVars = ""
-
         if (isMaven()) {
             extraGoals = " sonar:sonar"
-            // Set MAVEN_OPTS for Maven execution to prevent heap space errors
-            envVars = "MAVEN_OPTS='${sonarJvmOpts}' "
         }
         // Gradle has higher priority!
         if (isGradle()) {
             extraGoals = " sonarqube"
         }
-
-        // Add SONAR_SCANNER_OPTS for Sonar Scanner CLI (applicable to both Maven and Gradle)
-        envVars += "SONAR_SCANNER_OPTS='${sonarScannerOpts}' "
-
-        goals = envVars + goals + extraGoals
+        goals += extraGoals
 
         return goals
     }
