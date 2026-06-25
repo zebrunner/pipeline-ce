@@ -434,9 +434,15 @@ public class TestNG extends Runner {
         uuid = getUUID()
         logger.info("UUID: " + uuid)
         def testRun
-        String nodeName = "built-in"
-        context.node(nodeName) {
-            nodeName = chooseNode()
+        String nodeName = chooseNode()
+        if (isParamEmpty(nodeName)) {
+            // node value lives only in the variables.env config file, which needs a workspace to read
+            context.node("built-in") {
+                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) {
+                    nodeName = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+                }
+            }
+            Configuration.set("node", nodeName)
         }
         context.node(nodeName) {
             // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
@@ -509,23 +515,22 @@ public class TestNG extends Runner {
         //Do nothing in default implementation
     }
 
+    // returns "" when the node is only resolvable from variables.env (caller must read it on a node)
     protected String chooseNode() {
-        // reuse overriden node label assignment and return 
         def nodeLabel = Configuration.get("node_label")
         if (!isParamEmpty(nodeLabel)) {
             logger.info("overriding default node to: " + nodeLabel)
             Configuration.set("node", nodeLabel)
             return Configuration.get("node")
         }
-        
-        def nodeMaven = "maven"
-        context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
-            nodeMaven = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
+
+        if (!isParamEmpty(context.env[Configuration.ZEBRUNNER_NODE_MAVEN])) {
+            Configuration.set("node", context.env[Configuration.ZEBRUNNER_NODE_MAVEN])
+            logger.info("node: " + Configuration.get("node"))
+            return Configuration.get("node")
         }
-        
-        Configuration.set("node", nodeMaven)
-        logger.info("node: " + Configuration.get("node"))
-        return Configuration.get("node")
+
+        return ""
     }
 
     //TODO: moved almost everything into argument to be able to move this methoud outside of the current class later if necessary
