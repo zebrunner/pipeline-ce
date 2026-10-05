@@ -63,16 +63,12 @@ public class TestNG extends Runner {
     //Events
     @Override
     public void onPullRequest() {
-        context.node("built-in") {
+        context.node(getMavenNodeLabel()) {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPullRequest")
-                    
-                    def node = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
-                    context.node(node) {
-                        getScm().clonePR()
-                        compile("-U clean compile test", true)
-                    }
+                    getScm().clonePR()
+                    compile("-U clean compile test", true)
                 }
             }
         }
@@ -82,15 +78,11 @@ public class TestNG extends Runner {
     public void onPush() {
         boolean isValid = false
         
-        def nodeMaven = "maven"
-        
-        context.node("built-in") {
+        context.node(getMavenNodeLabel()) {
             context.timestamps {
                 context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // read values from variables.env
                     logger.info("TestNG->onPush")
                     
-                    nodeMaven = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
-
                     try {
                         getScm().clone(true)
                         if (isUpdated(currentBuild,"**.xml,**/zafira.properties") || !onlyUpdated) {
@@ -103,14 +95,7 @@ public class TestNG extends Runner {
                         logger.error("Scan failed.\n" + e.getMessage())
                         this.currentBuild.result = BuildResult.FAILURE
                     }
-                }
-            }
-        }
-        
-        
-        context.node(nodeMaven) {
-            context.timestamps {
-                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) { // re-read values from variables.env for maven runner
+
                     if (isValid) {
                         getScm().clonePush()
                         compile("-U clean compile test")

@@ -11,6 +11,7 @@ import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 import java.nio.file.Paths
 
 import static com.zebrunner.jenkins.Utils.replaceMultipleSymbolsToOne
+import static com.zebrunner.jenkins.Utils.isParamEmpty
 
 /*
  * BaseObject to operate with pipeline context, loggers and runners
@@ -128,6 +129,29 @@ public abstract class BaseObject {
         }
     }
     
+    protected String getMavenNodeLabel() {
+        def nodeLabel = Configuration.get("node_label")
+        if (!isParamEmpty(nodeLabel)) {
+            return nodeLabel
+        }
+
+        def nodeMaven = context.env[Configuration.ZEBRUNNER_NODE_MAVEN]
+        if (!isParamEmpty(nodeMaven)) {
+            return nodeMaven
+        }
+
+        nodeMaven = "maven"
+        context.node("maven") {
+            context.withEnv(getVariables(Configuration.VARIABLES_ENV)) {
+                def configuredNode = context.env[Configuration.ZEBRUNNER_NODE_MAVEN]
+                if (!isParamEmpty(configuredNode)) {
+                    nodeMaven = configuredNode
+                }
+            }
+        }
+        return nodeMaven
+    }
+
     protected def getVariables(configFile) {
         def vars = []
         
