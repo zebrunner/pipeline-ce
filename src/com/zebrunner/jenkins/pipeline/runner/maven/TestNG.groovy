@@ -245,7 +245,7 @@ public class TestNG extends Runner {
             //pipeline job
             def jobDesc = "zbr_project: ${currentZbrProject}; owner: ${suiteOwner}"
             branch = getSuiteParameter(Configuration.get("branch"), "jenkinsDefaultGitBranch", currentSuite)
-            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, currentSuitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
+            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, suitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
 
 			//cron job
             if (!isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))) {
@@ -253,7 +253,7 @@ public class TestNG extends Runner {
                 for (def cronJobName : cronJobNames.split(",")) {
                     cronJobName = cronJobName.trim()
 					def cronDesc = "type: cron"
-					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, this.repoUrl, branch, currentSuitePath, cronDesc, orgRepoScheduling)
+					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, this.repoUrl, branch, suitePath, cronDesc, orgRepoScheduling)
 
 					if (!dslObjects.containsKey(cronJobName)) {
 						// register CronJobFactory only if its declaration is missed
@@ -283,19 +283,18 @@ public class TestNG extends Runner {
 	protected def getSuiteAttribute(suite, attribute) {
 		def res = "1"
 
-		def file = new File(suite.getFileName())
-		def documentBuilderFactory = DocumentBuilderFactory.newInstance()
-
-		documentBuilderFactory.setValidating(false)
-		documentBuilderFactory.setNamespaceAware(true)
 		try {
+			def content = context.readFile(file: suite.getFileName(), encoding: "UTF-8")
+			def documentBuilderFactory = DocumentBuilderFactory.newInstance()
+			documentBuilderFactory.setValidating(false)
+			documentBuilderFactory.setNamespaceAware(true)
 			documentBuilderFactory.setFeature("http://xml.org/sax/features/namespaces", false)
 			documentBuilderFactory.setFeature("http://xml.org/sax/features/validation", false)
 			documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false)
 			documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
 
 			def documentBuilder = documentBuilderFactory.newDocumentBuilder()
-			def document = documentBuilder.parse(file)
+			def document = documentBuilder.parse(new ByteArrayInputStream(content.getBytes("UTF-8")))
 
 			for (int i = 0; i < document.getChildNodes().getLength(); i++) {
 				def nodeMapAttributes = document.getChildNodes().item(i).getAttributes()
@@ -333,7 +332,7 @@ public class TestNG extends Runner {
 		XmlSuite currentSuite = null
 		boolean res = false
 		try {
-			currentSuite = parseSuite(filePath)
+			currentSuite = parseSuite(filePath, context.readFile(file: filePath, encoding: "UTF-8"))
 			res = true
 		} catch (FileNotFoundException e) {
 			logger.error("Unable to find suite: " + filePath)
@@ -349,7 +348,7 @@ public class TestNG extends Runner {
         logger.debug("filePath: " + filePath)
         XmlSuite currentSuite = null
         try {
-            currentSuite = parseSuite(filePath)
+            currentSuite = parseSuite(filePath, context.readFile(file: filePath, encoding: "UTF-8"))
         } catch (FileNotFoundException e) {
             logger.error("Unable to find suite: " + filePath)
             logger.error(printStackTrace(e))

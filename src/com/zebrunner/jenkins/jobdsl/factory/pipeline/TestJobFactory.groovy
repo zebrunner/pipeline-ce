@@ -36,7 +36,7 @@ public class TestJobFactory extends PipelineFactory {
     def create() {
         logger.info("TestJobFactory->create")
 
-        XmlSuite currentSuite = parseSuite(suitePath)
+        XmlSuite currentSuite = parseSuite(suitePath, _dslFactory.readFileFromWorkspace(suitePath))
 
         this.name = !isParamEmpty(currentSuite.getParameter("jenkinsJobName")) ? currentSuite.getParameter("jenkinsJobName") : currentSuite.getName()
         name = replaceSpecialSymbols(name)

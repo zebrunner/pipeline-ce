@@ -26,6 +26,14 @@ class Utils {
         return currentSuite
     }
 
+    static XmlSuite parseSuite(String path, String content) {
+        def xmlFile = new Parser(new ByteArrayInputStream(content.getBytes("UTF-8")))
+        xmlFile.setLoadClasses(false)
+        XmlSuite currentSuite = xmlFile.parseToList().get(0)
+        currentSuite.setFileName(path)
+        return currentSuite
+    }
+
     static boolean isParamEmpty(value) {
         if (value == null) {
             return true

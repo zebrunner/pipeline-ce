@@ -29,7 +29,7 @@ public class CronJobFactory extends PipelineFactory {
 
     def create() {
         logger.info("CronJobFactory->create")
-        XmlSuite currentSuite = parseSuite(suitePath)
+        XmlSuite currentSuite = parseSuite(suitePath, _dslFactory.readFileFromWorkspace(suitePath))
         def pipelineJob = super.create()
 
         pipelineJob.with {
