@@ -60,6 +60,7 @@ class Repository extends BaseObject {
             parameters: [
                     context.string(name: 'repoUrl', value: this.repoUrl),
                     context.string(name: 'branch', value: Configuration.get(BRANCH)),
+                    context.string(name: 'node_label', value: Configuration.get('node_label')),
                     context.booleanParam(name: 'onlyUpdated', value: false),
                     context.string(name: 'removedConfigFilesAction', value: 'DELETE'),
                     context.string(name: 'removedJobAction', value: 'DELETE'),
@@ -127,8 +128,8 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, scmClient.webHookArgs()))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs()))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, scmClient.webHookArgs(), Configuration.get('node_label')))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs(), Configuration.get('node_label')))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
             if (isBuildToolDependent) {

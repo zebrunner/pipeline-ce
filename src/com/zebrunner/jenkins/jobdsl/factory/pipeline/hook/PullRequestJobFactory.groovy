@@ -12,8 +12,9 @@ public class PullRequestJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def webHookArgs
+    def nodeLabel = ''
 
-    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, webHookArgs) {
+    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, webHookArgs, nodeLabel = '') {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
@@ -22,6 +23,7 @@ public class PullRequestJobFactory extends PipelineFactory {
         this.repoUrl = repoUrl
         this.branch = branch
         this.webHookArgs = webHookArgs
+        this.nodeLabel = nodeLabel
     }
 
     def create() {
@@ -33,6 +35,7 @@ public class PullRequestJobFactory extends PipelineFactory {
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('branch', '', branch)
+                stringParam('node_label', this.nodeLabel, 'Optional TestNG agent label. Leave empty to use the configured node.')
                 configure addHiddenParameter('pr_number', '', '')
                 configure addHiddenParameter('pr_repository', '', '')
                 configure addHiddenParameter('pr_source_branch', '', '')

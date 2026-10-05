@@ -14,8 +14,9 @@ public class PushJobFactory extends PipelineFactory {
     def userId
     def isTestNgRunner
     def webHookArgs
+    def nodeLabel = ''
 
-    public PushJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, userId, isTestNgRunner, webHookArgs) {
+    public PushJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, userId, isTestNgRunner, webHookArgs, nodeLabel = '') {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
@@ -26,6 +27,7 @@ public class PushJobFactory extends PipelineFactory {
         this.userId = userId
         this.isTestNgRunner = isTestNgRunner
         this.webHookArgs = webHookArgs
+        this.nodeLabel = nodeLabel
     }
 
     def create() {
@@ -36,6 +38,7 @@ public class PushJobFactory extends PipelineFactory {
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
+                stringParam('node_label', this.nodeLabel, 'Optional TestNG agent label. Leave empty to use the configured node.')
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }
