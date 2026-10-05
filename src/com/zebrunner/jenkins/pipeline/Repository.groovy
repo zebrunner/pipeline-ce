@@ -10,6 +10,9 @@ import com.zebrunner.jenkins.jobdsl.factory.view.ListViewFactory
 import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
 import com.zebrunner.jenkins.pipeline.runner.maven.TestNG
 import com.zebrunner.jenkins.pipeline.runner.maven.Runner
+import hudson.BulkChange
+import hudson.model.ParametersDefinitionProperty
+import hudson.model.StringParameterDefinition
 import java.nio.file.Paths
 
 import static com.zebrunner.jenkins.Utils.*
@@ -32,6 +35,9 @@ class Repository extends BaseObject {
 
     public void register() {
         logger.info("Repository->register")
+        if (addNodeLabelParameter()) {
+            logger.info("Added node_label to this job for future builds")
+        }
         
         this.branch = Configuration.get(BRANCH)
 
@@ -66,6 +72,31 @@ class Repository extends BaseObject {
                     context.string(name: 'removedJobAction', value: 'DELETE'),
                     context.string(name: 'removedViewAction', value: 'DELETE'),
             ]
+    }
+
+    @NonCPS
+    private boolean addNodeLabelParameter() {
+        def job = context.currentBuild.rawBuild.parent
+        synchronized (job) {
+            def property = job.getProperty(ParametersDefinitionProperty)
+            def definitions = new ArrayList(property?.parameterDefinitions ?: [])
+            if (definitions.any { it.name == 'node_label' }) {
+                return false
+            }
+
+            definitions.add(new StringParameterDefinition('node_label', '', 'Optional agent label. Leave empty to use the configured node.'))
+            def change = new BulkChange(job)
+            try {
+                if (property != null) {
+                    job.removeProperty(property)
+                }
+                job.addProperty(new ParametersDefinitionProperty(definitions))
+                change.commit()
+            } finally {
+                change.abort()
+            }
+            return true
+        }
     }
 
     public void create() {
