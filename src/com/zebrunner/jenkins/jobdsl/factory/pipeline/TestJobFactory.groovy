@@ -11,6 +11,7 @@ public class TestJobFactory extends PipelineFactory {
 
     def repoUrl
     def branch
+    def scmCredentialsId = ''
     def sub_project
     def suitePath
     def suiteName
@@ -19,12 +20,13 @@ public class TestJobFactory extends PipelineFactory {
     def threadCount
     def dataProviderThreadCount
 
-    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount) {
+    public TestJobFactory(folder, pipelineScript, repoUrl, branch, sub_project, suitePath, suiteName, jobDesc, orgRepoScheduling, threadCount, dataProviderThreadCount, scmCredentialsId = '') {
         this.folder = folder
         this.description = jobDesc
         this.pipelineScript = pipelineScript
         this.repoUrl = repoUrl
         this.branch = branch
+        this.scmCredentialsId = scmCredentialsId
         this.sub_project = sub_project
         this.suitePath = suitePath
         this.suiteName = suiteName
@@ -176,6 +178,7 @@ public class TestJobFactory extends PipelineFactory {
                 }
                 configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
                 configure addHiddenParameter('sub_project', '', sub_project)
                 if (!isParamEmpty(suiteName)) {
                     configure addHiddenParameter('suite', '', suiteName)

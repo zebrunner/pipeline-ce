@@ -8,8 +8,9 @@ class BuildJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def isDockerRepo
+    def scmCredentialsId = ''
 
-    public BuildJobFactory(folder, pipelineScript, jobName, desc, repoUrl, branch, isDockerRepo) {
+    public BuildJobFactory(folder, pipelineScript, jobName, desc, repoUrl, branch, isDockerRepo, scmCredentialsId = '') {
         this.name = jobName
         this.description = desc
         this.folder = folder
@@ -17,6 +18,7 @@ class BuildJobFactory extends PipelineFactory {
         this.repoUrl = repoUrl
         this.branch = branch
         this.isDockerRepo = isDockerRepo
+        this.scmCredentialsId = scmCredentialsId
     }
 
     def create() {
@@ -38,6 +40,7 @@ class BuildJobFactory extends PipelineFactory {
                 configure stringParam('branch', branch, "SCM repository branch containing sources for component build")
                 configure stringParam('goals', '', 'Extra build tool goals to build the project')
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
             }
 
         }

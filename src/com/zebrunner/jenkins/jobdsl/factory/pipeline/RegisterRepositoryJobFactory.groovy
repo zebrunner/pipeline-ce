@@ -1,8 +1,7 @@
 package com.zebrunner.jenkins.jobdsl.factory.pipeline
 
-import static com.zebrunner.jenkins.Utils.*
-import org.testng.xml.XmlSuite
 import groovy.transform.InheritConstructors
+import com.cloudbees.plugins.credentials.common.StandardCredentials
 
 @InheritConstructors
 public class RegisterRepositoryJobFactory extends PipelineFactory {
@@ -23,8 +22,12 @@ public class RegisterRepositoryJobFactory extends PipelineFactory {
                 configure stringParam('repoUrl', "https://github.com/zebrunner/carina-demo.git", 'Repository for scanning')
                 configure stringParam('branch', 'main', "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 stringParam('node_label', '', 'Optional agent label. Leave empty to use the configured node.')
-                configure stringParam('scmUser', '', 'SCM user')
-                configure stringParam('scmToken', '', 'CSM token with read permissions')
+                credentialsParam('scmCredentialsId') {
+                    type(StandardCredentials.class.name)
+                    defaultValue('')
+                    required(false)
+                    description('Optional credential for repository checkout: a GitHub App or username/password credential containing a PAT.')
+                }
                 configure addExtensibleChoice('pipelineLibrary', "gc_PIPELINE_LIBRARY", "Groovy JobDSL/Pipeline library, for example: https://github.com/zebrunner/pipeline-ce/releases", "Zebrunner-CE")
                 configure addExtensibleChoice('runnerClass', "gc_RUNNER_CLASS", "Pipeline runner class", "com.zebrunner.jenkins.pipeline.runner.maven.TestNG")
                 configure addHiddenParameter('userId', '', '2')

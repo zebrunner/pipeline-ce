@@ -13,8 +13,9 @@ public class PullRequestJobFactory extends PipelineFactory {
     def branch
     def webHookArgs
     def nodeLabel = ''
+    def scmCredentialsId = ''
 
-    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, webHookArgs, nodeLabel = '') {
+    public PullRequestJobFactory(folder, pipelineScript, jobName, desc, organization, repoUrl, branch, webHookArgs, nodeLabel = '', scmCredentialsId = '') {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.name = jobName
@@ -24,6 +25,7 @@ public class PullRequestJobFactory extends PipelineFactory {
         this.branch = branch
         this.webHookArgs = webHookArgs
         this.nodeLabel = nodeLabel
+        this.scmCredentialsId = scmCredentialsId
     }
 
     def create() {
@@ -34,6 +36,7 @@ public class PullRequestJobFactory extends PipelineFactory {
 
             parameters {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
                 configure addHiddenParameter('branch', '', branch)
                 stringParam('node_label', this.nodeLabel, 'Optional TestNG agent label. Leave empty to use the configured node.')
                 configure addHiddenParameter('pr_number', '', '')

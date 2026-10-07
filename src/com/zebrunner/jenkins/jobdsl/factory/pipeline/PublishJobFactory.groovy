@@ -7,13 +7,19 @@ class PublishJobFactory extends PipelineFactory {
 
 	def repoUrl
 	def branch
+	def scmCredentialsId = ''
 
     public PublishJobFactory(folder, pipelineScript, jobName, repoUrl, branch) {
+        this(folder, pipelineScript, jobName, repoUrl, branch, '')
+    }
+
+    public PublishJobFactory(folder, pipelineScript, jobName, repoUrl, branch, scmCredentialsId) {
         this.name = jobName
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.repoUrl = repoUrl
         this.branch = branch
+        this.scmCredentialsId = scmCredentialsId
     }
 
     def create() {
@@ -32,6 +38,7 @@ class PublishJobFactory extends PipelineFactory {
                 configure stringParam('SIGNING_PASSWORD', '', 'PGP key signing password')
                 configure stringParam('SIGNING_KEY_BASE64', '', 'Base64 encoded PGP secret key')
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
             }
     	}
 

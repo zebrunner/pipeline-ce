@@ -170,7 +170,11 @@ public class Configuration {
 
         context.println("PARAMS:")
         for (param in params) {
-            context.println(param)
+            if (param.getKey().equalsIgnoreCase("scmToken")) {
+                context.println(param.getKey() + "=********")
+            } else {
+                context.println(param)
+            }
         }
 
         //6. TODO: investigate how private pipeline can override those values

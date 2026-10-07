@@ -12,17 +12,19 @@ public class CronJobFactory extends PipelineFactory {
 
     def repoUrl
     def branch
+    def scmCredentialsId = ''
     def suitePath
     def scheduling
     def orgRepoScheduling
 
-    public CronJobFactory(folder, pipelineScript, cronJobName, repoUrl, branch, suitePath, jobDesc, orgRepoScheduling) {
+    public CronJobFactory(folder, pipelineScript, cronJobName, repoUrl, branch, suitePath, jobDesc, orgRepoScheduling, scmCredentialsId = '') {
         this.folder = folder
         this.pipelineScript = pipelineScript
         this.description = jobDesc
         this.name = cronJobName
         this.repoUrl = repoUrl
         this.branch = branch
+        this.scmCredentialsId = scmCredentialsId
         this.suitePath = suitePath
         this.orgRepoScheduling = orgRepoScheduling
     }
@@ -66,6 +68,7 @@ public class CronJobFactory extends PipelineFactory {
                     }
                 }
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
+                configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
                 configure addHiddenParameter('ci_parent_url', '', '')
                 configure addHiddenParameter('ci_parent_build', '', '')
 

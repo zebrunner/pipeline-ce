@@ -245,7 +245,7 @@ public class TestNG extends Runner {
             //pipeline job
             def jobDesc = "zbr_project: ${currentZbrProject}; owner: ${suiteOwner}"
             branch = getSuiteParameter(Configuration.get("branch"), "jenkinsDefaultGitBranch", currentSuite)
-            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, suitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount))
+            registerObject(suitePath, new TestJobFactory(repoFolder, getPipelineScript(), this.repoUrl, branch, subProject, suitePath, suiteName, jobDesc, orgRepoScheduling, suiteThreadCount, suiteDataProviderThreadCount, this.scmCredentialsId))
 
 			//cron job
             if (!isParamEmpty(currentSuite.getParameter("jenkinsRegressionPipeline"))) {
@@ -253,7 +253,7 @@ public class TestNG extends Runner {
                 for (def cronJobName : cronJobNames.split(",")) {
                     cronJobName = cronJobName.trim()
 					def cronDesc = "type: cron"
-					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, this.repoUrl, branch, suitePath, cronDesc, orgRepoScheduling)
+					def cronJobFactory = new CronJobFactory(repoFolder, getCronPipelineScript(), cronJobName, this.repoUrl, branch, suitePath, cronDesc, orgRepoScheduling, this.scmCredentialsId)
 
 					if (!dslObjects.containsKey(cronJobName)) {
 						// register CronJobFactory only if its declaration is missed
@@ -1183,6 +1183,9 @@ public class TestNG extends Runner {
 
             //add current build params from cron
             for (param in Configuration.getParams()) {
+				if ('scmCredentialsId'.equals(param.getKey())) {
+					continue
+				}
 				if ("params_name".equals(param.getKey())) {
 					//do not append params_name as it it used only for naming
 					continue
@@ -1207,8 +1210,12 @@ public class TestNG extends Runner {
                 }
             }
             for (param in entry) {
+                if (SCM_CREDENTIALS_ID == param.getKey()) {
+                    continue
+                }
                 jobParams.add(context.string(name: param.getKey(), value: param.getValue()))
             }
+            jobParams.add(context.string(name: SCM_CREDENTIALS_ID, value: this.scmCredentialsId))
             
             logger.info("jobParams: " + jobParams.dump())
 

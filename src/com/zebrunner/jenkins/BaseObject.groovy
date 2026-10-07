@@ -9,6 +9,8 @@ import com.zebrunner.jenkins.pipeline.tools.scm.gitlab.Gitlab
 import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 
 import java.nio.file.Paths
+import hudson.model.ParametersAction
+import hudson.model.ParametersDefinitionProperty
 
 import static com.zebrunner.jenkins.Utils.replaceMultipleSymbolsToOne
 import static com.zebrunner.jenkins.Utils.isParamEmpty
@@ -26,6 +28,7 @@ public abstract class BaseObject {
     protected ISCM scmClient
     protected def scmUser
     protected def scmToken
+    protected String scmCredentialsId = ""
     
     // organization folder name of the current job/runner
     protected String organization = ""
@@ -43,6 +46,7 @@ public abstract class BaseObject {
     protected static final String REPO_URL = "repoUrl"
     private static final String SCM_USER = "scmUser"
     private static final String SCM_TOKEN = "scmToken"
+    protected static final String SCM_CREDENTIALS_ID = "scmCredentialsId"
 
     public BaseObject(context) {
         this.context = context
@@ -75,12 +79,27 @@ public abstract class BaseObject {
                 throw new RuntimeException("Unsuported source control management: ${gitType}!")
         }
         
-        //hotfix to init valid credentialsId object reference
         def credId = "${this.repo}"
         if (!this.organization.isEmpty()) {
             credId = "${this.organization}-${this.repo}"
         }
-        this.scmClient.setCredentialsId(credId)
+        def definitions = currentBuild.rawBuild.parent.getProperty(ParametersDefinitionProperty)?.parameterDefinitions
+        def scmCredentialsDefinition = null
+        for (def definition : definitions ?: []) {
+            if (definition.name == SCM_CREDENTIALS_ID) {
+                scmCredentialsDefinition = definition
+                break
+            }
+        }
+        if (scmCredentialsDefinition != null) {
+            def submittedValue = currentBuild.rawBuild.getAction(ParametersAction)?.getParameter(SCM_CREDENTIALS_ID)
+            this.scmCredentialsId = submittedValue != null
+                ? (submittedValue.value?.toString() ?: '')
+                : (scmCredentialsDefinition.defaultParameterValue?.value?.toString() ?: '')
+        } else {
+            this.scmCredentialsId = credId
+        }
+        this.scmClient.setCredentialsId(this.scmCredentialsId)
     }
 
     protected String getDisplayName() {

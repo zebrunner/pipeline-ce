@@ -11,8 +11,13 @@ import com.zebrunner.jenkins.jobdsl.factory.folder.FolderFactory
 import com.zebrunner.jenkins.pipeline.runner.maven.TestNG
 import com.zebrunner.jenkins.pipeline.runner.maven.Runner
 import hudson.BulkChange
+import hudson.model.ParametersAction
 import hudson.model.ParametersDefinitionProperty
 import hudson.model.StringParameterDefinition
+import hudson.security.ACL
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import com.cloudbees.plugins.credentials.CredentialsParameterDefinition
+import com.cloudbees.plugins.credentials.common.StandardCredentials
 import java.nio.file.Paths
 
 import static com.zebrunner.jenkins.Utils.*
@@ -26,6 +31,11 @@ class Repository extends BaseObject {
     protected def branch
 
     private static final String BRANCH = "branch"
+    private static final String PAT_CREDENTIALS_ID = "scmPatCredentialsId"
+    private static final String GITHUB_APP_CREDENTIALS_ID = "scmGitHubAppCredentialsId"
+    private static final String PAT_CREDENTIALS_TYPE = "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl"
+    private static final String GITHUB_APP_CREDENTIALS_TYPE = "org.jenkinsci.plugins.github_branch_source.GitHubAppCredentials"
+    private static final String SCM_CREDENTIALS_DESCRIPTION = 'Optional credential for repository checkout: a GitHub App or username/password credential containing a PAT.'
 
     public Repository(context) {
         super(context)
@@ -35,11 +45,14 @@ class Repository extends BaseObject {
 
     public void register() {
         logger.info("Repository->register")
-        if (addNodeLabelParameter()) {
-            logger.info("Added node_label to this job for future builds")
+        if (updateRegistrationParameters()) {
+            logger.info("RegisterRepository parameters updated. Reopen Build with Parameters and run the job again.")
+            return
         }
         
         this.branch = Configuration.get(BRANCH)
+        this.scmCredentialsId = selectScmCredentialsId()
+        this.scmClient.setCredentialsId(this.scmCredentialsId)
 
         logger.debug("repoUrl: ${this.repoUrl}; repo: ${this.repo}; branch: ${this.branch}")
 
@@ -67,6 +80,7 @@ class Repository extends BaseObject {
                     context.string(name: 'repoUrl', value: this.repoUrl),
                     context.string(name: 'branch', value: Configuration.get(BRANCH)),
                     context.string(name: 'node_label', value: Configuration.get('node_label')),
+                    context.string(name: SCM_CREDENTIALS_ID, value: this.scmCredentialsId),
                     context.booleanParam(name: 'onlyUpdated', value: false),
                     context.string(name: 'removedConfigFilesAction', value: 'DELETE'),
                     context.string(name: 'removedJobAction', value: 'DELETE'),
@@ -75,16 +89,36 @@ class Repository extends BaseObject {
     }
 
     @NonCPS
-    private boolean addNodeLabelParameter() {
+    private boolean updateRegistrationParameters() {
         def job = context.currentBuild.rawBuild.parent
         synchronized (job) {
             def property = job.getProperty(ParametersDefinitionProperty)
             def definitions = new ArrayList(property?.parameterDefinitions ?: [])
-            if (definitions.any { it.name == 'node_label' }) {
+            boolean removedLegacyParameters = definitions.removeAll {
+                it.name in ['scmUser', 'scmToken', PAT_CREDENTIALS_ID, GITHUB_APP_CREDENTIALS_ID]
+            }
+            boolean addNodeLabel = !definitions.any { it.name == 'node_label' }
+            def credentialDefinitions = definitions.findAll { it.name == SCM_CREDENTIALS_ID }
+            def credentialDefinition = credentialDefinitions ? credentialDefinitions[0] : null
+            boolean updateCredentialSelector = credentialDefinitions.size() != 1 ||
+                !(credentialDefinition instanceof CredentialsParameterDefinition) ||
+                credentialDefinition.credentialType != StandardCredentials.class.name ||
+                credentialDefinition.defaultValue != '' ||
+                credentialDefinition.required ||
+                credentialDefinition.description != SCM_CREDENTIALS_DESCRIPTION
+            if (!removedLegacyParameters && !addNodeLabel && !updateCredentialSelector) {
                 return false
             }
 
-            definitions.add(new StringParameterDefinition('node_label', '', 'Optional agent label. Leave empty to use the configured node.'))
+            if (addNodeLabel) {
+                definitions.add(new StringParameterDefinition('node_label', '', 'Optional agent label. Leave empty to use the configured node.'))
+            }
+            if (updateCredentialSelector) {
+                int index = credentialDefinition != null ? definitions.indexOf(credentialDefinition) : definitions.size()
+                definitions.removeAll { it.name == SCM_CREDENTIALS_ID }
+                definitions.add(index, new CredentialsParameterDefinition(SCM_CREDENTIALS_ID,
+                    SCM_CREDENTIALS_DESCRIPTION, '', StandardCredentials.class.name, false))
+            }
             def change = new BulkChange(job)
             try {
                 if (property != null) {
@@ -97,6 +131,27 @@ class Repository extends BaseObject {
             }
             return true
         }
+    }
+
+    private String selectScmCredentialsId() {
+        def buildParameters = context.currentBuild.rawBuild.getAction(ParametersAction)
+        String selectedId = buildParameters?.getParameter(SCM_CREDENTIALS_ID)?.value?.toString()?.trim() ?: ''
+        if (!selectedId) {
+            return ''
+        }
+        def credential = CredentialsProvider.lookupCredentials(StandardCredentials.class,
+            context.currentBuild.rawBuild.parent, ACL.SYSTEM).find { it.id == selectedId }
+        String selectedType = credential?.getClass()?.getName()
+        if (selectedType != PAT_CREDENTIALS_TYPE && selectedType != GITHUB_APP_CREDENTIALS_TYPE) {
+            throw new IllegalArgumentException("Credential '${selectedId}' is unavailable in the global or organization folder store, or is not a PAT or GitHub App credential. Personal-only credentials are unsupported.")
+        }
+        if (selectedType == GITHUB_APP_CREDENTIALS_TYPE && !'github'.equalsIgnoreCase(Configuration.get('scmType'))) {
+            throw new IllegalArgumentException('GitHub App credentials require scmType github.')
+        }
+        if (!this.repoUrl.startsWith('https://')) {
+            throw new IllegalArgumentException('PAT and GitHub App credentials require an HTTPS repository URL.')
+        }
+        return selectedId
     }
 
     public void create() {
@@ -116,11 +171,6 @@ class Repository extends BaseObject {
         }
         
         
-        def scmTokenCreds = "${this.repo}"
-        if (!isParamEmpty(this.organization)) {
-            scmTokenCreds = "${this.organization}-${this.repo}"
-        }
-        updateJenkinsCredentials(scmTokenCreds, "${this.repo} SCM token", this.scmUser, this.scmToken)
         getScm().clone(true)
     }
 
@@ -159,8 +209,8 @@ class Repository extends BaseObject {
             // TODO: move folder and main trigger job creation onto the createRepository method
             registerObject("project_folder", new FolderFactory(repoFolder, ""))
             registerObject("hooks_view", new ListViewFactory(repoFolder, 'SYSTEM', null, ".*onPush.*|.*onPullRequest.*|.*CutBranch-.*|build|deploy|publish"))
-            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, scmClient.webHookArgs(), Configuration.get('node_label')))
-            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs(), Configuration.get('node_label')))
+            registerObject("push_job", new PushJobFactory(repoFolder, getOnPushScript(), "onPush-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, userId, isTestNgRunner, scmClient.webHookArgs(), Configuration.get('node_label'), this.scmCredentialsId))
+            registerObject("pull_request_job", new PullRequestJobFactory(repoFolder, getOnPullRequestScript(), "onPullRequest-${this.repo}", systemJobDesc, this.organization, this.repoUrl, this.branch, scmClient.webHookArgs(), Configuration.get('node_label'), this.scmCredentialsId))
 
             def isBuildToolDependent = extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner, com.zebrunner.jenkins.pipeline.runner.gradle.Runner, com.zebrunner.jenkins.pipeline.runner.docker.Runner])
             if (isBuildToolDependent) {
@@ -172,11 +222,11 @@ class Repository extends BaseObject {
                     }
 
                     isDockerRunner = true
-                    registerObject("deploy_job", new DeployJobFactory(repoFolder, getDeployScript(), "deploy", this.repoUrl))
-                    registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.repoUrl, this.branch))
+                    registerObject("deploy_job", new DeployJobFactory(repoFolder, getDeployScript(), "deploy", this.repoUrl, this.scmCredentialsId))
+                    registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.repoUrl, this.branch, this.scmCredentialsId))
                 }
 
-                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", systemJobDesc, this.repoUrl, this.branch, isDockerRunner))
+                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", systemJobDesc, this.repoUrl, this.branch, isDockerRunner, this.scmCredentialsId))
             }
 
             logger.debug("before - factoryRunner.run(dslObjects)")
