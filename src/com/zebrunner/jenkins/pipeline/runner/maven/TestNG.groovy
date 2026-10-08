@@ -420,14 +420,9 @@ public class TestNG extends Runner {
         def testRun
         String nodeName = chooseNode()
         if (isParamEmpty(nodeName)) {
-            // node value lives only in the variables.env config file, which needs a workspace to read
-            context.node("built-in") {
-                context.withEnv(getVariables(Configuration.VARIABLES_ENV)) {
-                    nodeName = context.env[Configuration.ZEBRUNNER_NODE_MAVEN] ? context.env[Configuration.ZEBRUNNER_NODE_MAVEN] : "maven"
-                }
-            }
-            Configuration.set("node", nodeName)
+            nodeName = getMavenNodeLabel()
         }
+        Configuration.set("node", nodeName)
         context.node(nodeName) {
             // set all required integration at the beginning of build operation to use actual value and be able to override anytime later
             setSeleniumUrl()
@@ -499,22 +494,15 @@ public class TestNG extends Runner {
         //Do nothing in default implementation
     }
 
-    // returns "" when the node is only resolvable from variables.env (caller must read it on a node)
     protected String chooseNode() {
-        def nodeLabel = Configuration.get("node_label")
-        if (!isParamEmpty(nodeLabel)) {
-            logger.info("overriding default node to: " + nodeLabel)
-            Configuration.set("node", nodeLabel)
-            return Configuration.get("node")
+        def nodeName = getMavenNodeLabel()
+        Configuration.set("node", nodeName)
+        if (!isParamEmpty(Configuration.get("node_label"))) {
+            logger.info("overriding default node to: " + nodeName)
+        } else {
+            logger.info("node: " + nodeName)
         }
-
-        if (!isParamEmpty(context.env[Configuration.ZEBRUNNER_NODE_MAVEN])) {
-            Configuration.set("node", context.env[Configuration.ZEBRUNNER_NODE_MAVEN])
-            logger.info("node: " + Configuration.get("node"))
-            return Configuration.get("node")
-        }
-
-        return ""
+        return nodeName
     }
 
     //TODO: moved almost everything into argument to be able to move this methoud outside of the current class later if necessary
@@ -876,7 +864,8 @@ public class TestNG extends Runner {
 
     public void runCron() {
         logger.info("TestNG->runCron")
-        context.node("built-in") {
+        def pipelineGroups = []
+        context.node(getMavenNodeLabel()) {
             getScm().clone()
             listPipelines = []
             def buildNumber = Configuration.get(Configuration.Parameter.BUILD_NUMBER)
@@ -902,8 +891,12 @@ public class TestNG extends Runner {
                 listPipelines.each { pipeline ->
                     logger.info(pipeline.toString())
                 }
-                executeStages()
+                pipelineGroups.add(new ArrayList(listPipelines))
             }
+        }
+        for (pipelines in pipelineGroups) {
+            listPipelines = pipelines
+            executeStages()
         }
     }
 
@@ -1220,7 +1213,9 @@ public class TestNG extends Runner {
             logger.info("jobParams: " + jobParams.dump())
 
             try {
-                context.build job: parseFolderName(getWorkspace()) + "/" + entry.get("jobName"),
+                def parentJobName = Configuration.get(Configuration.Parameter.JOB_NAME)
+                def jobFolder = parentJobName.substring(0, parentJobName.lastIndexOf('/') + 1)
+                context.build job: "/${jobFolder}${entry.get('jobName')}",
                         propagate: propagateJob,
                         parameters: jobParams,
                         wait: waitJob

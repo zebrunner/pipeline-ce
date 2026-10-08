@@ -173,9 +173,7 @@ public class TestJobFactory extends PipelineFactory {
                 }
 
                 def nodeLabel = getSuiteParameter("", "jenkinsNodeLabel", currentSuite)
-                if (!isParamEmpty(nodeLabel)) {
-                    configure addHiddenParameter('node_label', 'customized node label', nodeLabel)
-                }
+                stringParam('node_label', nodeLabel, 'Optional agent label. Leave empty to use the configured node.')
                 configure stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
@@ -207,7 +205,11 @@ public class TestJobFactory extends PipelineFactory {
                     logger.debug("Parameter: ${param}")
                     def delimiter = "::"
                     if (param.key.contains(delimiter)) {
-                        def (type, name, desc) = param.key.split(delimiter)
+                        def parameterParts = param.key.split(delimiter)
+                        if (parameterParts.length > 1 && 'node_label'.equals(parameterParts[1])) {
+                            continue
+                        }
+                        def (type, name, desc) = parameterParts
                         switch (type.toLowerCase()) {
                             case "hiddenparam":
                                 configure addHiddenParameter(name, desc, param.value)

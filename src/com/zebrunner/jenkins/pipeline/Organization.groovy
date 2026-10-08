@@ -35,9 +35,13 @@ class Organization extends BaseObject {
 
     public def register() {
         logger.info("Organization->register")
+        if (addNodeLabelParameter()) {
+            logger.info("RegisterOrganization parameters updated. Reopen Build with Parameters and run the job again.")
+            return
+        }
         setDisplayNameTemplate('#${BUILD_NUMBER}|${folderName}')
         currentBuild.displayName = getDisplayName()
-        context.node('built-in') {
+        context.node(getMavenNodeLabel()) {
             context.timestamps {
                 generateCreds()
                 generateCiItems()
@@ -53,7 +57,11 @@ class Organization extends BaseObject {
 
     public def delete() {
         logger.info("Organization->delete")
-        context.node('built-in') {
+        if (addNodeLabelParameter()) {
+            logger.info("DeleteOrganization parameters updated. Reopen Build with Parameters and run the job again.")
+            return
+        }
+        context.node(getMavenNodeLabel()) {
             context.timestamps {
                 def folder = Configuration.get("folderName")
                 def userName = folder + "-user"

@@ -8,9 +8,10 @@ class BuildJobFactory extends PipelineFactory {
     def repoUrl
     def branch
     def isDockerRepo
+    def isMavenRepo = false
     def scmCredentialsId = ''
 
-    public BuildJobFactory(folder, pipelineScript, jobName, desc, repoUrl, branch, isDockerRepo, scmCredentialsId = '') {
+    public BuildJobFactory(folder, pipelineScript, jobName, desc, repoUrl, branch, isDockerRepo, scmCredentialsId = '', isMavenRepo = false) {
         this.name = jobName
         this.description = desc
         this.folder = folder
@@ -18,6 +19,7 @@ class BuildJobFactory extends PipelineFactory {
         this.repoUrl = repoUrl
         this.branch = branch
         this.isDockerRepo = isDockerRepo
+        this.isMavenRepo = isMavenRepo
         this.scmCredentialsId = scmCredentialsId
     }
 
@@ -39,6 +41,9 @@ class BuildJobFactory extends PipelineFactory {
                 
                 configure stringParam('branch', branch, "SCM repository branch containing sources for component build")
                 configure stringParam('goals', '', 'Extra build tool goals to build the project')
+                if (isMavenRepo) {
+                    stringParam('node_label', '', 'Optional agent label. Leave empty to use the configured node.')
+                }
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
             }

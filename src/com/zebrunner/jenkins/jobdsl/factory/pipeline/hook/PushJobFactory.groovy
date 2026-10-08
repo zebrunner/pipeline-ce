@@ -41,7 +41,7 @@ public class PushJobFactory extends PipelineFactory {
                 configure addHiddenParameter('repoUrl', 'repository url', repoUrl)
                 configure addHiddenParameter('scmCredentialsId', '', scmCredentialsId)
                 stringParam('branch', this.branch, "SCM repository branch to run against (use 'refs/tags/1.0' to clone by tag)")
-                stringParam('node_label', this.nodeLabel, 'Optional TestNG agent label. Leave empty to use the configured node.')
+                stringParam('node_label', this.nodeLabel, 'Optional agent label. Leave empty to use the configured node.')
                 if (isTestNgRunner) {
                     booleanParam('onlyUpdated', true, 'If chosen, scan will be performed only in case of any change in *.xml suites.')
                 }

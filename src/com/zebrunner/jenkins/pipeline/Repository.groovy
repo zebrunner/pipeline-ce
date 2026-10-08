@@ -226,7 +226,7 @@ class Repository extends BaseObject {
                     registerObject("publish_job", new PublishJobFactory(repoFolder, getPublishScript(), "publish", this.repoUrl, this.branch, this.scmCredentialsId))
                 }
 
-                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", systemJobDesc, this.repoUrl, this.branch, isDockerRunner, this.scmCredentialsId))
+                registerObject("build_job", new BuildJobFactory(repoFolder, getBuildScript(), "build", systemJobDesc, this.repoUrl, this.branch, isDockerRunner, this.scmCredentialsId, extendsClass([com.zebrunner.jenkins.pipeline.runner.maven.Runner])))
             }
 
             logger.debug("before - factoryRunner.run(dslObjects)")

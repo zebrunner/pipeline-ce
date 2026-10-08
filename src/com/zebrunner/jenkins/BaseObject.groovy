@@ -9,8 +9,11 @@ import com.zebrunner.jenkins.pipeline.tools.scm.gitlab.Gitlab
 import com.zebrunner.jenkins.pipeline.tools.scm.bitbucket.BitBucket
 
 import java.nio.file.Paths
+import hudson.BulkChange
 import hudson.model.ParametersAction
 import hudson.model.ParametersDefinitionProperty
+import hudson.model.StringParameterDefinition
+import jenkins.model.Jenkins
 
 import static com.zebrunner.jenkins.Utils.replaceMultipleSymbolsToOne
 import static com.zebrunner.jenkins.Utils.isParamEmpty
@@ -159,8 +162,9 @@ public abstract class BaseObject {
             return nodeMaven
         }
 
-        nodeMaven = "maven"
-        context.node("maven") {
+        def bootstrapLabel = hasMavenLabel() ? "maven" : "built-in"
+        nodeMaven = bootstrapLabel
+        context.node(bootstrapLabel) {
             context.withEnv(getVariables(Configuration.VARIABLES_ENV)) {
                 def configuredNode = context.env[Configuration.ZEBRUNNER_NODE_MAVEN]
                 if (!isParamEmpty(configuredNode)) {
@@ -169,6 +173,36 @@ public abstract class BaseObject {
             }
         }
         return nodeMaven
+    }
+
+    @NonCPS
+    protected boolean hasMavenLabel() {
+        return !Jenkins.get().getLabel("maven").isEmpty()
+    }
+
+    @NonCPS
+    protected boolean addNodeLabelParameter() {
+        def job = context.currentBuild.rawBuild.parent
+        synchronized (job) {
+            def property = job.getProperty(ParametersDefinitionProperty)
+            def definitions = new ArrayList(property?.parameterDefinitions ?: [])
+            if (definitions.any { it.name == 'node_label' }) {
+                return false
+            }
+
+            definitions.add(new StringParameterDefinition('node_label', '', 'Optional agent label. Leave empty to use the configured node.'))
+            def change = new BulkChange(job)
+            try {
+                if (property != null) {
+                    job.removeProperty(property)
+                }
+                job.addProperty(new ParametersDefinitionProperty(definitions))
+                change.commit()
+            } finally {
+                change.abort()
+            }
+            return true
+        }
     }
 
     protected def getVariables(configFile) {
